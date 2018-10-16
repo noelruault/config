@@ -1,0 +1,65 @@
+alias rm="rm -i"
+alias hs='history | grep'
+alias hibernate="sudo systemctl hibernate"
+alias ds_clean="find . -name '.DS_Store' -type f -delete"
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+alias killport='sudo netstat -plten |grep'
+alias zshrc='subl $HOME/.zshrc-config'
+
+# CP command, do rsync if file is a folder or higher than 50MB  // rsync -ah --progress
+
+### Emacs
+alias emacs="/usr/local/bin/emacs"
+
+### GIT
+alias gamod="git ls-files --modified | xargs git add"
+
+### Vagrant
+alias vagrantclean="vagrant box list | cut -f 1 -d ' ' | xargs -L 1 vagrant box remove -f"
+
+
+function myip(){
+    echo ">> public"
+    curl http://ipecho.net/plain;echo
+
+    echo ">> private"
+    ips=($(hostname -I))
+    names=($(ifconfig | grep mtu | cut -d' ' -f1))
+    for (( i=0 ; i <= ${#ips} ; i++ )); do
+        echo "${names[$i]} ${ips[$i]}"
+    done
+
+    # for i "${ips[@]}"; do
+      # echo $i
+    # done
+}
+
+function pro_rebase(){
+    # https://stackoverflow.com/a/927386
+    regex='^[0-9]+$'
+    if [[ $@ =~ $regex ]] ; then
+        git rebase -i HEAD~"$@"
+        echo "Remember to push with --force flag."
+    else
+        echo "How pro_rebase works:"
+        echo "  Put as first param the number of commits you want to cover (1-N)."
+        echo "  e.g: pro_rebase 3  == git rebase -i HEAD~3"
+        echo "  Squash commits or whatever and then push your chages with --force"
+    fi
+}
+
+function search() { find / -name "$@" | echo; }
+function killapp() {
+    if [[ $# -eq 0 ]] ; then
+        echo "[INFO] You need to run this function with the name"
+        echo "of the application to kill as parameter."
+        exit 1
+    else
+        echo '   _   '
+        echo '_\( )/_'
+        echo ' /(O)\  Searching and killing processes...'
+        echo '       '
+        echo $(ps aux | grep "$@" | awk '{print $2}')
+        kill -9 $(ps aux | grep "$@" | awk '{print $2}')
+    fi
+}

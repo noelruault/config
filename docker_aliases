@@ -1,0 +1,4 @@
+export DEFAULT_PROJECT_PATH="$HOME/Projects/masmovil-docker"
+alias dk="$HOME/Projects/masmovil-docker/docker/run.sh $@"
+alias dkclean="sh $HOME/.docker/docker_clean_all.sh"
+alias dkcreate="sh $HOME/.docker/docker_turn_on.sh"
