@@ -1,1 +1,6 @@
-/Users/nruault/Library/Application Support/Sublime Text 3/Packages/User/Ruby.sublime-settings
+// These settings override both User and Default settings for the Ruby syntax
+{
+    "tab_size": 2,
+    "index_files": true,
+    "word_separators": "./\\()\"'-:,.;<>~@#$%^&*|+=[]{}`~"
+}

@@ -1,1 +1,12 @@
-/Users/nruault/Library/Application Support/Sublime Text 3/Packages/User/custom_commands.sublime-keymap
+[
+    {
+        "caption": "NRM: Open Sublime Keymap Settings",
+        "command": "open_dir",
+        "args": {"dir": "${packages}/User/"}
+    },
+    {
+        "caption": "Tasks: Tutorial",
+        "command": "open_file",
+        "args": {"file": "${packages}/PlainTasks/messages/Tutorial.todo"}
+    },
+]

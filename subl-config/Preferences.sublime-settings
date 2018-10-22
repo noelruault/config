@@ -1,1 +1,82 @@
-/Users/nruault/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings
+{
+	"bold_folder_labels": true,
+	"caret_extra_bottom": 0,
+	"caret_extra_top": 0,
+	"caret_extra_width": 1,
+	"caret_style": "wide",
+	"close_windows_when_empty": true,
+	"color_scheme": "Packages/Material Theme/schemes/Material-Theme-Palenight.tmTheme",
+	"detect_slow_plugins": false,
+	"enable_tab_scrolling": false,
+	"ensure_newline_at_eof_on_save": true,
+	"fade_fold_buttons": false,
+	"file_exclude_patterns":
+	[
+		"*.sqlite3",
+		"*.exe",
+		"*.pyc",
+		"*.pyo",
+		"*.dia"
+	],
+	"find_selected_text": true,
+	"folder_exclude_patterns":
+	[
+		".svn",
+		".git",
+		".gitignore",
+		".hg",
+		"CVS",
+		"_build",
+		"dist",
+		"build",
+		"site"
+	],
+	"font_face": "Inconsolata-g for Powerline",
+	"font_options":
+	[
+		"subpixel_antialias",
+		"gray_antialias",
+		"directwrite"
+	],
+	"font_size": 12,
+	"highlight_line": true,
+	"highlight_modified_tabs": false,
+	"ignored_packages":
+	[
+		"Vintage"
+	],
+	"indent_guide_options":
+	[
+		"draw_active"
+	],
+	"index_files": true,
+	"line_padding_bottom": 3,
+	"line_padding_top": 3,
+	"margin": 0,
+	"match_brackets_angle": true,
+	"material_theme_accent_orange": true,
+	"material_theme_contrast_mode": true,
+	"material_theme_small_statusbar": true,
+	"material_theme_small_tab": true,
+	"material_theme_tabs_autowidth": true,
+	"origami_auto_close_empty_panes": true,
+	"rulers":
+	[
+		79
+	],
+	"save_on_focus_lost": false,
+	"shift_tab_unindent": false,
+	"show_encoding": true,
+	"show_line_endings": true,
+	"show_tab_close_buttons": true,
+	"tab_size": 4,
+	"theme": "Material-Theme-Palenight.sublime-theme",
+	"theme_font_options":
+	[
+		"gray_antialias"
+	],
+	"translate_tabs_to_spaces": true,
+	"trim_trailing_white_space_on_save": true,
+	"use_tab_stops": true,
+	"word_wrap": "false"
+}

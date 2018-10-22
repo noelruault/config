@@ -1,1 +1,5 @@
-/Users/nruault/Library/Application Support/Sublime Text 3/Packages/User/Python.sublime-settings
+// These settings override both User and Default settings for the Ruby syntax
+{
+    "tab_size": 4,
+    "index_files": true,
+}
