@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# [INFO]
+# pre-commit-prevent-master hook for git.
+# Hook that prevents the user to push directly to master.
+
+
+echo -e "[PREVENT] --> Init (wait a second)"
+BRANCH=`git rev-parse --abbrev-ref HEAD`
+
+if [ $BRANCH == master ]; then
+    echo -e "[PREVENT] --> ✋ Non shall commit to master!"
+    exit 1
+else
+    echo -e "[PREVENT] --> 👍 Prevent commit to master approved."
+    exit 0
+fi

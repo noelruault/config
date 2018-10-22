@@ -8,7 +8,7 @@ export ZSH=$HOME/.oh-my-zsh
 # it'll load a random theme each time that oh-my-zsh is loaded.
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 # ZSH_THEME="robbyrussell"  # (default)
-ZSH_THEME="spaceship"  # https://github.com/denysdovhan/spaceship-zsh-theme 
+ZSH_THEME="spaceship"  # https://github.com/denysdovhan/spaceship-zsh-theme
 
 
 # Which would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
@@ -35,15 +35,14 @@ source $HOME/.zshrc-config/default_aliases
 
 ## Useful alias
 source $HOME/.zshrc-config/fix_zsh
-
 ## Useful alias
 source $HOME/.zshrc-config/useful_aliases
-
 ## Qvantel useful alias
 source $HOME/.zshrc-config/qvantel_aliases
-
 ### Docker useful alias
 source $HOME/.zshrc-config/docker_aliases
+## Useful macos alias
+source $HOME/.zshrc-config/macosx_aliases
 
 
 # export PATH="/usr/local/opt/sphinx-doc/bin:$PATH"

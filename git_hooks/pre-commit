@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# [INFO]
+# commit-msg hook for git.
+# Hook that runs all files specified, containing hooks with useful checks
+
+HOOKS="pre-commit-prevent-master pre-commit-forbidden pre-commit-ruby-forbidden pre-commit-ruby-rubocop"
+
+for hook in $HOOKS; do
+    if [ -f "$PWD/.git/hooks/$hook" ]; then
+        "$PWD/.git/hooks/$hook"
+        if [ $? != 0 ]; then
+            exit 1
+        fi
+    else
+        echo "Error: file $hook not found."
+        exit 1
+    fi
+done
