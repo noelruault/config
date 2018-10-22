@@ -6,10 +6,9 @@
     rm .git/hooks/pre-commit-rubocop .git/hooks/pre-commit-prevent-master
 
 ### In order to link the hooks to the project and activate them on commit, you will need to make symlinks into .git folder as shown...
-    ln -f $SCRIPTS_PATH/commit-msg .git/hooks/commit-msg
-    ln -f $SCRIPTS_PATH/pre-commit .git/hooks/pre-commit
-    ln -f $SCRIPTS_PATH/pre-commit-rubocop .git/hooks/pre-commit-rubocop
-    ln -f $SCRIPTS_PATH/pre-commit-prevent-master .git/hooks/pre-commit-prevent-master
+    ln -s $SCRIPTS_PATH/commit-msg $PROJECT_PATH.git/hooks/commit-msg
+    ln -s $SCRIPTS_PATH/pre-commit $PROJECT_PATH.git/hooks/pre-commit
+    ln -s $SCRIPTS_PATH/pre-commit-* $PROJECT_PATH.git/hooks/
 
 ### And finally give permissions to the files, to allow them execute on commit::
     chmod u+x .git/hooks/commit-msg

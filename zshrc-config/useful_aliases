@@ -8,6 +8,9 @@ alias zshrc='subl $HOME/.zshrc-config'
 
 # CP command, do rsync if file is a folder or higher than 50MB  // rsync -ah --progress
 
+### Sublime
+alias sublsettings="subl '$(find $HOME -type d -name "*Sublime*Text*" 2>&1 | grep -v "find")/Packages/User'"
+
 ### Emacs
 alias emacs="/usr/local/bin/emacs"
 

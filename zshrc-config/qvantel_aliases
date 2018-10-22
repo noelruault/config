@@ -1,4 +1,4 @@
- alias gom="cd $HOME/Projects/masmovil-web"
+alias gom="cd $HOME/Projects/masmovil-web"
 alias vpnconnect="globalprotect connect --portal vpn-portal.qvantel.net"
 alias vpndisconnect="globalprotect disconnect && globalprotect disconnect --portal vpn-portal.qvantel.net"
 alias qvservers="echo misam, murzim, nekkar, nembus, tureis"
