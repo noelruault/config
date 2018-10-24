@@ -1,6 +1,6 @@
 [
     {
-        "caption": "NRM: Open Sublime Keymap Settings",
+        "caption": "NRM: Open Sublime User Settings",
         "command": "open_dir",
         "args": {"dir": "${packages}/User/"}
     },
@@ -8,5 +8,5 @@
         "caption": "Tasks: Tutorial",
         "command": "open_file",
         "args": {"file": "${packages}/PlainTasks/messages/Tutorial.todo"}
-    },
+    }
 ]

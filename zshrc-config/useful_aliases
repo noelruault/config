@@ -10,7 +10,7 @@ alias zshrc='subl $HOME/.zshrc-config'
 
 ### Sublime
 alias sublsettingsf="subl '$(find $HOME -type d -name "*Sublime*Text*" 2>&1 | grep -v "find")/Packages/User/'*sublime*"
-alias sublsettings="subl '$(find $HOME -type d -name "*Sublime*Text*" 2>&1 | grep -v "find")/Packages/User/'*sublime*"
+alias sublsettings="subl '$(find $HOME -type d -name "*Sublime*Text*" 2>&1 | grep -v "find")/Packages/User/'"
 
 ### Emacs
 alias emacs="/usr/local/bin/emacs"

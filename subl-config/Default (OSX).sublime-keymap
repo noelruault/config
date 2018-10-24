@@ -1,7 +1,4 @@
 [
-	{
-    	"keys": ["cmd+shift+c"],
-    	"command": "copy_path_to_clipboard"
-  	},
-  	{ "keys": ["ctrl+0"], "command": "reset_font_size" },
+    { "keys": ["alt+shift+c"], "command": "copy_path" },
+    { "keys": ["ctrl+0"], "command": "reset_font_size" }
 ]
