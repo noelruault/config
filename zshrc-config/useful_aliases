@@ -3,8 +3,9 @@ alias hs='history | grep'
 alias hibernate="sudo systemctl hibernate"
 alias ds_clean="find . -name '.DS_Store' -type f -delete"
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
-alias killport='sudo netstat -plten |grep'
+#alias killport='sudo netstat -plten |grep'  # Only for LINUX
 alias zshrc='subl $HOME/.zshrc-config'
+alias wanip='dig +short myip.opendns.com @resolver1.opendns.com'
 
 # CP command, do rsync if file is a folder or higher than 50MB  // rsync -ah --progress
 

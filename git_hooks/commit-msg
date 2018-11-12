@@ -1,0 +1,144 @@
+#!/usr/bin/env python
+
+""" commit-msg hook for git.
+
+Hook that check and alter commit message content based
+on given rules.
+
+This uses concept of project tagging, if there environmental variable
+PROJECT_TAGS defined or hard coded TAGS variable then it takes
+it's value as possible tag words.
+
+Example:
+    PROJECT_TAGS=ISSUES, anotherissue
+
+Commits themselves should use convention::
+
+    'TAG-1234: Commit message'
+
+To us branch as basis for commit message creation.
+Then they should be in format::
+
+    TAG-1234_some_optional_text
+
+
+This should be installed as commit-msg into .git/hooks/commit-msg
+"""
+
+import sys
+import os
+import subprocess
+
+# Given example of common MM tags.
+TAGS = ["YCO", "YTS", "YDR"]
+# Given example of how to set (pythonic way) MM tags.
+#     os.environ["PROJECT_TAGS"] = "YCO YTS YDR"
+# Given example of how to set (bash way) MM tags.
+#     export PROJECT_TAGS="YCO YTS YDR"
+
+
+def ask_for_tags():
+    possible_tags = raw_input(
+        "Add tags that could be being used. Split them whith spaces")
+    os.environ["PROJECT_TAGS"] = possible_tags
+
+
+def get_tags():
+    """Get project tags from PROJECT_TAGS environmental variable. """
+    tags = TAGS or os.getenv('PROJECT_TAGS', '').split()
+    if not tags:
+        ask_for_tags()
+    return tags
+
+
+def get_current_branch_name():
+    return str(subprocess.check_output(
+        ['git', 'rev-parse', '--abbrev-ref', 'HEAD']))
+
+
+def _get_commit_message_file():
+    # The first argument is the filename where lies commit message
+    return open(sys.argv[1], 'r+')
+
+
+def read_commit_message():
+    """ Read original commit message from file. """
+    with _get_commit_message_file() as f:
+        return f.read().strip()
+
+
+def write_commit_message(message):
+    """ Write new commit message to file. """
+    with _get_commit_message_file() as f:
+        f.seek(0)
+        f.write(message)
+        f.truncate()
+
+
+def parse_tag(message):
+    """ Parse possible tag from message. """
+    return message.split('-')[0].strip()
+
+
+def parse_tag_and_num_from_branch(branch_name):
+    return branch_name.split('_')[0].strip()
+
+
+def parse_tag_from_tagnum(tagnum):
+    return tagnum.split('-')[0].strip()
+
+
+def is_tagged(message):
+    """ Check if commit message has already a tag in it. """
+    tags = get_tags()
+    possible_tag = parse_tag(message)
+    return any(possible_tag == tag for tag in tags)
+
+
+def get_tagnum_from_branch():
+    tags = get_tags()
+    branch_name = get_current_branch_name()
+    branch_tagnum = parse_tag_and_num_from_branch(branch_name)
+
+    if parse_tag_from_tagnum(branch_tagnum) in tags:
+        return branch_tagnum
+    # TODO: Store tags never used before?
+
+
+def write_tagnum(message, tag=None):
+    """ Write tagnum to commit message.
+
+    Add tag if exists.
+    """
+    if tag is not None:
+        write_commit_message("{}: {}".format(tag, message))
+
+
+def alter_message(message):
+    """ Alter message content if needed
+
+    tag is not added if it cannot be parsed from branch,
+    or it already exists.
+    """
+    if not is_tagged(message) and get_tagnum_from_branch():
+        info_branch_rename = (
+            '\033[93m' + 'Commit will be renamed as: "' +
+            str(get_tagnum_from_branch()) +
+            ': ' + str(message) + '"' + '\033[0m'
+        )
+        print info_branch_rename
+        write_tagnum(message, get_tagnum_from_branch())
+
+
+def run():
+    message = read_commit_message()
+    alter_message(message)
+
+
+if __name__ == '__main__':
+    try:
+        run()
+        sys.exit(0)
+    except Exception as e:
+        print(str(e))
+        sys.exit(1)
