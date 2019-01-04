@@ -1,4 +1,3 @@
-zshrc-config/docker_aliases # After installing brew install grep
 PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
 # MANPATH="/usr/local/opt/grep/libexec/gnuman:$MANPATH"
 alias killport='netstat -vanp tcp | grep'
