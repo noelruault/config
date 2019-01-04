@@ -1,3 +1,8 @@
+-------------------- Runtime --------------------
+# start=$(($(date +'%s * 1000 + %-N / 1000000')))
+start=$(python -c 'from time import time; print(int(round(time() * 1000)))')
+-------------------- Runtime --------------------
+
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
@@ -16,7 +21,7 @@ ZSH_THEME="spaceship"  # https://github.com/denysdovhan/spaceship-zsh-theme
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-	git
+    git
     fzf-zsh  # https://github.com/junegunn/fzf
     docker
     zsh-autosuggestions  # https://github.com/zsh-users/zsh-autosuggestions#oh-my-zsh
@@ -43,6 +48,8 @@ source $HOME/.zshrc-config/qvantel_aliases
 source $HOME/.zshrc-config/docker_aliases
 ## Useful macos alias
 source $HOME/.zshrc-config/macosx_aliases
+## Useful ubuntu/fedora alias
+source $HOME/.zshrc-config/linux_aliases
 
 
 # export PATH="/usr/local/opt/sphinx-doc/bin:$PATH"
@@ -53,3 +60,8 @@ source $HOME/.zshrc-config/macosx_aliases
 SPACESHIP_BATTERY_ALWAYS_SHOW=false
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+-------------------- Runtime --------------------
+# end=$(($(date +'%s * 1000 + %-N / 1000000'))); runtime=$((end-start)); echo "Runtime of zshrc was $runtime ms."
+end=$(python -c 'from time import time; print(int(round(time() * 1000)))'); runtime=$((end-start)); echo "Runtime of zshrc was $runtime ms."
+-------------------- Runtime --------------------
