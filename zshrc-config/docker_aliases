@@ -1,4 +1,5 @@
 export DEFAULT_PROJECT_PATH="$HOME/Projects/masmovil-dockerize"
 alias dk="$HOME/Projects/masmovil-dockerize/docker/run.sh $@"
-alias dkclean="sh $HOME/.docker/docker_clean_all.sh"
-alias dkcreate="sh $HOME/.docker/docker_turn_on.sh"
+alias dkclean="sh $HOME/.zshrc-config/docker/docker_clean_all.sh"
+alias dkcreate="sh $HOME/.zshrc-config/docker/docker_turn_on.sh"
+alias dklightclean="sh $HOME/.zshrc-config/docker/docker_light_clean.sh"
