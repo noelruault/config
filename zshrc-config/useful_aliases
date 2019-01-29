@@ -19,6 +19,8 @@ alias emacs="/usr/local/bin/emacs"
 
 ### GIT
 alias gamod="git ls-files --modified | xargs git add"
+# Remove all your local git branches but keep master and the current branch:
+alias greset="git branch | egrep -v "(master|\*)" | xargs git branch -D"
 
 ### Vagrant
 alias vagrantclean="vagrant box list | cut -f 1 -d ' ' | xargs -L 1 vagrant box remove -f"
