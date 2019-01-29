@@ -8,12 +8,11 @@ alias zshrc='subl $HOME/.zshrc-config'
 alias wanip='dig +short myip.opendns.com @resolver1.opendns.com'
 alias python='python3'
 alias gos='cd ~/Projects/stitch_project'
-
 # CP command, do rsync if file is a folder or higher than 50MB  // rsync -ah --progress
 
-### Sublime // !WARNING: Slows runtime.
+### Sublime
 # alias sublsettingsf="subl '$(find $HOME -type d -name "*Sublime*Text*" 2>&1 | grep -v "find")/Packages/User/'*sublime*"
-# alias sublsettings="subl '$(find $HOME -type d -name "*Sublime*Text*" 2>&1 | grep -v "find")/Packages/User/'"
+# alias sublsettings='subl '$(find $HOME -type d -name "*Sublime*Text*" 2>&1 | grep -v "find")/Packages/User/''
 
 ### Emacs
 alias emacs="/usr/local/bin/emacs"
@@ -41,7 +40,6 @@ function myip(){
     # done
 }
 
-
 function pro_rebase(){
     # https://stackoverflow.com/a/927386
     regex='^[0-9]+$'
@@ -55,7 +53,6 @@ function pro_rebase(){
         echo "  Squash commits or whatever and then push your chages with --force"
     fi
 }
-
 
 function search() { find / -name "$@" | echo; }
 function killapp() {
