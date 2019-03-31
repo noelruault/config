@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# [INFO]
+# commit-msg hook for git.
+# Hook that runs all files specified, containing hooks with useful checks
+# ################## GLOBAL PRE-COMMITS ##################
+# https://coderwall.com/p/jp7d5q/create-a-global-git-commit-hook
+
+HOOKS="pre-commit-prevent-master pre-commit-forbidden"
+
+for hook in $HOOKS; do
+	path_to_hook="$HOME/.config/git/hooks/$hook"
+    if [ -f $path_to_hook ]; then  # CHECK if hook exists.
+        $path_to_hook  # RUN hook.
+        if [ $? != 0 ]; then
+            exit 1
+        fi
+    else
+        echo "Error: file $path_to_hook not found."
+        exit 1
+    fi
+done
