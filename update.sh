@@ -1,3 +1,12 @@
 #/bin/bash
-cd subl-config && bash update.sh
-cd ../zshrc-config && bash update.sh
+
+# Link default zsh path to this one.
+ln -s $HOME/.zshrc-config/ $HOME/.config/
+mv $HOME/.zshrc-config $HOME/zshrc-config
+
+
+
+
+
+
+

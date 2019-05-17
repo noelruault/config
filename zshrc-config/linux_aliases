@@ -1,1 +1,1 @@
-alias killport='sudo netstat -plten |grep'
+alias killport='sudo netstat -plten | grep'

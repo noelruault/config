@@ -1,5 +1,15 @@
-PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
-# MANPATH="/usr/local/opt/grep/libexec/gnuman:$MANPATH"
 alias killport='netstat -vanp tcp | grep'
 alias ipython='python -m IPython'
 alias notebook='/anaconda3/bin/jupyter_mac.command ; exit;'
+
+# GO Aliases
+alias go='/usr/local/go/bin/go'
+alias gosrc='cd $GOPATH/src'
+alias gobin='cd $GOPATH/src'
+
+
+function whoamipro(){
+    echo '*** $whoami ***' && whoami
+    echo '*** $groups $(whoami) ***' && groups $(whoami) | cut -d' ' -f1
+    echo '*** $id ***' && id
+}

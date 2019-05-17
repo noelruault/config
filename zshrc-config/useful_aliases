@@ -7,7 +7,7 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 alias zshrc='subl $HOME/.zshrc-config'
 alias wanip='dig +short myip.opendns.com @resolver1.opendns.com'
 alias python='python3'
-alias gos='cd ~/Projects/stitch_project'
+
 # CP command, do rsync if file is a folder or higher than 50MB  // rsync -ah --progress
 
 ### Sublime
@@ -20,26 +20,30 @@ alias emacs="/usr/local/bin/emacs"
 ### GIT
 alias gamod="git ls-files --modified | xargs git add"
 # Remove all your local git branches but keep master and the current branch:
-alias greset="git branch | egrep -v "(master|\*)" | xargs git branch -D"
+alias greset='git branch | egrep -v "(master|\*)" | xargs git branch -D'
 
 ### Vagrant
 alias vagrantclean="vagrant box list | cut -f 1 -d ' ' | xargs -L 1 vagrant box remove -f"
 
-
+## Good grep stuff https://www.thegeekstuff.com/2011/10/grep-or-and-not-operators/
 function myip(){
-    echo ">> public"
+    echo ">> public ip / curl <remote_url>"
     curl http://ipecho.net/plain;echo
 
-    echo ">> private"
-    ips=($(hostname -I))
-    names=($(ifconfig | grep mtu | cut -d' ' -f1))
-    for (( i=0 ; i <= ${#ips} ; i++ )); do
-        echo "${names[$i]} ${ips[$i]}"
-    done
-
+    echo ">> private ip / ipconfig"
+    ## LINUX  https://stackoverflow.com/a/24634284/4349318
+    # ips=($(hostname -I))
+    # names=($(ifconfig | grep mtu | cut -d' ' -f1))
+    # for (( i=0 ; i <= ${#ips} ; i++ )); do
+    #     echo "${names[$i]} ${ips[$i]}"
+    # done
     # for i "${ips[@]}"; do
       # echo $i
     # done
+    ## MACOS
+    ipconfig getifaddr en0  # ifconfig | grep "inet " 
+    echo ">> default gateway (usually router) / netstat"
+    netstat -nr | grep -E "default.*en0" --color=never
 }
 
 function pro_rebase(){
@@ -71,3 +75,13 @@ function killapp() {
         kill -9 $(ps aux | grep "$@" | awk '{print $2}')
     fi
 }
+
+alias awesome='cat ~/.zshrc-config/awesome.txt'
+alias githooksconfig='git config --global core.hooksPath ~/.config/git/hooks/'
+
+
+# CD ANYWHER aliases
+alias gow='cd ~/Work'
+alias gopath='cd $(go env GOPATH)'
+alias gof='cd $(go env GOPATH)/src/bitbucket.org/outcomex/farmdeck'
+alias gosrc='cd $(go env GOPATH)/src/'

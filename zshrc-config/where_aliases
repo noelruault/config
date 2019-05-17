@@ -1,0 +1,76 @@
+# whereis commands
+alias paths\?='echo /etc/paths/ && echo /etc/paths.d/ && echo $HOME/.bashrc && echo $HOME/.zshrc'
+alias hosts\?='echo /etc/hosts && echo ~/.ssh/config'
+
+# how commands
+alias virtualenv\?='echo """
+	1. virtualenv <venv_name>
+	2. source <venv_name>/bin/activate
+	3. deactivate
+	"""
+'
+
+alias tar\?='echo "tar -zxvf <file_name>.tar"'
+
+
+
+alias npm\?='echo """
+	All packages are in node_modules folder.
+	npm list <package>
+	npm view <package> version
+	"""
+'
+
+alias django-migrations\?='echo """
+	[ROLLBACK]
+	python manage.py showmigrations
+	python manage.py migrate <app_name> <old_migration>
+	rm <app_name>/migrations/<last_migration>.py
+	[MIGRATE]
+	python manage.py makemigrations <app_name> --name=<name>  # python manage.py makemigrations
+	python manage.py migrate <app_name>  # python manage.py migrate 
+
+	[[Source: https://stackoverflow.com/questions/32123477/django-revert-last-migration]]
+	"""
+'
+
+# function django\?(){
+# 	echo '[MIGRATIONS]'
+# 	django-migrations?
+# }
+
+
+alias git\?='echo"""
+	(1)git fetch origin
+	(1)git reset origin
+	(2)git fetch origin
+	(2)git reset --hard origin
+	# git reset --hard HEAD
+	[[Source:https://stackoverflow.com/a/102309/4349318]]
+
+"""'
+
+
+alias postgres\?='echo """
+	[	]
+
+	- psql [-U/--username] <user_name> [(optional)--dbname=]<database_name>
+	- psql ... [-W/--password] # force password prompt (should happen automatically)
+
+	\dt ; \dt+  # shows all tables in the current schema:
+
+	e.g:
+	SELECT * FROM portal_user WHERE user_id = 1;
+	UPDATE portal_user SET password = abc1234... WHERE user_id = 1;
+
+	UPDATE <table> SET <column> = <value> WHERE <column> = <value>;
+
+
+	"""
+'
+
+alias crypto\?='go run ~/.zshrc-config/crypto.go'
+
+alias subl\?='echo"""
+	https://superuser.com/questions/1100918/how-can-i-prevent-the-iterm2-hotkey-window-from-losing-focus
+"""'
