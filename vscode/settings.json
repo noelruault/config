@@ -1,0 +1,79 @@
+{
+    "window.zoomLevel": 0,
+    "editor.formatOnPaste": true,
+    "editor.multiCursorModifier": "ctrlCmd",
+    "editor.snippetSuggestions": "top",
+    "[python]": {
+        "editor.rulers": [
+            79,
+            120
+        ]
+    },
+    "[go]": {
+        "editor.rulers": [
+            80
+        ],
+        // "editor.formatOnSave": true,
+    },
+    "editor.suggestSelection": "first",
+    // "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+    "breadcrumbs.enabled": true,
+    "files.trimTrailingWhitespace": false,
+    "files.trimFinalNewlines": true,
+    "editor.minimap.enabled": false,
+    "workbench.colorCustomizations": {
+
+    },
+    "python.jediEnabled": false,
+    "todo-tree.tags":[
+        "TODO",
+        "FIXME",
+        "WHY",
+        "HOWTO",
+    ],
+    "todo-tree.customHighlight": {
+        // https://github.com/Gruntfuggly/todo-tree
+        "TODO": {
+            "type": "tag",
+            "background": "yellow",
+            "opacity": 85,
+        },
+        "FIXME": {
+            "type": "tag",
+            "background": "#E979B2",
+            "icon": "tools",
+            "opacity": 85,
+        },
+        "WHY": {
+            "icon": "book", // https://octicons.github.com/
+            "type": "text",
+            "iconColour": "grey",
+            "background": "white",
+            "opacity": 60,
+        },
+        "HOWTO": {
+            "icon": "book",
+            "type": "text",
+            "iconColour": "grey",
+            "background": "white",
+            "opacity": 60,
+        },
+    },
+    "go.delveConfig": {
+        "dlvLoadConfig": {
+            "followPointers": true,
+            "maxVariableRecurse": 1,
+            "maxStringLen": 200,
+        }
+    },
+    "workbench.colorTheme": "Atom One Dark",
+    "todo-tree.general.tags": [
+        "TODO",
+        "FIXME",
+        "WHY",
+        "HOWTO"
+    ],
+    "sync.gist": "96c000cd39491f85f7bad4155f9d3eac",
+    "sync.autoUpload": false,
+    "sync.forceUpload": false
+}

@@ -21,7 +21,7 @@ import (
 	"time"
 )
 
-type Currencies struct {
+type currencies struct {
 	TrxValue struct {
 		Eur float32 `json:"EUR"`
 	} `json:"TRX"`
@@ -61,7 +61,7 @@ func main() {
 		log.Fatal(readErr)
 	}
 
-	mytotal := &Currencies{}
+	mytotal := &currencies{}
 	json.Unmarshal([]byte(body), &mytotal)
 
 	total :=

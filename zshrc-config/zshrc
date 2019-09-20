@@ -23,6 +23,7 @@ plugins=(
     docker
     zsh-autosuggestions  # https://github.com/zsh-users/zsh-autosuggestions#oh-my-zsh
     zsh-syntax-highlighting  # https://github.com/zsh-users/zsh-syntax-highlighting
+    golang
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -40,13 +41,13 @@ source $HOME/.zshrc-config/fix_zsh
 ## Useful aliases
 source $HOME/.zshrc-config/useful_aliases
 ## Qvantel useful aliases
-source $HOME/.zshrc-config/qvantel_aliases
+source $HOME/.zshrc-config/outcomex_aliases
 ### Docker useful aliases
 source $HOME/.zshrc-config/docker_aliases
 ## Useful macos aliases
-source $HOME/.zshrc-config/macosx_aliases
+source $HOME/.zshrc-config/macos/macosx_aliases
 ## Useful whereis aliases
-source $HOME/.zshrc-config/where_aliases
+source $HOME/.zshrc-config/howto_aliases
 ## Useful hacky aliases
 source $HOME/.zshrc-config/hacky_aliases
 

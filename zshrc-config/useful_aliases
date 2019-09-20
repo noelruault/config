@@ -1,14 +1,16 @@
 alias rm="rm -i"
+alias python='python3'
 alias hs='history | grep'
+alias zshrc='code $HOME/.zshrc-config'
 alias hibernate="sudo systemctl hibernate"
 alias ds_clean="find . -name '.DS_Store' -type f -delete"
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 #alias killport='sudo netstat -plten |grep'  # Only for LINUX
-alias zshrc='subl $HOME/.zshrc-config'
 alias wanip='dig +short myip.opendns.com @resolver1.opendns.com'
-alias python='python3'
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+alias localhosts='ifconfig | grep "inet " | grep -v 127.0.0.1'  # https://stackoverflow.com/a/4779992
 
 # CP command, do rsync if file is a folder or higher than 50MB  // rsync -ah --progress
+alias cp='rsync -ah --progress'
 
 ### Sublime
 # alias sublsettingsf="subl '$(find $HOME -type d -name "*Sublime*Text*" 2>&1 | grep -v "find")/Packages/User/'*sublime*"
@@ -25,7 +27,6 @@ alias greset='git branch | egrep -v "(master|\*)" | xargs git branch -D'
 ### Vagrant
 alias vagrantclean="vagrant box list | cut -f 1 -d ' ' | xargs -L 1 vagrant box remove -f"
 
-## Good grep stuff https://www.thegeekstuff.com/2011/10/grep-or-and-not-operators/
 function myip(){
     echo ">> public ip / curl <remote_url>"
     curl http://ipecho.net/plain;echo
@@ -41,7 +42,7 @@ function myip(){
       # echo $i
     # done
     ## MACOS
-    ipconfig getifaddr en0  # ifconfig | grep "inet " 
+    ipconfig getifaddr en0  # ifconfig | grep "inet "
     echo ">> default gateway (usually router) / netstat"
     netstat -nr | grep -E "default.*en0" --color=never
 }
@@ -61,27 +62,41 @@ function pro_rebase(){
 }
 
 function search() { find / -name "$@" | echo; }
-function killapp() {
-    if [[ $# -eq 0 ]] ; then
-        echo "[INFO] You need to run this function with the name"
-        echo "of the application to kill as parameter."
-        exit 1
-    else
-        echo '   _   '
-        echo '_\( )/_'
-        echo ' /(O)\  Searching and killing processes...'
-        echo '       '
-        echo $(ps aux | grep "$@" | awk '{print $2}')
-        kill -9 $(ps aux | grep "$@" | awk '{print $2}')
-    fi
-}
 
 alias awesome='cat ~/.zshrc-config/awesome.txt'
 alias githooksconfig='git config --global core.hooksPath ~/.config/git/hooks/'
 
+### GOLANG
+# alias gotest='go test ./... -p 1 -v'
+# TODO:
+# https://stackoverflow.com/a/30033822/4349318
+gotest(){ color : string }{
+    color
+    : string color
 
-# CD ANYWHER aliases
+    if [[ "$color" != "color" ]]
+        then
+            go test ./... -p 1 -v \
+            | sed ''/PASS/s//$(printf "\033[32mPASS\033[0m")/'' \
+            | sed ''/FAIL/s//$(printf "\033[31mFAIL\033[0m")/'' # \
+            #| GREP_COLOR="01;33" egrep --color=always '\s*[a-zA-Z0-9\-_.]+[:][0-9]+[:]|^'
+    fi
+    if [[ "$color" != "" ]]
+        then
+        go test ./... -p 1 -v
+    fi
+}
+gocover () {
+  local t=$(mktemp -t cover)
+  go test $COVERFLAGS -coverprofile=$t $@ && go tool cover -func=$t && unlink $t
+}
+# for pkg in *; do go test "./$pkg"; done
+# go clean -testcache # https://golang.org/pkg/cmd/go/internal/clean/
+
+# CD ANYWHERE aliases
 alias gow='cd ~/Work'
 alias gopath='cd $(go env GOPATH)'
-alias gof='cd $(go env GOPATH)/src/bitbucket.org/outcomex/farmdeck'
 alias gosrc='cd $(go env GOPATH)/src/'
+
+
+alias crypto\?='go run ~/.zshrc-config/crypto.go &'

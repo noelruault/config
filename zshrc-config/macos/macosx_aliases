@@ -1,0 +1,53 @@
+
+alias ipython='python -m IPython'
+alias notebook='/anaconda3/bin/jupyter_mac.command ; exit;'
+
+# GO Aliases
+alias go='/usr/local/go/bin/go'
+alias gosrc='cd $HOME/go/src'
+alias gobin='cd $HOME/go/bin'
+
+
+function whoamipro(){
+    echo '*** $whoami ***' && whoami
+    echo '*** $groups $(whoami) ***' && groups $(whoami) | cut -d' ' -f1
+    echo '*** $id ***' && id
+}
+
+
+SPIDER="""
+    _
+ _\( )/_  Searching and killing
+  /(O)\   service...
+"""
+NO_PARAM_ERROR="""
+[INFO]: You need to run this function with the name
+        of the application to kill as parameter.
+ """
+
+function killapp() {
+    if [[ -z "$1" ]]; then
+        echo $NO_PARAM_ERROR
+        return
+    else
+        echo $SPIDER
+        echo $(ps aux | grep "$@" | awk '{print $2}')
+        kill -9 $(ps aux | grep "$@" | awk '{print $2}')
+    fi
+}
+
+function killport() {
+    if [[ -z "$1" ]]; then
+        echo $NO_PARAM_ERROR
+        return
+    else
+        echo $SPIDER
+        echo $(netstat -vanp tcp| grep "$@" | awk '{print $9}')
+        kill -9 $(netstat -vanp tcp| grep "$@" | awk '{print $9}')
+    fi
+}
+
+# /Users/nruault/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/highlighters/brackets/brackets-highlighter.zsh
+
+### How to use Terminal to send keystrokes?
+## osascript -e 'tell application "System Events" to keystroke "q" using {control down, command down}'

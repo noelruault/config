@@ -6,21 +6,25 @@ PATH="$PATH:/usr/local/opt/fzf/bin"  # fuzzy finder: https://github.com/junegunn
 PATH="$PATH:/usr/local/opt/grep/libexec/gnubin"  # Using another grep function
 # PATH="$PATH:/opt/X11/bin"  # Quartz: https://www.xquartz.org/Developer-Info.html
 
+### SET PROFILE ###
+source /etc/profile # System-wide .profile for sh(1)
+
 NPM_CONFIG_PREFIX=~/.npm-global
 
 ### GO ###
-PATH="$PATH:$HOME/go/bin"
-# seems that gopaths are in 'go env' so are not required
+# export GOPATH=$HOME/go
+# export PATH=$PATH:/usr/local/go/bin
+# (gopaths are in 'go env')
+
 
 ### ZSH advice (?)###
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 # export PATH="/usr/local/opt/sphinx-doc/bin:$PATH"
 
-
 export PATH
 
-
+# TODO: Code here an IF to check if fzf exists and prints and error if not.
 export FZF_BASE=/usr/local/bin/fzf  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/fzf
 # export GOPATH=$(/usr/local/go/bin/go env GOPATH)
 # MANPATH="/usr/local/opt/grep/libexec/gnuman:$MANPATH"; export MANPATH

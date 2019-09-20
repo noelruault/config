@@ -1,10 +1,8 @@
-export DEFAULT_PROJECT_PATH="$HOME/Projects/masmovil-dockerize"
-alias dk="$HOME/Projects/masmovil-dockerize/docker/run.sh $@"
+alias dk="$HOME/<PATH>/run.sh $@"
 alias dkclean="sh $HOME/.zshrc-config/docker/docker_clean_all.sh"
 alias dkcreate="sh $HOME/.zshrc-config/docker/docker_turn_on.sh"
 alias dklightclean="sh $HOME/.zshrc-config/docker/docker_light_clean.sh"
 alias dkstatus="docker ps -q | xargs  docker stats --no-stream"
-alias localhosts='ifconfig | grep "inet " | grep -v 127.0.0.1'  # https://stackoverflow.com/a/4779992
 alias unsetkube='kubectl config unset current-context'
 alias dkprune='docker system prune --volumes'
 
@@ -16,21 +14,18 @@ function dklist(){
 
 
 # https://stackoverflow.com/a/20352563/4349318
-# Start a simple SMTP server with Python like so:  
+# Start a simple SMTP server with Python like so:
 # 	$ python -m smtpd -n -c DebuggingServer localhost:1025
-# 		TIP: Enter to the container through bash 
+# 		TIP: Enter to the container through bash
 # 		(docker exec -it -u root <container_name> bash) and run the python command
 
 
-
-alias dkps='docker ps --format "table {{.ID}}\t{{.Image}}\t{{.Ports}}\t{{.Names}}"' 
+alias dkps='docker ps --format "table {{.ID}}\t{{.Image}}\t{{.Ports}}\t{{.Names}}"'
 # You can put this into ~/.docker/config.json to make it the default format.
+alias dki='echo "\n___DOCKER IMAGES____ " && docker images -a && echo "\n___DOCKER COMPOSE IMAGES____ " && docker-compose images'
 
 
-alias dki='echo "\n___DOCKER COMPOSE IMAGES____ " && docker images -a && echo "\n___DOCKER COMPOSE IMAGES____ " && docker-compose images'
-
-
-#### 
+####
 # DOCKER PERMISSION ISSUES?
 # - docker-compose run --rm --service-ports -u root devenv-node-cp
 # - docker run -u root devenv-node-cp

@@ -11,3 +11,8 @@
 **Remove dotfile:**
 
 ```$ mv $HOME/.zshrc-config $HOME/zshrc-config```
+
+TODO:
+
+- iTerm2 navigation guide?
+- Personal folder (store awesome, crypto, gofarm... etc.)

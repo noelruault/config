@@ -1,0 +1,295 @@
+# ========================
+# TODO
+# Function that takes the name of each function and makes it an alias...
+# function hello()
+# for each $(grep 'alias' | awk '{print $2}'){
+#	alias X\?
+# }
+# ========================
+
+# ========================
+# Function to display howto possibilities by typing 'howto?'
+function howto_possibilities(){
+	grep -E '^alias.*\?' /Users/nruault/.zshrc-config/howto_aliases | awk '{print $2}' | awk -F'=' '{print $1}';
+}
+
+alias howto\?='howto_possibilities'
+# ========================
+
+# ====HOW-TO Commands=====
+
+alias paths\?='echo /etc/paths/ && echo /etc/paths.d/ && echo $HOME/.bashrc && echo $HOME/.zshrc'
+alias hosts\?='echo /etc/hosts && echo ~/.ssh/config'
+
+alias virtualenv\?='virtualenv_doc'
+function virtualenv_doc(){
+	echo """
+	1. virtualenv <venv_name>
+	2. source <venv_name>/bin/activate
+	3. deactivate
+	"""
+}
+
+alias tar\?='tar_doc'
+function tar_doc(){
+	echo "tar -zxvf <file_name>.tar"
+}
+
+alias npm\?='npm_doc'
+function npm_doc(){
+	echo """
+	All packages are in node_modules folder.
+	npm list <package>
+	npm view <package> version
+	"""
+}
+
+alias django-migrations\?='django-migrations_doc'
+function django-migrations_doc(){
+	echo """
+	[ROLLBACK]
+	python manage.py showmigrations
+	python manage.py migrate <app_name> <old_migration>
+	rm <app_name>/migrations/<last_migration>.py
+
+	[MIGRATE]
+	python manage.py makemigrations <app_name> --name=<name>  # python manage.py makemigrations
+	python manage.py migrate <app_name>  # python manage.py migrate
+
+	[[Source: https://stackoverflow.com/questions/32123477/django-revert-last-migration]]
+	"""
+}
+
+alias git\?='git_doc'
+function git_doc() {
+	echo """
+	(1) git fetch origin
+	(1) git reset origin
+	(2) git fetch origin
+	(2) git reset --hard origin
+	(?) git reset --hard HEAD
+	# Remove all untracked files Git
+	git clean -df
+	#	-d  :remove whole directories
+	# 	-f  :force
+	[[Source: https://stackoverflow.com/a/102309/4349318]]
+	"""
+}
+
+alias psql\?='postgres_doc'
+alias postgres\?='postgres_doc'
+function postgres_doc() {
+	echo """
+	[ https://hackernoon.com/dont-install-postgres_docker-pull-postgres-bee20e200198 ]
+
+	Current DB:
+	- SELECT current_database();
+
+	- psql [-U/--username] <user_name> [(optional)--dbname=]<database_name>
+	- psql ... [-W/--password] # force password prompt (should happen automatically)
+
+	\dt ; \dt+  	# shows all tables in the current schema
+	\d <table_name> # shows a table and its rules
+	SELECT * from pg_rules; # shows all rules in the database
+
+	e.g:
+	SELECT * FROM portal_user WHERE user_id = 1;
+	UPDATE portal_user SET password = abc1234... WHERE user_id = 1;
+
+	UPDATE <table> SET <column> = <value> WHERE <column> = <value>;
+
+
+	DELETE ALL TABLES:
+	- drop schema public cascade;
+	- create schema public;
+	"""
+}
+
+alias pkg\?='pkg_doc'
+function pkg_doc() {
+	echo """
+	pkgutil --pkgs # list all installed packages
+	pkgutil --pkgs | grep -i {keyword}
+	pkgutil --pkg-info package-name.pkg # find the package location
+	pkgutil --files package-name.pkg # list the packages installed files
+
+	locate psql | grep /bin
+
+	[[Source: https://stackoverflow.com/a/27546100/4349318]]
+	"""
+}
+
+alias farmdeck\?='farmdeck_doc'
+function farmdeck_doc() {
+	echo """
+	docker-compose run --rm --service-ports --name farmdeck farmdeck
+	go build -mod=vendor ./cmd/farmdeck && ./farmdeck -v
+
+	[[Source: https://bitbucket.org/outcomex/farmdeck/src/sensors/]]
+	"""
+}
+
+alias diskutil\?='diskutil_doc'
+function diskutil_doc() {
+	echo """
+	diskutil list
+
+	diskutil unmount 		/dev/diskXYZ
+			 unmountDisk	...
+			 eject			...
+
+	diskutil eraseDisk FAT32 SDCARD /dev/diskXYZ
+
+	[[Docs: https://www.dssw.co.uk/reference/diskutil.html]]
+	"""
+}
+
+alias dd\?='dd_doc'
+function dd_doc() {
+	echo """
+	dd if=/<path>/<file.iso> of=/dev/diskXYZ status=progress
+	"""
+}
+
+alias thread\?='thread_doc'
+function thread_doc(){
+	echo """
+	> means truncate and write
+	>> means append
+	( appending to or writing to /dev/null has the same net effect )
+
+	2>&1 redirects standard error STDERR (2) to standard output STDOUT (1),
+	which then discards it as well since standard output has already been redirected.
+
+	[[Source: https://stackoverflow.com/a/10508862/4349318]]
+	"""
+}
+
+alias docker\?='docker_doc'
+function docker_doc(){
+	echo """
+	docker exec -it <container1> ping <container2> # names in docker ps and docker compose
+
+	try dkps & dki to inspect containers and images, in a cleaner way.
+	#####
+	# DOCKER PERMISSION ISSUES?
+	# - docker-compose run --rm --service-ports -u root devenv-node-cp
+	# - docker run -u root devenv-node-cp
+	"""
+}
+alias grep\?='grep_doc'
+function grep_doc(){
+	echo """
+	[[Docs:]] https://www.thegeekstuff.com/2011/10/grep-or-and-not-operators/
+	"""
+}
+alias bashrc\?='bashrc_doc'
+function bashrc_doc(){
+	echo """
+    ## interactive login shell, or with --login
+    /etc/profile
+    ~/.bash_profile
+    ~/.bash_login
+    ~/.profile
+    # exit builtin command: ~/.bash_logout
+
+    ## interactive non-login shell
+    ~/.bashrc
+
+    man path_helper
+    $ /usr/libexec/path_helper  # Check man docs for more info
+
+    $ ls -aFGl / | grep private
+        lrwxr-xr-x@   1 root  wheel     11 Oct  6  2018 etc@ -> private/etc
+        drwxr-xr-x    6 root  wheel    192 Feb 24 11:57 private/
+        lrwxr-xr-x@   1 root  wheel     11 Oct  6  2018 tmp@ -> private/tmp
+        lrwxr-xr-x@   1 root  wheel     11 Oct  6  2018 var@ -> private/var
+    # INFO: /etc/bashrc is not automatically read in under any circumstance.
+    # The only way it gets included, is if its referenced in your ~/.bashrc file
+    # [[Source: https://www.linuxquestions.org/questions/linux-general-1/etc-profile-v-s-etc-bashrc-273992/ ]]
+
+    [[Source: https://www.gnu.org/software/bash/manual/bash.pdf]]
+    ???: Why dotfiles and /etc/* files?? I mean, why two definitions of the same file?
+	"""
+}
+
+alias statuscodes\?='statuscodes_doc'
+function statuscodes_doc(){
+
+	echo """
+	StatusContinue           = 100 // RFC 7231, 6.2.1
+	StatusSwitchingProtocols = 101 // RFC 7231, 6.2.2
+	StatusProcessing         = 102 // RFC 2518, 10.1
+	"""
+
+	echo """
+	StatusOK                   = 200 // RFC 7231, 6.3.1
+	StatusCreated              = 201 // RFC 7231, 6.3.2
+	StatusAccepted             = 202 // RFC 7231, 6.3.3
+	StatusNonAuthoritativeInfo = 203 // RFC 7231, 6.3.4
+	StatusNoContent            = 204 // RFC 7231, 6.3.5
+	StatusResetContent         = 205 // RFC 7231, 6.3.6
+	StatusPartialContent       = 206 // RFC 7233, 4.1
+	StatusMultiStatus          = 207 // RFC 4918, 11.1
+	StatusAlreadyReported      = 208 // RFC 5842, 7.1
+	StatusIMUsed               = 226 // RFC 3229, 10.4.1
+	"""
+
+	echo """
+	StatusMultipleChoices   = 300 // RFC 7231, 6.4.1
+	StatusMovedPermanently  = 301 // RFC 7231, 6.4.2
+	StatusFound             = 302 // RFC 7231, 6.4.3
+	StatusSeeOther          = 303 // RFC 7231, 6.4.4
+	StatusNotModified       = 304 // RFC 7232, 4.1
+	StatusUseProxy          = 305 // RFC 7231, 6.4.5
+	_                       = 306 // RFC 7231, 6.4.6 (Unused)
+	StatusTemporaryRedirect = 307 // RFC 7231, 6.4.7
+	StatusPermanentRedirect = 308 // RFC 7538, 3
+	"""
+
+	echo """
+	StatusBadRequest                   = 400 // RFC 7231, 6.5.1
+	StatusUnauthorized                 = 401 // RFC 7235, 3.1
+	StatusPaymentRequired              = 402 // RFC 7231, 6.5.2
+	StatusForbidden                    = 403 // RFC 7231, 6.5.3
+	StatusNotFound                     = 404 // RFC 7231, 6.5.4
+	StatusMethodNotAllowed             = 405 // RFC 7231, 6.5.5
+	StatusNotAcceptable                = 406 // RFC 7231, 6.5.6
+	StatusProxyAuthRequired            = 407 // RFC 7235, 3.2
+	StatusRequestTimeout               = 408 // RFC 7231, 6.5.7
+	StatusConflict                     = 409 // RFC 7231, 6.5.8
+	StatusGone                         = 410 // RFC 7231, 6.5.9
+	StatusLengthRequired               = 411 // RFC 7231, 6.5.10
+	StatusPreconditionFailed           = 412 // RFC 7232, 4.2
+	StatusRequestEntityTooLarge        = 413 // RFC 7231, 6.5.11
+	StatusRequestURITooLong            = 414 // RFC 7231, 6.5.12
+	StatusUnsupportedMediaType         = 415 // RFC 7231, 6.5.13
+	StatusRequestedRangeNotSatisfiable = 416 // RFC 7233, 4.4
+	StatusExpectationFailed            = 417 // RFC 7231, 6.5.14
+	StatusTeapot                       = 418 // RFC 7168, 2.3.3
+	StatusMisdirectedRequest           = 421 // RFC 7540, 9.1.2
+	StatusUnprocessableEntity          = 422 // RFC 4918, 11.2
+	StatusLocked                       = 423 // RFC 4918, 11.3
+	StatusFailedDependency             = 424 // RFC 4918, 11.4
+	StatusTooEarly                     = 425 // RFC 8470, 5.2.
+	StatusUpgradeRequired              = 426 // RFC 7231, 6.5.15
+	StatusPreconditionRequired         = 428 // RFC 6585, 3
+	StatusTooManyRequests              = 429 // RFC 6585, 4
+	StatusRequestHeaderFieldsTooLarge  = 431 // RFC 6585, 5
+	StatusUnavailableForLegalReasons   = 451 // RFC 7725, 3
+	"""
+
+	echo """
+	StatusInternalServerError           = 500 // RFC 7231, 6.6.1
+	StatusNotImplemented                = 501 // RFC 7231, 6.6.2
+	StatusBadGateway                    = 502 // RFC 7231, 6.6.3
+	StatusServiceUnavailable            = 503 // RFC 7231, 6.6.4
+	StatusGatewayTimeout                = 504 // RFC 7231, 6.6.5
+	StatusHTTPVersionNotSupported       = 505 // RFC 7231, 6.6.6
+	StatusVariantAlsoNegotiates         = 506 // RFC 2295, 8.1
+	StatusInsufficientStorage           = 507 // RFC 4918, 11.5
+	StatusLoopDetected                  = 508 // RFC 5842, 7.2
+	StatusNotExtended                   = 510 // RFC 2774, 7
+	StatusNetworkAuthenticationRequired = 511 // RFC 6585, 6
+	"""
+}
