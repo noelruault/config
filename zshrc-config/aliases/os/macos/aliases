@@ -1,0 +1,72 @@
+# alias killport='netstat -vanp tcp | grep'
+alias notebook='/anaconda3/bin/jupyter_mac.command ; exit;'
+
+function whoamipro(){
+    echo '*** $whoami ***' && whoami
+    echo '*** $groups $(whoami) ***' && groups $(whoami) | cut -d' ' -f1
+    echo '*** $id ***' && id
+}
+
+function myip(){
+    echo ">> public ip / curl <remote_url>"
+    curl http://ipecho.net/plain;echo
+
+    echo ">> private ip / ipconfig"
+    ## MACOS
+    ipconfig getifaddr en0  # ifconfig | grep "inet "
+
+    echo ">> default gateway (usually router) / netstat"
+    netstat -nr | grep -E "default.*en0" --color=never
+}
+
+
+SPIDER="""
+    _
+ _\( )/_  Searching and killing
+  /(O)\   service...
+"""
+NO_PARAM_ERROR="""
+[INFO]: You need to run this function with the name
+of the application/port to kill as parameter.
+"""
+
+function killapp() {
+    if [[ -z "$1" ]]; then
+        echo $NO_PARAM_ERROR
+        return
+    else
+        pids=$(ps aux | grep -Ei "$@" | awk '{print $2}')
+
+        if [[ -z "$pids" ]]; then
+            echo "Couldn't be found any PID related to the given application."
+            return
+        else
+            echo $SPIDER
+            echo "Related PIDS found:\n$pids"
+            kill -9 $(ps aux | grep -Ei "$@" | awk '{print $2}')
+        fi
+    fi
+}
+
+function killport() {
+    if [[ -z "$1" ]]; then
+        echo $NO_PARAM_ERROR
+        return
+    else
+        pids=$(netstat -vanp tcp| grep "$@" | awk '{print $9}')
+
+        if [[ -z "$pids" ]]; then
+            echo "Couldn't be found any PID related to the given port."
+            return
+        else
+            echo $SPIDER
+            echo "Related PIDS found:\n$pids"
+            kill -9 $(netstat -vanp tcp| grep "$@" | awk '{print $9}')
+        fi
+    fi
+}
+
+# $ZSH_CUSTOM/plugins/zsh-syntax-highlighting/highlighters/brackets/brackets-highlighter.zsh
+
+### How to use Terminal to send keystrokes?
+## osascript -e 'tell application "System Events" to keystroke "q" using {control down, command down}'

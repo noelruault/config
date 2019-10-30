@@ -69,7 +69,7 @@ alias postgres\?='echo """
 	"""
 '
 
-alias crypto\?='go run ~/.zshrc-config/crypto.go'
+alias crypto\?='go run $ZSH_CUSTOM_CONFIG_FILES/crypto.go'
 
 alias subl\?='echo"""
 	https://superuser.com/questions/1100918/how-can-i-prevent-the-iterm2-hotkey-window-from-losing-focus

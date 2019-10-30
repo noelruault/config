@@ -1,7 +1,7 @@
 alias dk="$HOME/<PATH>/run.sh $@"
-alias dkclean="sh $HOME/.zshrc-config/docker/docker_clean_all.sh"
-alias dkcreate="sh $HOME/.zshrc-config/docker/docker_turn_on.sh"
-alias dklightclean="sh $HOME/.zshrc-config/docker/docker_light_clean.sh"
+alias dkclean="sh $ZSH_CUSTOM_CONFIG_ALIASES/docker_scripts/docker_clean_all.sh"
+alias dkcreate="sh $ZSH_CUSTOM_CONFIG_ALIASES/docker_scripts/docker_turn_on.sh"
+alias dklightclean="sh $ZSH_CUSTOM_CONFIG_ALIASES/docker_scripts/docker_light_clean.sh"
 alias dkstatus="docker ps -q | xargs  docker stats --no-stream"
 alias unsetkube='kubectl config unset current-context'
 alias dkprune='docker system prune --volumes'

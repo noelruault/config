@@ -1,10 +1,7 @@
-alias rm="rm -i"
-alias python='python3'
 alias hs='history | grep'
-alias zshrc='code $HOME/.zshrc-config'
+alias zshrc='code $ZSH_CUSTOM_CONFIG_FILES'
 alias hibernate="sudo systemctl hibernate"
 alias ds_clean="find . -name '.DS_Store' -type f -delete"
-#alias killport='sudo netstat -plten |grep'  # Only for LINUX
 alias wanip='dig +short myip.opendns.com @resolver1.opendns.com'
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 alias localhosts='ifconfig | grep "inet " | grep -v 127.0.0.1'  # https://stackoverflow.com/a/4779992
@@ -27,26 +24,6 @@ alias greset='git branch | egrep -v "(master|\*)" | xargs git branch -D'
 ### Vagrant
 alias vagrantclean="vagrant box list | cut -f 1 -d ' ' | xargs -L 1 vagrant box remove -f"
 
-function myip(){
-    echo ">> public ip / curl <remote_url>"
-    curl http://ipecho.net/plain;echo
-
-    echo ">> private ip / ipconfig"
-    ## LINUX  https://stackoverflow.com/a/24634284/4349318
-    # ips=($(hostname -I))
-    # names=($(ifconfig | grep mtu | cut -d' ' -f1))
-    # for (( i=0 ; i <= ${#ips} ; i++ )); do
-    #     echo "${names[$i]} ${ips[$i]}"
-    # done
-    # for i "${ips[@]}"; do
-      # echo $i
-    # done
-    ## MACOS
-    ipconfig getifaddr en0  # ifconfig | grep "inet "
-    echo ">> default gateway (usually router) / netstat"
-    netstat -nr | grep -E "default.*en0" --color=never
-}
-
 function pro_rebase(){
     # https://stackoverflow.com/a/927386
     regex='^[0-9]+$'
@@ -63,7 +40,7 @@ function pro_rebase(){
 
 function search() { find / -name "$@" | echo; }
 
-alias awesome='cat ~/.zshrc-config/awesome.txt'
+alias awesome='cat $ZSH_CUSTOM_CONFIG_FILES/awesome.txt'
 alias githooksconfig='git config --global core.hooksPath ~/.config/git/hooks/'
 
 ### GOLANG
@@ -99,4 +76,4 @@ alias gopath='cd $(go env GOPATH)'
 alias gosrc='cd $(go env GOPATH)/src/'
 
 
-alias crypto\?='go run ~/.zshrc-config/crypto.go &'
+alias crypto\?='go run $ZSH_CUSTOM_CONFIG_FILES/crypto.go &'

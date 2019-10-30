@@ -16,3 +16,9 @@ TODO:
 
 - iTerm2 navigation guide?
 - Personal folder (store awesome, crypto, gofarm... etc.)
+
+
+- instalar iterm
+- instalar zsh
+- instalar oh-my-zsh
+- instalar plugins

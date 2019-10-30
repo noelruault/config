@@ -10,7 +10,7 @@ docker volume rm $(docker volume ls)
 
 
 if [  -z "$PROJECT_PATH" ]; then
-	cd /Users/nruault/Work/ && sudo find . -name \*.pyc -print -delete
+	# cd $HOME/Work/ && sudo find . -name \*.pyc -print -delete
 	echo """
 	PROJECT_PATH is empty, specify PROJECT_PATH
 	"""

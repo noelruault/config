@@ -1,0 +1,5 @@
+alias rm="rm -i"
+alias python='python3'
+alias ipython='python -m IPython'
+alias pip='pip3 --version && pip3'
+alias pip2='pip2 --version && pip2'

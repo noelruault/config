@@ -15,6 +15,12 @@ NPM_CONFIG_PREFIX=~/.npm-global
 # export GOPATH=$HOME/go
 # export PATH=$PATH:/usr/local/go/bin
 # (gopaths are in 'go env')
+# GO Aliases
+# https://golang.org/doc/code.html#GOPATH
+export GOPATH=$(go env GOPATH)
+alias go='/usr/local/go/bin/go'
+alias gosrc='cd $GOPATH/src'
+alias gobin='cd $GOPATH/bin'
 
 
 ### ZSH advice (?)###

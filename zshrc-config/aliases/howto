@@ -10,7 +10,7 @@
 # ========================
 # Function to display howto possibilities by typing 'howto?'
 function howto_possibilities(){
-	grep -E '^alias.*\?' /Users/nruault/.zshrc-config/howto_aliases | awk '{print $2}' | awk -F'=' '{print $1}';
+	grep -E '^alias.*\?' $ZSH_CUSTOM_CONFIG_FILES/howto_aliases | awk '{print $2}' | awk -F'=' '{print $1}';
 }
 
 alias howto\?='howto_possibilities'

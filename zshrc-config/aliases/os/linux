@@ -1,0 +1,20 @@
+alias killport='sudo netstat -plten | grep'
+
+function myip(){
+    echo ">> public ip / curl <remote_url>"
+    curl http://ipecho.net/plain;echo
+
+    echo ">> private ip / ipconfig"
+    ## LINUX  https://stackoverflow.com/a/24634284/4349318
+    ips=($(hostname -I))
+    names=($(ifconfig | grep mtu | cut -d' ' -f1))
+    for (( i=0 ; i <= ${#ips} ; i++ )); do
+        echo "${names[$i]} ${ips[$i]}"
+    done
+    for i "${ips[@]}"; do
+      echo $i
+    done
+
+    echo ">> default gateway (usually router) / netstat"
+    netstat -nr | grep -E "default.*en0" --color=never
+}

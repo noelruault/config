@@ -1,8 +1,0 @@
-alias pip='pip3 --version && pip3'
-alias pip2='pip2 --version && pip2'
-
-export UPSTREAM_SERVER_URL="https://outcomex-dummy.com.au/customer/"
-export UPSTREAM_SERVER_USERNAME="dummy"
-export UPSTREAM_SERVER_PASSWORD="dummy"
-export LORASERVER_MQTT_DSL="tcp://10.190.100.8:1883"
-
