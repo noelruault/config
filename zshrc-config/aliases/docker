@@ -1,3 +1,5 @@
+#!/bin/bash
+
 alias dk="$HOME/<PATH>/run.sh $@"
 alias dkclean="sh $ZSH_CUSTOM_CONFIG_ALIASES/docker_scripts/docker_clean_all.sh"
 alias dkcreate="sh $ZSH_CUSTOM_CONFIG_ALIASES/docker_scripts/docker_turn_on.sh"
@@ -5,6 +7,7 @@ alias dklightclean="sh $ZSH_CUSTOM_CONFIG_ALIASES/docker_scripts/docker_light_cl
 alias dkstatus="docker ps -q | xargs  docker stats --no-stream"
 alias unsetkube='kubectl config unset current-context'
 alias dkprune='docker system prune --volumes'
+alias dkstop='docker stop $(docker ps -aq)'
 
 function dklist(){
     echo '\n*** images ***' && docker images -a
@@ -12,18 +15,15 @@ function dklist(){
     echo '\n*** containers ***' && docker ps -a
 }
 
-
 # https://stackoverflow.com/a/20352563/4349318
 # Start a simple SMTP server with Python like so:
 # 	$ python -m smtpd -n -c DebuggingServer localhost:1025
 # 		TIP: Enter to the container through bash
 # 		(docker exec -it -u root <container_name> bash) and run the python command
 
-
 alias dkps='docker ps --format "table {{.ID}}\t{{.Image}}\t{{.Ports}}\t{{.Names}}"'
 # You can put this into ~/.docker/config.json to make it the default format.
 alias dki='echo "\n___DOCKER IMAGES____ " && docker images -a && echo "\n___DOCKER COMPOSE IMAGES____ " && docker-compose images'
-
 
 ####
 # DOCKER PERMISSION ISSUES?

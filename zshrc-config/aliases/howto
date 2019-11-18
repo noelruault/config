@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # ========================
 # TODO
 # Function that takes the name of each function and makes it an alias...
@@ -9,182 +11,23 @@
 
 # ========================
 # Function to display howto possibilities by typing 'howto?'
-function howto_possibilities(){
-	grep -E '^alias.*\?' $ZSH_CUSTOM_CONFIG_FILES/howto_aliases | awk '{print $2}' | awk -F'=' '{print $1}';
+alias howto\?='howto_possibilities'
+function howto_possibilities() {
+	grep -E '^alias.*\?' $ZSH_CUSTOM_CONFIG_FILES/aliases/howto | awk '{print $2}' | awk -F'=' '{print $1}'
 }
 
-alias howto\?='howto_possibilities'
 # ========================
+# Formatting helpers
+spacer3='\t\t\t'
+spacer2='\t\t]'
+spacer1='\t'
 
 # ====HOW-TO Commands=====
 
-alias paths\?='echo /etc/paths/ && echo /etc/paths.d/ && echo $HOME/.bashrc && echo $HOME/.zshrc'
-alias hosts\?='echo /etc/hosts && echo ~/.ssh/config'
-
-alias virtualenv\?='virtualenv_doc'
-function virtualenv_doc(){
-	echo """
-	1. virtualenv <venv_name>
-	2. source <venv_name>/bin/activate
-	3. deactivate
-	"""
-}
-
-alias tar\?='tar_doc'
-function tar_doc(){
-	echo "tar -zxvf <file_name>.tar"
-}
-
-alias npm\?='npm_doc'
-function npm_doc(){
-	echo """
-	All packages are in node_modules folder.
-	npm list <package>
-	npm view <package> version
-	"""
-}
-
-alias django-migrations\?='django-migrations_doc'
-function django-migrations_doc(){
-	echo """
-	[ROLLBACK]
-	python manage.py showmigrations
-	python manage.py migrate <app_name> <old_migration>
-	rm <app_name>/migrations/<last_migration>.py
-
-	[MIGRATE]
-	python manage.py makemigrations <app_name> --name=<name>  # python manage.py makemigrations
-	python manage.py migrate <app_name>  # python manage.py migrate
-
-	[[Source: https://stackoverflow.com/questions/32123477/django-revert-last-migration]]
-	"""
-}
-
-alias git\?='git_doc'
-function git_doc() {
-	echo """
-	(1) git fetch origin
-	(1) git reset origin
-	(2) git fetch origin
-	(2) git reset --hard origin
-	(?) git reset --hard HEAD
-	# Remove all untracked files Git
-	git clean -df
-	#	-d  :remove whole directories
-	# 	-f  :force
-	[[Source: https://stackoverflow.com/a/102309/4349318]]
-	"""
-}
-
-alias psql\?='postgres_doc'
-alias postgres\?='postgres_doc'
-function postgres_doc() {
-	echo """
-	[ https://hackernoon.com/dont-install-postgres_docker-pull-postgres-bee20e200198 ]
-
-	Current DB:
-	- SELECT current_database();
-
-	- psql [-U/--username] <user_name> [(optional)--dbname=]<database_name>
-	- psql ... [-W/--password] # force password prompt (should happen automatically)
-
-	\dt ; \dt+  	# shows all tables in the current schema
-	\d <table_name> # shows a table and its rules
-	SELECT * from pg_rules; # shows all rules in the database
-
-	e.g:
-	SELECT * FROM portal_user WHERE user_id = 1;
-	UPDATE portal_user SET password = abc1234... WHERE user_id = 1;
-
-	UPDATE <table> SET <column> = <value> WHERE <column> = <value>;
-
-
-	DELETE ALL TABLES:
-	- drop schema public cascade;
-	- create schema public;
-	"""
-}
-
-alias pkg\?='pkg_doc'
-function pkg_doc() {
-	echo """
-	pkgutil --pkgs # list all installed packages
-	pkgutil --pkgs | grep -i {keyword}
-	pkgutil --pkg-info package-name.pkg # find the package location
-	pkgutil --files package-name.pkg # list the packages installed files
-
-	locate psql | grep /bin
-
-	[[Source: https://stackoverflow.com/a/27546100/4349318]]
-	"""
-}
-
-alias farmdeck\?='farmdeck_doc'
-function farmdeck_doc() {
-	echo """
-	docker-compose run --rm --service-ports --name farmdeck farmdeck
-	go build -mod=vendor ./cmd/farmdeck && ./farmdeck -v
-
-	[[Source: https://bitbucket.org/outcomex/farmdeck/src/sensors/]]
-	"""
-}
-
-alias diskutil\?='diskutil_doc'
-function diskutil_doc() {
-	echo """
-	diskutil list
-
-	diskutil unmount 		/dev/diskXYZ
-			 unmountDisk	...
-			 eject			...
-
-	diskutil eraseDisk FAT32 SDCARD /dev/diskXYZ
-
-	[[Docs: https://www.dssw.co.uk/reference/diskutil.html]]
-	"""
-}
-
-alias dd\?='dd_doc'
-function dd_doc() {
-	echo """
-	dd if=/<path>/<file.iso> of=/dev/diskXYZ status=progress
-	"""
-}
-
-alias thread\?='thread_doc'
-function thread_doc(){
-	echo """
-	> means truncate and write
-	>> means append
-	( appending to or writing to /dev/null has the same net effect )
-
-	2>&1 redirects standard error STDERR (2) to standard output STDOUT (1),
-	which then discards it as well since standard output has already been redirected.
-
-	[[Source: https://stackoverflow.com/a/10508862/4349318]]
-	"""
-}
-
-alias docker\?='docker_doc'
-function docker_doc(){
-	echo """
-	docker exec -it <container1> ping <container2> # names in docker ps and docker compose
-
-	try dkps & dki to inspect containers and images, in a cleaner way.
-	#####
-	# DOCKER PERMISSION ISSUES?
-	# - docker-compose run --rm --service-ports -u root devenv-node-cp
-	# - docker run -u root devenv-node-cp
-	"""
-}
-alias grep\?='grep_doc'
-function grep_doc(){
-	echo """
-	[[Docs:]] https://www.thegeekstuff.com/2011/10/grep-or-and-not-operators/
-	"""
-}
+# ========== A
+# ========== B
 alias bashrc\?='bashrc_doc'
-function bashrc_doc(){
+function bashrc_doc() {
 	echo """
     ## interactive login shell, or with --login
     /etc/profile
@@ -213,8 +56,303 @@ function bashrc_doc(){
 	"""
 }
 
+# ========== C
+alias crypto\?='go run $ZSH_CUSTOM_CONFIG_FILES/crypto.go'
+
+# ========== D
+alias dd\?='dd_doc'
+function dd_doc() {
+	echo """
+	dd if=/<path>/<file.iso> of=/dev/diskXYZ status=progress
+	"""
+}
+
+alias diskutil\?='diskutil_doc'
+function diskutil_doc() {
+	echo """
+	diskutil list
+
+	diskutil unmount 		/dev/diskXYZ
+			 unmountDisk	...
+			 eject			...
+
+	diskutil eraseDisk FAT32 SDCARD /dev/diskXYZ
+
+	[[Docs: https://www.dssw.co.uk/reference/diskutil.html]]
+	"""
+}
+
+alias docker\?='docker_doc'
+function docker_doc() {
+	echo """
+	docker exec -it <container1> ping <container2> # names in docker ps and docker compose
+
+	try dkps & dki to inspect containers and images, in a cleaner way.
+	#####
+	# DOCKER PERMISSION ISSUES?
+	# - docker-compose run --rm --service-ports -u root devenv-node-cp
+	# - docker run -u root devenv-node-cp
+	"""
+}
+
+alias docker-compose\?='docker-compose_doc'
+function docker-compose_doc() {
+	echo """
+	docker-compose run --rm --service-ports --name <name> <name>
+	go build -mod=vendor ./cmd/<name> && ./<name> -v
+	"""
+}
+
+alias django\?='django-migrations_doc'
+alias django-migrations\?='django-migrations_doc'
+function django-migrations_doc() {
+	echo """
+	[MIGRATIONS]
+
+	[ROLLBACK]
+	python manage.py showmigrations
+	python manage.py migrate <app_name> <old_migration>
+	rm <app_name>/migrations/<last_migration>.py
+
+	[MIGRATE]
+	python manage.py makemigrations <app_name> --name=<name>  # python manage.py makemigrations
+	python manage.py migrate <app_name>  # python manage.py migrate
+
+	[[Source: https://stackoverflow.com/questions/32123477/django-revert-last-migration]]
+	"""
+}
+# ========== E
+# ========== F
+# ========== G
+alias git\?='git_doc'
+function git_doc() {
+	echo """
+	(1) git fetch origin
+	(1) git reset origin
+	(2) git fetch origin
+	(2) git reset --hard origin
+	(?) git reset --hard HEAD
+	# Remove all untracked files Git
+	git clean -df
+	#	-d  :remove whole directories
+	# 	-f  :force
+	[[Source: https://stackoverflow.com/a/102309/4349318]]
+	"""
+}
+
+alias go\?='go_doc'
+function go_doc() {
+	echo """
+	go-comments?
+	go-mod?
+	"""
+}
+
+alias go-comments\?='go-comments_doc'
+function go-comments_doc() {
+	echo """
+	1. The comment should explain what the thing does.
+	2. The comment should explain how the thing does what it does.
+	3. The comment should explain why the thing is why it is.
+
+	[Reference]: https://dave.cheney.net/practical-go/presentations/qcon-china.html#_comments
+	"""
+}
+
+alias go-mod\?='go-mod_doc'
+function go-mod_doc() {
+	echo """
+	[INITIALISE GO MODULES]
+	go mod init # go mod init <modulename>
+
+	[ADD THE DEPENDENCIES TO THE GO.MOD FILE]
+	go get [-v] -u ./...
+
+	[VENDOR THOSE DEPENDENCIES]
+	go mod vendor
+
+	[UPDATE A DEPENDENCY]
+	go get -u <repo url>
+	go mod vendor
+
+	[Reference]: https://www.kablamo.com.au/blog/2018/12/10/just-tell-me-how-to-use-go-modules
+	"""
+}
+
+alias go-naming\?='go-naming_doc'
+function go-naming_doc() {
+	echo """
+	- Name everything for what it provides, not what it contains.
+	- Short variable names work well when the distance between their declaration and last use is short.
+	- Long variable names need to justify themselves; the longer they are the more value they need to provide.
+		Lengthy bureaucratic names carry a low amount of signal compared to their weight on the page.
+	- Don’t include the name of your type in the name of your variable.
+	- Constants should describe the value they hold, not how that value is used.
+	- Prefer single letter variables for loops and branches, single words for parameters and return values, multiple words for functions and package level declaration.
+	- Prefer single words for methods, interfaces, and packages.
+	- Remember that the name of a package is part of the name the caller uses to to refer to it, so make use of that.
+	- Don’t mix and match long and short formal parameters in the same declaration.
+
+	[Reference]: https://dave.cheney.net/practical-go/presentations/qcon-china.html#_identifiers
+	"""
+}
+
+alias gpg\?='gpg_doc'
+function gpg_doc() {
+	echo """
+	GENERATE:	gpg --export --armor <user>@<domain>.com > <user>.asc
+	"""
+}
+
+alias grep\?='grep_doc'
+function grep_doc() {
+	echo """
+	[[Docs:]] https://www.thegeekstuff.com/2011/10/grep-or-and-not-operators/
+	"""
+}
+
+# ========== H
+alias hosts\?='echo /etc/hosts && echo ~/.ssh/config'
+
+# ========== I
+alias iterm\?='iterm_doc'
+function iterm_doc() {
+	echo """
+
+	⌘ ⇧ C ${spacer1}| Enter copy mode.
+	- ${spacer2} v    select by character.
+	- ${spacer2} ⇧ v  select by line.
+
+	[[Reference:] copy-mode ] https://kevinjalbert.com/iterm2-mouseless-copy/
+
+	"""
+}
+
+# ========== J
+# ========== K
+# ========== L
+# ========== M
+# ========== N
+alias npm\?='npm_doc'
+function npm_doc() {
+	echo """
+	All packages are in node_modules folder.
+	npm list <package>
+	npm view <package> version
+	"""
+}
+
+# ========== O
+# ========== P
+alias paths\?='echo /etc/paths/ && echo /etc/paths.d/ && echo $HOME/.bashrc && echo $HOME/.zshrc'
+
+alias psql\?='postgres_doc'
+alias postgres\?='postgres_doc'
+function postgres_doc() {
+	echo """
+	[ https://hackernoon.com/dont-install-postgres_docker-pull-postgres-bee20e200198 ]
+
+	[CONNECT]
+		- psql [-U/--username] <user_name> [(optional)--dbname]<database_name> --host localhost
+		- psql ... [-W/--password] # force password prompt (should happen automatically)
+
+	[SELECT]
+	Current DB:
+	- SELECT current_database();
+
+	\dt ; \dt+  	# shows all tables in the current schema
+	\d <table_name> # shows a table and its rules
+	SELECT * from pg_rules; # shows all rules in the database
+
+	[e.g]:
+	SELECT * FROM portal_user WHERE user_id = 1;
+	UPDATE portal_user SET password = abc1234... WHERE user_id = 1;
+
+	UPDATE <table> SET <column> = <value> WHERE <column> = <value>;
+
+	[DROP]
+	(ALL TABLES):
+		- drop schema public cascade;
+		- create schema public;
+
+
+	*** DAEMONS
+		brew services <start/stop> postgresql
+		pg_ctl -D /usr/local/var/postgres <start/stop> # -D flags the location of the database storage area
+
+	"""
+}
+
+alias pkg\?='pkg_doc'
+function pkg_doc() {
+	echo """
+	pkgutil --pkgs # list all installed packages
+	pkgutil --pkgs | grep -i {keyword}
+	pkgutil --pkg-info package-name.pkg # find the package location
+	pkgutil --files package-name.pkg # list the packages installed files
+
+	locate psql | grep /bin
+
+	[[Source: https://stackoverflow.com/a/27546100/4349318]]
+	"""
+}
+
+# ========== Q
+# ========== R
+alias ram\?='ram_doc'
+function ram_doc() {
+	echo """
+	top -o MEM
+	cleanup # https://github.com/fwartner/mac-cleanup
+	"""
+}
+
+# ========== S
+alias safari\?='safari_doc'
+function safari_doc() {
+	echo """
+	⌘ + ⇧ + \\ ${spacer1}| Show tab overview
+	"""
+}
+
+alias shebang\?='shebang_doc'
+function shebang_doc() {
+	echo """
+	There are two ways to use the Shebang directive and set the interpreter:
+
+	Using the absolute path to the bash binary:
+		/bin/bash
+
+	Using the env utility:
+		/usr/bin/env bash
+	The advantage of using the second approach is that it will search for the bash
+	executable in the user's \$PATH environmental variable. If there are more than
+	one paths to bash, the first one will be used by the script.
+	"""
+}
+
+alias ssh\?='ssh_doc'
+function ssh_doc() {
+	echo """
+	GENERATE:	ssh-keygen -t rsa -b 4096 # -m PEM
+	COPY:		pbcopy < ~/.ssh/id_rsa.pub
+	SSH CONFIG:
+	  - (optional) git config --global --add url."git@github.com:".insteadOf "https://github.com/"
+	  - ssh-add -K ~/.ssh/[your-private-key]
+	  - In .ssh/config file, add the following lines:
+			Host *
+			UseKeychain yes
+			AddKeysToAgent yes
+			IdentityFile ~/.ssh/id_rsa
+
+	  Reference: https://apple.stackexchange.com/a/250572
+	  Referende: https://help.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account
+	  *(Golang issues with ssh keys) Reference: https://github.com/golang/go/issues/18692
+	"""
+}
+
 alias statuscodes\?='statuscodes_doc'
-function statuscodes_doc(){
+function statuscodes_doc() {
 
 	echo """
 	StatusContinue           = 100 // RFC 7231, 6.2.1
@@ -293,3 +431,57 @@ function statuscodes_doc(){
 	StatusNetworkAuthenticationRequired = 511 // RFC 6585, 6
 	"""
 }
+
+alias subl\?='subl_doc'
+function subl_doc() {
+	echo """
+	[Reference]: https://superuser.com/questions/1100918/how-can-i-prevent-the-iterm2-hotkey-window-from-losing-focus#answer-1259726
+	"""
+}
+
+# ========== T
+alias tar\?='tar_doc'
+function tar_doc() {
+	echo "tar -zxvf <file_name>.tar"
+}
+
+alias thread\?='thread_doc'
+function thread_doc() {
+	echo """
+	> means truncate and write
+	>> means append
+	( appending to or writing to /dev/null has the same net effect )
+
+	2>&1 redirects standard error STDERR (2) to standard output STDOUT (1),
+	which then discards it as well since standard output has already been redirected.
+
+	[[Source: https://stackoverflow.com/a/10508862/4349318]]
+	"""
+}
+
+# ========== U
+# ========== V
+alias virtualenv\?='virtualenv_doc'
+function virtualenv_doc() {
+	echo """
+	1. virtualenv <venv_name>
+	2. source <venv_name>/bin/activate
+	3. deactivate
+	"""
+}
+
+alias vscode\?='vscode_doc'
+function vscode_doc() {
+	echo """
+	⌘ ⇧ \\ ${spacer3}| Beginning / End of containing function
+	⌃ Tab / ⌃ ⇧ Tab ${spacer1}| Open previous / next file
+	⌃ \` ${spacer3}| Show integrated terminal
+
+	[Reference]: https://code.visualstudio.com/shortcuts/keyboard-shortcuts-macos.pdf
+	"""
+}
+
+# ========== W
+# ========== X
+# ========== Y
+# ========== Z

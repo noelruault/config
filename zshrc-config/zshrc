@@ -1,3 +1,4 @@
+#!/bin/bash
 ## ------------------------- BEGINING OF CUSTOM ZSHRC -------------------------
 # start=$(($(date +'%s * 1000 + %-N / 1000000')))
 start=$(python3 -c 'from time import time; print(int(round(time() * 1000)))')
@@ -9,8 +10,8 @@ source $HOME/.config/zshrc-config/aliases/os/macos/set_path
 export ZSH="$HOME/.oh-my-zsh"
 export ZSH_CUSTOM="$HOME/.oh-my-zsh/custom"
 
-# Set name of the theme to load. Optionally, if you set this to "random"
-# it'll load a random theme each time that oh-my-zsh is loaded.
+# Set name of the theme to load. Optionally, if you set this to "random",
+# will load a random theme each time that oh-my-zsh is loaded.
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 # ZSH_THEME="robbyrussell"  # (default)
 ZSH_THEME="spaceship"  # https://github.com/denysdovhan/spaceship-zsh-theme
@@ -57,6 +58,11 @@ source $ZSH_CUSTOM_CONFIG_ALIASES/os/macos/aliases
 source $ZSH_CUSTOM_CONFIG_ALIASES/howto
 ## Useful hacky aliases
 source $ZSH_CUSTOM_CONFIG_ALIASES/hacky
+
+## Company specific aliases
+for file in $ZSH_CUSTOM_CONFIG_ALIASES/assembly/*; do
+    source "$file"
+done
 
 ## Some aliases to fix zsh history
 source $ZSH_CUSTOM_CONFIG_FILES/config/fix_zsh

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # To remove duplicate items in fzf prompt,
 # add the following lines into ~/.zshrc:
 

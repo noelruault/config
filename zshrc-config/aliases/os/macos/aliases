@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # alias killport='netstat -vanp tcp | grep'
 alias notebook='/anaconda3/bin/jupyter_mac.command ; exit;'
 
@@ -26,8 +28,7 @@ SPIDER="""
   /(O)\   service...
 """
 NO_PARAM_ERROR="""
-[INFO]: You need to run this function with the name
-of the application/port to kill as parameter.
+[INFO]: You need to run this function with at least one string parameter.
 """
 
 function killapp() {
@@ -44,6 +45,7 @@ function killapp() {
             echo $SPIDER
             echo "Related PIDS found:\n$pids"
             kill -9 $(ps aux | grep -Ei "$@" | awk '{print $2}')
+            return
         fi
     fi
 }
@@ -62,9 +64,28 @@ function killport() {
             echo $SPIDER
             echo "Related PIDS found:\n$pids"
             kill -9 $(netstat -vanp tcp| grep "$@" | awk '{print $9}')
+            return
         fi
     fi
 }
+
+function findapp() {
+    if [[ -z "$1" ]]; then
+        echo $NO_PARAM_ERROR
+        return
+    else
+        apps=$(ps axc | grep "$@")
+
+        if [[ -z "$apps" ]]; then
+            echo "Couldn't be found any PID related to the given app name."
+            return
+        else
+            echo "Related apps found:\n$apps"
+            return
+        fi
+    fi
+}
+
 
 # $ZSH_CUSTOM/plugins/zsh-syntax-highlighting/highlighters/brackets/brackets-highlighter.zsh
 

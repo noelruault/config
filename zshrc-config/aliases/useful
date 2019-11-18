@@ -1,3 +1,5 @@
+#!/bin/bash
+
 alias hs='history | grep'
 alias zshrc='code $ZSH_CUSTOM_CONFIG_FILES'
 alias hibernate="sudo systemctl hibernate"
@@ -14,7 +16,7 @@ alias cp='rsync -ah --progress'
 # alias sublsettings='subl '$(find $HOME -type d -name "*Sublime*Text*" 2>&1 | grep -v "find")/Packages/User/''
 
 ### Emacs
-alias emacs="/usr/local/bin/emacs"
+# alias emacs="/usr/local/bin/emacs"
 
 ### GIT
 alias gamod="git ls-files --modified | xargs git add"

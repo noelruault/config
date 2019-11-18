@@ -1,5 +1,10 @@
+#!/bin/bash
+
 alias rm="rm -i"
 alias python='python3'
 alias ipython='python -m IPython'
-alias pip='pip3 --version && pip3'
-alias pip2='pip2 --version && pip2'
+
+# FIX PIP
+PIP_HARDCODE="Remember that pip path is hardcoded, due to incompatibilities. Check at $ZSH_CUSTOM_CONFIG_ALIASES/hacky to review them."
+alias pip=pip3
+alias pip3='$HOME/Library/Python/3.7/bin/pip3 --version && $HOME/Library/Python/3.7/bin/pip3 && ${PIP_HARDCODE}'

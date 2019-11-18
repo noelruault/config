@@ -1,3 +1,5 @@
+#!/bin/bash
+
 PATH=$(getconf PATH)
 PATH="$PATH:/usr/local/bin"
 PATH="$PATH:/usr/local/sbin"
@@ -34,4 +36,3 @@ export PATH
 export FZF_BASE=/usr/local/bin/fzf  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/fzf
 # export GOPATH=$(/usr/local/go/bin/go env GOPATH)
 # MANPATH="/usr/local/opt/grep/libexec/gnuman:$MANPATH"; export MANPATH
-
