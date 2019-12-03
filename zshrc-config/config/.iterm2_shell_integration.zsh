@@ -4,12 +4,12 @@
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
 # of the License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -65,39 +65,39 @@ if [[ -o interactive ]]; then
     #
     # 1) A command is entered at the prompt and you press return.
     #    The following steps happen:
-    #    * iterm2_preexec is invoked
-    #      * PS1 is set to ITERM2_PRECMD_PS1
-    #      * ITERM2_SHOULD_DECORATE_PROMPT is set to 1
-    #    * The command executes (possibly reading or modifying PS1)
-    #    * iterm2_precmd is invoked
-    #      * ITERM2_PRECMD_PS1 is set to PS1 (as modified by command execution)
-    #      * PS1 gets our escape sequences added to it
-    #    * zsh displays your prompt
-    #    * You start entering a command
+    #    - iterm2_preexec is invoked
+    #      - PS1 is set to ITERM2_PRECMD_PS1
+    #      - ITERM2_SHOULD_DECORATE_PROMPT is set to 1
+    #    - The command executes (possibly reading or modifying PS1)
+    #    - iterm2_precmd is invoked
+    #      - ITERM2_PRECMD_PS1 is set to PS1 (as modified by command execution)
+    #      - PS1 gets our escape sequences added to it
+    #    - zsh displays your prompt
+    #    - You start entering a command
     #
     # 2) You press ^C while entering a command at the prompt.
     #    The following steps happen:
-    #    * (iterm2_preexec is NOT invoked)
-    #    * iterm2_precmd is invoked
-    #      * iterm2_before_cmd_executes is called since we detected that iterm2_preexec was not run
-    #      * (ITERM2_PRECMD_PS1 and PS1 are not messed with, since PS1 already has our escape
+    #    - (iterm2_preexec is NOT invoked)
+    #    - iterm2_precmd is invoked
+    #      - iterm2_before_cmd_executes is called since we detected that iterm2_preexec was not run
+    #      - (ITERM2_PRECMD_PS1 and PS1 are not messed with, since PS1 already has our escape
     #        sequences and ITERM2_PRECMD_PS1 already has PS1's original value)
-    #    * zsh displays your prompt
-    #    * You start entering a command
+    #    - zsh displays your prompt
+    #    - You start entering a command
     #
     # 3) A new shell is born.
-    #    * PS1 has some initial value, either zsh's default or a value set before this script is sourced.
-    #    * iterm2_precmd is invoked
-    #      * ITERM2_SHOULD_DECORATE_PROMPT is initialized to 1
-    #      * ITERM2_PRECMD_PS1 is set to the initial value of PS1
-    #      * PS1 gets our escape sequences added to it
-    #    * Your prompt is shown and you may begin entering a command.
+    #    - PS1 has some initial value, either zsh's default or a value set before this script is sourced.
+    #    - iterm2_precmd is invoked
+    #      - ITERM2_SHOULD_DECORATE_PROMPT is initialized to 1
+    #      - ITERM2_PRECMD_PS1 is set to the initial value of PS1
+    #      - PS1 gets our escape sequences added to it
+    #    - Your prompt is shown and you may begin entering a command.
     #
     # Invariants:
-    # * ITERM2_SHOULD_DECORATE_PROMPT is 1 during and just after command execution, and "" while the prompt is
+    # - ITERM2_SHOULD_DECORATE_PROMPT is 1 during and just after command execution, and "" while the prompt is
     #   shown and until you enter a command and press return.
-    # * PS1 does not have our escape sequences during command execution
-    # * After the command executes but before a new one begins, PS1 has escape sequences and
+    # - PS1 does not have our escape sequences during command execution
+    # - After the command executes but before a new one begins, PS1 has escape sequences and
     #   ITERM2_PRECMD_PS1 has PS1's original value.
     iterm2_decorate_prompt() {
       # This should be a raw PS1 without iTerm2's stuff. It could be changed during command

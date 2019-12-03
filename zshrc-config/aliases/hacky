@@ -5,6 +5,17 @@ alias python='python3'
 alias ipython='python -m IPython'
 
 # FIX PIP
-PIP_HARDCODE="Remember that pip path is hardcoded, due to incompatibilities. Check at $ZSH_CUSTOM_CONFIG_ALIASES/hacky to review them."
-alias pip=pip3
-alias pip3='$HOME/Library/Python/3.7/bin/pip3 --version && $HOME/Library/Python/3.7/bin/pip3 && ${PIP_HARDCODE}'
+alias pip=pip3_func
+alias pip3=pip3_func
+function pip3_func() {
+    $HOME/Library/Python/3.7/bin/pip3 "$@"
+    echo """
+\e[1;33m
+pip version: $($HOME/Library/Python/3.7/bin/pip3 --version)
+WARNING! Remember that pip path is hardcoded, due to incompatibilities. Check at $ZSH_CUSTOM_CONFIG_ALIASES/hacky to change its behaviour.
+\e[0m
+    """
+}
+
+# Export pipenv, virtualenv....
+export PATH=$PATH:$HOME/Library/Python/3.7/bin

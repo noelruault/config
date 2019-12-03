@@ -1,6 +1,8 @@
 {
     "terminal.integrated.fontFamily": "Source Code Pro for Powerline",
+    "terminal.integrated.copyOnSelection": true,
     // "workbench.fontAliasing": "auto",
+    "workbench.colorTheme": "Atom One Dark",
     "window.zoomLevel": 1,
     "editor.formatOnPaste": true,
     "editor.multiCursorModifier": "ctrlCmd",
@@ -23,14 +25,12 @@
     "files.trimTrailingWhitespace": false,
     "files.trimFinalNewlines": true,
     "editor.minimap.enabled": false,
-    "workbench.colorCustomizations": {
-
-    },
-    "python.jediEnabled": false,
+    // "workbench.colorCustomizations": {},
+    // "python.jediEnabled": false,
     "todo-tree.general.tags":[
         "TODO",
         "FIXME",
-        "WHY",
+        "NOTE",
         "HOWTO",
     ],
     "todo-tree.highlights.customHighlight": {
@@ -46,7 +46,7 @@
             "icon": "tools",
             "opacity": 85,
         },
-        "WHY": {
+        "NOTE": {
             "icon": "book", // https://octicons.github.com/
             "type": "text",
             "iconColour": "grey",
@@ -68,7 +68,6 @@
             "maxStringLen": 200,
         }
     },
-    "workbench.colorTheme": "Atom One Dark",
     "sync.gist": "96c000cd39491f85f7bad4155f9d3eac",
     "sync.autoUpload": false,
     "sync.forceUpload": false,

@@ -23,7 +23,7 @@ export GOPATH=$(go env GOPATH)
 alias go='/usr/local/go/bin/go'
 alias gosrc='cd $GOPATH/src'
 alias gobin='cd $GOPATH/bin'
-
+export PATH=$PATH:$GOPATH/bin
 
 ### ZSH advice (?)###
 # If you come from bash you might have to change your $PATH.

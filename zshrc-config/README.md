@@ -2,23 +2,23 @@
 
 **If you want to backup zshrc:**
 
-```$ mv $HOME/.zshrc-config $HOME/zshrc-config-backup```
+    mv $HOME/.zshrc-config $HOME/zshrc-config-backup
 
 **In order to create a symlink to the repo zshrc:**
 
-```$ ln -s $HOME/.zshrc-config/ $HOME/.config/```
+    ln -s $HOME/.zshrc-config/ $HOME/.config/
 
 **Remove dotfile:**
 
-```$ mv $HOME/.zshrc-config $HOME/zshrc-config```
+    mv $HOME/.zshrc-config $HOME/.backup-zshrc-config
 
-TODO:
+    TODO:
 
-- iTerm2 navigation guide?
-- Personal folder (store awesome, crypto, gofarm... etc.)
+    - Personal folder (store awesome, crypto... etc.)
 
+    code makefile to ...
 
-- instalar iterm
-- instalar zsh
-- instalar oh-my-zsh
-- instalar plugins
+    - install iterm
+    - install zsh
+    - install oh-my-zsh
+    - install plugins

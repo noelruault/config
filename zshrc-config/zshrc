@@ -1,9 +1,12 @@
 #!/bin/bash
-## ------------------------- BEGINING OF CUSTOM ZSHRC -------------------------
-# start=$(($(date +'%s * 1000 + %-N / 1000000')))
-start=$(python3 -c 'from time import time; print(int(round(time() * 1000)))')
 
-# TODO: If/else for checking the OS
+## ------------------------- BEGINING OF CUSTOM ZSHRC -------------------------
+# start=$(($(date +'%s * 1000 + %-N / 1000000'))) # GNU
+# https://apple.stackexchange.com/questions/135742/time-in-milliseconds-since-epoch-in-the-terminal
+start=$(python3 -c 'from time import time; print(int(round(time() * 1000)))') # OSX
+
+# TODO: If/else for checking the OS ?
+# bash --version # https://itnext.io/upgrading-bash-on-macos-7138bd1066ba
 source $HOME/.config/zshrc-config/aliases/os/macos/set_path
 
 # Path to your oh-my-zsh installation.
@@ -21,17 +24,17 @@ ZSH_THEME="spaceship"  # https://github.com/denysdovhan/spaceship-zsh-theme
 SPACESHIP_BATTERY_SHOW='never'
 
 # IMPORTANT: oh-my-zsh must be installed for making next section work.
-# Which would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
+# What add-ons do you want to use? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-    git
-    fzf  # https://github.com/junegunn/fzf#using-homebrew-or-linuxbrew
     docker
-    zsh-autosuggestions  # https://github.com/zsh-users/zsh-autosuggestions#oh-my-zsh
-    zsh-syntax-highlighting  # https://github.com/zsh-users/zsh-syntax-highlighting
+    fzf                         # https://github.com/junegunn/fzf#using-homebrew-or-linuxbrew
+    git
     golang
+    zsh-autosuggestions         # https://github.com/zsh-users/zsh-autosuggestions#oh-my-zsh
+    zsh-syntax-highlighting     # https://github.com/zsh-users/zsh-syntax-highlighting
 )
 # LOAD oh-my-zsh. This will load all the plugins.
 source $ZSH/oh-my-zsh.sh
@@ -39,6 +42,7 @@ source $ZSH/oh-my-zsh.sh
 # Path to your custom configuration.
 export ZSH_CUSTOM_CONFIG_FILES="$HOME/.config/zshrc-config"
 export ZSH_CUSTOM_CONFIG_ALIASES="$ZSH_CUSTOM_CONFIG_FILES/aliases"
+alias zshrc='code $ZSH_CUSTOM_CONFIG_FILES'
 
 source $ZSH_CUSTOM_CONFIG_ALIASES/default
 
@@ -70,6 +74,6 @@ source $ZSH_CUSTOM_CONFIG_FILES/config/fix_zsh
 test -e "$ZSH_CUSTOM_CONFIG_FILES/config/.iterm2_shell_integration.zsh" && \
     source "$ZSH_CUSTOM_CONFIG_FILES/config/.iterm2_shell_integration.zsh"
 
-# end=$(($(date +'%s * 1000 + %-N / 1000000'))); runtime=$((end-start)); echo "Runtime of zshrc was $runtime ms."
-end=$(python3 -c 'from time import time; print(int(round(time() * 1000)))'); runtime=$((end-start)); echo "Runtime of zshrc was $runtime ms."
+# end=$(($(date +'%s * 1000 + %-N / 1000000'))); runtime=$((end-start)); echo "Runtime of zshrc was $runtime ms." # GNU
+end=$(python3 -c 'from time import time; print(int(round(time() * 1000)))'); runtime=$((end-start)); echo "Runtime of zshrc was $runtime ms." # OSX
 ## ------------------------- END OF CUSTOM ZSHRC -------------------------

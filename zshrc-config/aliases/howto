@@ -57,6 +57,13 @@ function bashrc_doc() {
 }
 
 # ========== C
+alias copy\?='copy_doc'
+function copy_doc() {
+	echo """
+	cp ~/.<file-name>{,-<extension>}
+	"""
+}
+
 alias crypto\?='go run $ZSH_CUSTOM_CONFIG_FILES/crypto.go'
 
 # ========== D
@@ -232,6 +239,15 @@ function iterm_doc() {
 # ========== K
 # ========== L
 # ========== M
+alias mkdir\?='mkdir_doc'
+function mkdir_doc() {
+	echo """
+	mkdir -p ./{proto,server/proto,database/proto} # -p Creates intermediate directories as required.
+			     └── proto  └── server     └── database
+							  └── proto		 └── proto
+	"""
+}
+
 # ========== N
 alias npm\?='npm_doc'
 function npm_doc() {
