@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo "REMEMBER TO TAG THE MASTER BRANCH TO DEPLOY"
+echo "1.checkout master"
+echo "./build-tool.sh create_new_tag"

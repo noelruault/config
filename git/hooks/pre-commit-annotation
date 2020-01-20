@@ -1,0 +1,20 @@
+#!/bin/bash
+
+FLAGS="TODO(nruault) NOTE(nruault)" # Check instead TODO(nr NOTE(nr to be less specific?
+
+for flag in $FLAGS; do
+    flag_found=$(git grep --files-with-matches --color "$flag*")
+    if [ -n "$flag_found" ]; then
+
+        while true
+        do
+            read -p "$flag was found on $flag_found. Do you want to commit it? " answer < /dev/tty
+            case $answer in
+                [Yy]*) break ;;
+                [Nn]*) exit ;;
+                *) echo "Please answer yes or no." ;;
+            esac
+        done
+
+    fi
+done
