@@ -1730,9 +1730,13 @@ Restart Session</string>
 	<key>LoadPrefsFromCustomFolder</key>
 	<true/>
 	<key>NSNavLastRootDirectory</key>
-	<string>~/.config/iTerm2</string>
+	<string>~/Documents</string>
+	<key>NSNavLastUserSetHideExtensionButtonState</key>
+	<false/>
 	<key>NSNavPanelExpandedSizeForOpenMode</key>
 	<string>{799, 448}</string>
+	<key>NSNavPanelExpandedSizeForSaveMode</key>
+	<string>{712, 448}</string>
 	<key>NSQuotedKeystrokeBinding</key>
 	<string></string>
 	<key>NSRepeatCountBinding</key>
@@ -1775,9 +1779,13 @@ Restart Session</string>
 		<integer>1</integer>
 	</dict>
 	<key>NSWindow Frame NSNavPanelAutosaveName</key>
-	<string>320 322 799 448 0 0 1440 877 </string>
+	<string>546 522 347 181 0 0 1440 877 </string>
+	<key>NSWindow Frame SUStatusFrame</key>
+	<string>526 1866 400 129 0 0 1440 877 </string>
+	<key>NSWindow Frame SUUpdateAlert</key>
+	<string>416 1668 620 392 -554 900 2560 1417 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>0 432 1440 445 0 0 1440 877 </string>
+	<string>0 452 1440 425 0 0 1440 877 </string>
 	<key>New Bookmarks</key>
 	<array>
 		<dict>
@@ -1820,13 +1828,13 @@ Restart Session</string>
 				<key>Alpha Component</key>
 				<real>1</real>
 				<key>Blue Component</key>
-				<real>0.6178932785987854</real>
+				<real>0.4392156862745098</real>
 				<key>Color Space</key>
 				<string>sRGB</string>
 				<key>Green Component</key>
-				<real>0.6179012656211853</real>
+				<real>0.77647058823529413</real>
 				<key>Red Component</key>
-				<real>0.61788642406463623</real>
+				<real>0.65490196078431373</real>
 			</dict>
 			<key>Ansi 11 Color</key>
 			<dict>
@@ -1846,26 +1854,26 @@ Restart Session</string>
 				<key>Alpha Component</key>
 				<real>1</real>
 				<key>Blue Component</key>
-				<real>0.44285190105438232</real>
+				<real>0.77726441621780396</real>
 				<key>Color Space</key>
 				<string>sRGB</string>
 				<key>Green Component</key>
-				<real>0.77726441621780396</real>
+				<real>0.45707831237450591</real>
 				<key>Red Component</key>
-				<real>0.65665173530578613</real>
+				<real>0.44285190105438232</real>
 			</dict>
 			<key>Ansi 13 Color</key>
 			<dict>
 				<key>Alpha Component</key>
 				<real>1</real>
 				<key>Blue Component</key>
-				<real>0.69920748472213745</real>
+				<real>0.77647058823529413</real>
 				<key>Color Space</key>
 				<string>sRGB</string>
 				<key>Green Component</key>
-				<real>0.69921654462814331</real>
+				<real>0.4392156862745098</real>
 				<key>Red Component</key>
-				<real>0.6991998553276062</real>
+				<real>0.6021000880821078</real>
 			</dict>
 			<key>Ansi 14 Color</key>
 			<dict>
@@ -1898,13 +1906,13 @@ Restart Session</string>
 				<key>Alpha Component</key>
 				<real>1</real>
 				<key>Blue Component</key>
-				<real>0.47564041614532471</real>
+				<real>0.30588235294117649</real>
 				<key>Color Space</key>
 				<string>sRGB</string>
 				<key>Green Component</key>
-				<real>0.4756467342376709</real>
+				<real>0.55294117647058827</real>
 				<key>Red Component</key>
-				<real>0.47563493251800537</real>
+				<real>0.46666666666666667</real>
 			</dict>
 			<key>Ansi 3 Color</key>
 			<dict>
@@ -1924,26 +1932,26 @@ Restart Session</string>
 				<key>Alpha Component</key>
 				<real>1</real>
 				<key>Blue Component</key>
-				<real>0.30936223268508911</real>
+				<real>0.5511474609375</real>
 				<key>Color Space</key>
 				<string>sRGB</string>
 				<key>Green Component</key>
-				<real>0.55539321899414062</real>
+				<real>0.38319980743066195</real>
 				<key>Red Component</key>
-				<real>0.46882337331771851</real>
+				<real>0.32388827763497829</real>
 			</dict>
 			<key>Ansi 5 Color</key>
 			<dict>
 				<key>Alpha Component</key>
 				<real>1</real>
 				<key>Blue Component</key>
-				<real>0.53691816329956055</real>
+				<real>0.5490196078431373</real>
 				<key>Color Space</key>
 				<string>sRGB</string>
 				<key>Green Component</key>
-				<real>0.53692519664764404</real>
+				<real>0.32156862745098036</real>
 				<key>Red Component</key>
-				<real>0.53691214323043823</real>
+				<real>0.43829273897058824</real>
 			</dict>
 			<key>Ansi 6 Color</key>
 			<dict>
@@ -3951,6 +3959,7 @@ Restart Session</string>
 	<key>NoSyncAllAppVersions</key>
 	<array>
 		<string>3.3.6</string>
+		<string>3.3.7</string>
 	</array>
 	<key>NoSyncBFPFavorites</key>
 	<array>
@@ -3974,16 +3983,16 @@ Restart Session</string>
 		<key>screenFrame</key>
 		<string>{{0, 0}, {1440, 900}}</string>
 		<key>topLeft</key>
-		<string>{398, 710}</string>
+		<string>{216, 686}</string>
 	</dict>
 	<key>NoSyncHaveUsedCopyMode</key>
 	<true/>
 	<key>NoSyncInstallationId</key>
 	<string>09D59361-7148-439A-A8B8-8FB1D51462F4</string>
 	<key>NoSyncLastTipTime</key>
-	<real>595686126.39405596</real>
+	<real>597030456.483639</real>
 	<key>NoSyncLaunchExperienceControllerRunCount</key>
-	<integer>16</integer>
+	<integer>28</integer>
 	<key>NoSyncNeverRemindPrefsChangesLostForFile</key>
 	<true/>
 	<key>NoSyncNeverRemindPrefsChangesLostForFile_selection</key>
@@ -4692,6 +4701,8 @@ Restart Session</string>
 			</dict>
 		</array>
 	</dict>
+	<key>NoSyncSaveDocumentAsPathSet_saveDocumentAs:</key>
+	<true/>
 	<key>NoSyncSearchHistory2</key>
 	<array>
 		<string>gpg --</string>
@@ -4709,17 +4720,30 @@ Restart Session</string>
 	<real>594010908.546579</real>
 	<key>NoSyncTipsToNotShow</key>
 	<array>
-		<string>0006</string>
-		<string>0003</string>
-		<string>0000</string>
-		<string>0007</string>
+		<string>0010</string>
+		<string>0015</string>
 		<string>0004</string>
+		<string>0009</string>
+		<string>0013</string>
+		<string>0002</string>
+		<string>0018</string>
+		<string>0007</string>
+		<string>0011</string>
+		<string>0000</string>
+		<string>0016</string>
+		<string>0005</string>
+		<string>0020</string>
+		<string>0014</string>
+		<string>0003</string>
+		<string>0019</string>
+		<string>0008</string>
+		<string>0012</string>
 		<string>0001</string>
 		<string>000</string>
-		<string>0008</string>
-		<string>0005</string>
-		<string>0002</string>
-		<string>0009</string>
+		<string>0017</string>
+		<string>0006</string>
+		<string>0021</string>
+		<string>0022</string>
 	</array>
 	<key>OpenArrangementAtStartup</key>
 	<false/>
@@ -4781,8 +4805,10 @@ Restart Session</string>
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2019-11-18T00:29:31Z</date>
+	<date>2019-12-03T04:38:33Z</date>
 	<key>SUSendProfileInfo</key>
+	<false/>
+	<key>SUUpdateRelaunchingMarker</key>
 	<false/>
 	<key>SavePasteHistory</key>
 	<false/>
@@ -4816,7 +4842,7 @@ Restart Session</string>
 	<key>findMode_iTerm</key>
 	<integer>0</integer>
 	<key>iTerm Version</key>
-	<string>3.3.6</string>
+	<string>3.3.7</string>
 	<key>kCPKSelectionViewPreferredModeKey</key>
 	<integer>0</integer>
 	<key>kCPKSelectionViewShowHSBTextFieldsKey</key>

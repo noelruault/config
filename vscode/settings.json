@@ -9,17 +9,22 @@
     "editor.snippetSuggestions": "top",
     "[python]": {
         "editor.rulers": [
-            79,
-            120
+            79
         ]
     },
     "[go]": {
         "editor.rulers": [
             80
         ],
+        "editor.formatOnSave": true, // REMOVEME
+        "editor.codeActionsOnSave": { // REMOVEME
+            "source.organizeImports": true // REMOVEME
+        }
+        // "go.formatTool": "goimports", // Default format tool. Will take care of formatting "on save"
         // "editor.formatOnSave": true,
     },
     "editor.suggestSelection": "first",
+
     // "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
     "breadcrumbs.enabled": true,
     "files.trimTrailingWhitespace": false,
@@ -27,12 +32,16 @@
     "editor.minimap.enabled": false,
     // "workbench.colorCustomizations": {},
     // "python.jediEnabled": false,
+
+    // (extension) To-do tree
+    // todo-tree.general.tags adds the next tags to the TODO tree (sidebar)
     "todo-tree.general.tags":[
         "TODO",
         "FIXME",
         "NOTE",
         "HOWTO",
     ],
+    // todo-tree.general.customHighlight adds styles to the TODO tree (sidebar)
     "todo-tree.highlights.customHighlight": {
         // https://github.com/Gruntfuggly/todo-tree
         "TODO": {
@@ -61,6 +70,28 @@
             "opacity": 60,
         },
     },
+    // (extension) Better comments
+    "better-comments.multilineComments": true,
+    "better-comments.tags": [
+        {
+            "tag": "TODO",
+            "color": "#FFAA01",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "NOTE",
+            "color": "#FFAA01",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        // {
+        //     "tag": "*",
+        //     "color": "#98C379",
+        //     "strikethrough": false,
+        //     "backgroundColor": "transparent"
+        // }
+    ],
     "go.delveConfig": {
         "dlvLoadConfig": {
             "followPointers": true,
@@ -73,7 +104,7 @@
     "sync.forceUpload": false,
     "todo-tree.highlights.enabled": false,
 
-    // AP
+    // Assembly Payments config
     "go.testTags": "endtoend",
     "go.buildTags": "endtoend integration",
     // "window.zoomLevel": 0,
@@ -98,6 +129,25 @@
         "-count=1"
     ],
     "files.insertFinalNewline": true,
+    "terminal.integrated.env.osx": {
+        "GOPRIVATE": "github.com/AssemblyPayments/*"
+    },
+    "git.autofetch": false,
+
+    // Clang formatter for proto files.
+    "clang-format.language.proto.enable": true,
+    "[proto3]": {
+        "editor.defaultFormatter": "xaver.clang-format"
+    },
+    "[sql]": {
+        "editor.formatOnSave": false,
+        // "editor.defaultFormatter": "mtxr.sqltools"
+    },
+    "go.useLanguageServer": false,
+    "gitlens.currentLine.enabled": false,
+    "gitlens.hovers.currentLine.over": "line",
+
+    // Fix imports for Assembly Payments on save.
     "emeraldwalk.runonsave": {
         "commands": [
             {
@@ -109,25 +159,12 @@
             }
         ]
     },
-    "terminal.integrated.env.osx": {
-        "GOPRIVATE": "github.com/AssemblyPayments/*"
-    },
-    "clang-format.language.proto.enable": true,
-    "git.autofetch": false,
-    "[proto3]": {
-        "editor.defaultFormatter": "xaver.clang-format"
-    },
-    "[sql]": {
-        "editor.formatOnSave": false,
-        // "editor.defaultFormatter": "mtxr.sqltools"
-    },
-    "go.useLanguageServer": false,
-    "gitlens.currentLine.enabled": false,
-    "gitlens.hovers.currentLine.over": "line",
+    "gitlens.blame.avatars": false,
+    "gitlens.codeLens.authors.enabled": false,
+    "gitlens.hovers.enabled": false,
 }
 
 // {
-
 //     "editor.fontLigatures": true,
 //     "editor.fontFamily": "Fira Code",
 //     "workbench.colorTheme": "Dracula",
