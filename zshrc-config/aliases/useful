@@ -50,22 +50,22 @@ alias awesome='cat $ZSH_CUSTOM_CONFIG_FILES/awesome.txt'
 # alias gotest='go test ./... -p 1 -v'
 # TODO:
 # https://stackoverflow.com/a/30033822/4349318
-gotest(){ color : string }{
-    color
-    : string color
+gotest(){
 
-    if [[ "$color" != "color" ]]
-        then
-            go test ./... -p 1 -v \
-            | sed ''/PASS/s//$(printf "\033[32mPASS\033[0m")/'' \
-            | sed ''/FAIL/s//$(printf "\033[31mFAIL\033[0m")/'' # \
-            #| GREP_COLOR="01;33" egrep --color=always '\s*[a-zA-Z0-9\-_.]+[:][0-9]+[:]|^'
-    fi
-    if [[ "$color" != "" ]]
-        then
-        go test ./... -p 1 -v
+    # if [[ "$1" == "color" ]]; then
+    go test ./... -p 1 -count 1 -v \
+    | sed ''/PASS/s//$(printf "\033[32mPASS\033[0m")/'' \
+    | sed ''/FAIL/s//$(printf "\033[31mFAIL\033[0m")/'' # \
+    ## | GREP_COLOR="01;33" egrep --color=always '\s*[a-zA-Z0-9\-_.]+[:][0-9]+[:]|^'
+    # return
+
+    if [[ "$1" == "e2e" ]]; then
+        go test ./test/endtoend -tags=endtoend -count=1 -timeout 120s \
+        | sed ''/PASS/s//$(printf "\033[32mPASS\033[0m")/'' \
+        | sed ''/FAIL/s//$(printf "\033[31mFAIL\033[0m")/''
     fi
 }
+
 gocover () {
   local t=$(mktemp -t cover)
   go test $COVERFLAGS -coverprofile=$t $@ && go tool cover -func=$t && unlink $t
@@ -82,7 +82,7 @@ alias goa=go_to_dir_on_specific_folder # A $COMPANY_DIRECTORY needs to be config
 # go_to_dir_on_specific_folder will try to find a directory that matches
 # with the given parameters inside of an specific folder.
 #
-# Note: AP_DIR variable could be changed to something else, more specific
+# Note: WORK_FOLDER variable could be changed to something else, more specific
 # and without evaluations or commands. It's done this way for confidentiality.
 #
 # Used uncommon commands :
@@ -90,16 +90,22 @@ alias goa=go_to_dir_on_specific_folder # A $COMPANY_DIRECTORY needs to be config
 # - https://ss64.com/bash/awk.html
 # - Colors: https://www.tldp.org/HOWTO/Bash-Prompt-HOWTO/x329.html https://www.shellhacks.com/bash-colors/
 function go_to_dir_on_specific_folder() {
-    AP_DIR=$(eval echo $(go env GOPATH)/src/$COMPANY_DIRECTORY/) # eval will store the desired payments path.
+    WORK_FOLDER=$(eval echo $(go env GOPATH)/src/$COMPANY_DIRECTORY/) # eval will store the desired payments path.
 
-    counter=$(find $AP_DIR -type d -name "*$1*$2*" -print -maxdepth 1 | wc -l) # wc is used for counting the lines
+    # If there is no arguments, just go to $COMPANY_DIRECTORY
+    if [[ $# -eq 0 ]] ; then
+        cd $WORK_FOLDER
+        return
+    fi
+
+    counter=$(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | wc -l) # wc is used for counting the lines
     if (( $counter == 0 )); then
         # An inverted counter will try to find matches inverting the order of the params.
-        inverted_counter=$(find $AP_DIR -type d -name "*$2*$1*" -print -maxdepth 1 | wc -l)
+        inverted_counter=$(find $WORK_FOLDER -type d -name "*$2*$1*" -print -maxdepth 1 | wc -l)
         if (( $inverted_counter > 0 )); then
             # If something matches, will display the results in addition to a tip.
             echo "Better try \e[0;33m$2 $1\e[0m"
-            echo "Found:\n\e[0;34m$(find $AP_DIR -type d -name "*$2*$1*" -print -maxdepth 1 | awk -F/ '{print $NF}')\e[0m"
+            echo "Found:\n\e[0;34m$(find $WORK_FOLDER -type d -name "*$2*$1*" -print -maxdepth 1 | awk -F/ '{print $NF}')\e[0m"
             return
         fi
 
@@ -108,11 +114,11 @@ function go_to_dir_on_specific_folder() {
 
     elif (( $counter > 1 )); then
         # If more than one folder were found, print the results
-        find $AP_DIR -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}' # awk is used for getting the name of the folder without the path
+        find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}' # awk is used for getting the name of the folder without the path
         return
     else
         # If only one folder was found, change to the found directory
-        cd $AP_DIR$(find $AP_DIR -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}')
+        cd $WORK_FOLDER$(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}')
     fi;
 }
 

@@ -1,11 +1,17 @@
 #!/bin/bash
 
 # Remove Containers
+echo "Stopping containers..."
 sudo docker container stop $(docker container ls -aq)
+
+echo "Removing containers..."
 sudo docker rm $(sudo docker ps -aq) --force --volumes
+
 # Remove Images
 # sudo docker rmi $(sudo docker images -q) --force
+
 # Remove Volumes
+echo "Removing volumes..."
 docker volume rm $(docker volume ls)
 
 
@@ -20,7 +26,6 @@ else
 fi
 
 # && rm scripts/data.cache
-
 
 # $ docker rm --help
 #   Options:

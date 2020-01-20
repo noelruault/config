@@ -144,6 +144,19 @@ function git_doc() {
 	#	-d  :remove whole directories
 	# 	-f  :force
 	[[Source: https://stackoverflow.com/a/102309/4349318]]
+
+	Remove branches?
+	* Deleting local branches
+		git branch -d <branch_name>
+	* Deleting remote branches
+		git push origin :<branch_name>
+		git push origin --delete <branch_name>
+
+	[[Source: https://www.educative.io/edpresso/how-to-delete-remote-branches-in-git]]
+
+	Remove existing `.DS_Store` files from the repository:
+	find . -name .DS_Store -print0 | xargs -0 git rm -f --ignore-unmatch
+
 	"""
 }
 
@@ -164,6 +177,31 @@ function go-comments_doc() {
 
 	[Reference]: https://dave.cheney.net/practical-go/presentations/qcon-china.html#_comments
 	"""
+}
+
+alias go-mock\?='go-mock_doc'
+function go-mock_doc() {
+	echo '''
+	-----
+	if err != nil {
+		stats.Incr("internal.errors", stats.T("error_code", "tokenization.UpdateTokenTransaction"))
+	}
+	-----
+
+	* (??) How to MOCK stats.Incr:
+
+	`api.go`
+
+	type statsEngine interface {
+		Incr(name string, tags ...stats.Tag)
+	}
+
+	`api_test.go`
+
+	type statsEngineMock struct{}
+	func (sem *statsEngineMock) Incr(name string, tags ...stats.Tag) {}
+
+	'''
 }
 
 alias go-mod\?='go-mod_doc'
