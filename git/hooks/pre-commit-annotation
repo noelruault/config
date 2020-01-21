@@ -11,7 +11,7 @@ for flag in $FLAGS; do
             read -p "$flag was found on $flag_found. Do you want to commit it? " answer < /dev/tty
             case $answer in
                 [Yy]*) break ;;
-                [Nn]*) exit ;;
+                [Nn]*) exit 1 ;;
                 *) echo "Please answer yes or no." ;;
             esac
         done
