@@ -1,6 +1,7 @@
 #!/bin/bash
 
-FLAGS="TODO(nruault) NOTE(nruault)" # Check instead TODO(nr NOTE(nr to be less specific?
+FLAGS="TODO(nruault) NOTE(nruault)"
+# TODO: Check instead `TODO(nr` `NOTE(nr` to be less specific?
 
 for flag in $FLAGS; do
     flag_found=$(git grep --files-with-matches --color "$flag*")

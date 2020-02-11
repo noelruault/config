@@ -9,9 +9,9 @@ echo -e "[PREVENT] --> Init (wait a second)"
 BRANCH=`git rev-parse --abbrev-ref HEAD`
 
 if [ $BRANCH == master ]; then
-    echo -e "[PREVENT] --> ✋ Non shall commit to master!"
+    echo -e "[PREVENT] --> ✋ You shouldn't commit to master!"
     exit 1
 else
-    echo -e "[PREVENT] --> 👍 Prevent commit to master approved."
+    echo -e "[PREVENT] --> 👍 Commit to master approved."
     exit 0
 fi

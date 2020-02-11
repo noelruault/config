@@ -1,0 +1,22 @@
+# General
+.DS_Store
+*.DS_Store
+.DS_Store?
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Visual studio code related files
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace

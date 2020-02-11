@@ -44,7 +44,7 @@ export ZSH_CUSTOM_CONFIG_FILES="$HOME/.config/zshrc-config"
 export ZSH_CUSTOM_CONFIG_ALIASES="$ZSH_CUSTOM_CONFIG_FILES/aliases"
 alias zshrc='code $ZSH_CUSTOM_CONFIG_FILES'
 
-source $ZSH_CUSTOM_CONFIG_ALIASES/default
+source $ZSH_CUSTOM_CONFIG_FILES/config/default
 
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
@@ -53,19 +53,26 @@ source $ZSH_CUSTOM_CONFIG_ALIASES/default
 # To reload .zshrc: 'source .zshrc' or just type 'zsh'
 
 ## Useful aliases
-source $ZSH_CUSTOM_CONFIG_ALIASES/useful
-## Docker useful aliases
-source $ZSH_CUSTOM_CONFIG_ALIASES/docker
-## Useful macOS aliases
-source $ZSH_CUSTOM_CONFIG_ALIASES/os/macos/aliases
-## Useful whereis aliases
-source $ZSH_CUSTOM_CONFIG_ALIASES/howto
-## Useful hacky aliases
-source $ZSH_CUSTOM_CONFIG_ALIASES/hacky
+source $ZSH_CUSTOM_CONFIG_ALIASES/utils/useful
 
-## Company specific aliases
-for file in $ZSH_CUSTOM_CONFIG_ALIASES/assembly/*; do
-    source "$file"
+## Docker aliases
+source $ZSH_CUSTOM_CONFIG_ALIASES/docker/aliases
+
+## Operating System aliases
+CURRENT_OS="$(uname -a | awk '{print $1}')"
+if [ $CURRENT_OS = "Darwin" ]; then
+    source $ZSH_CUSTOM_CONFIG_ALIASES/os/macos/aliases
+else
+    source $ZSH_CUSTOM_CONFIG_ALIASES/os/linux
+fi
+
+## Personal aliases
+source $ZSH_CUSTOM_CONFIG_ALIASES/nruault
+
+## Private aliases
+PRIV_FILES=($(ls $ZSH_CUSTOM_CONFIG_ALIASES/private | grep -v '\.')) # Trick to discard the non-aliases files
+for file in $PRIV_FILES; do
+    source "$ZSH_CUSTOM_CONFIG_ALIASES/private/$file"
 done
 
 ## Some aliases to fix zsh history

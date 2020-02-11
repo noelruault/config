@@ -1,0 +1,25 @@
+#!/bin/bash
+
+alias crypto\?='go run $ZSH_CUSTOM_CONFIG_FILES/crypto.go &'
+
+function check_noelio_domain() {
+    # Checks for internet connectivity.
+    if ping -q -c 1 -W 1 8.8.8.8 >/dev/null; then; else exit 1; fi
+
+    domain_expiry_date=$(whois noel.io | grep "Expiry" | grep -oE '(\d{4})-(\d\d)-(\d\d)' | sed 's/[\._-]//g')
+    current_date=$(date +%Y%m%d)
+    time_until_expiration=$((domain_expiry_date - $(date +%Y%m%d)))
+
+    if [[ "$1" == "bash:request" ]]; then
+        if (($time_until_expiration < 7)); then
+            echo "DOMAIN ABOUT TO EXPIRE, $time_until_expiration days left."
+        fi
+    else
+        echo "Domain expiration is $time_until_expiration days ahead."
+    fi
+    exit 0
+}
+
+(check_noelio_domain "bash:request" &) # https://stackoverflow.com/a/7687722/4349318
+
+alias noel.io\?='check_noelio_domain'

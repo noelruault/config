@@ -12,11 +12,11 @@
 
     mv $HOME/.zshrc-config $HOME/.backup-zshrc-config
 
-    TODO:
+TO-DO:
 
     - Personal folder (store awesome, crypto... etc.)
 
-    code makefile to ...
+Create makefile to ...
 
     - install iterm
     - install zsh

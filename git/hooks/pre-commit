@@ -4,7 +4,12 @@
 # pre-commit hooks for git.
 # Hook that runs all files specified, containing hooks with useful checks
 
-HOOKS="pre-commit-forbidden pre-commit-annotation" # Add here more files containing hooks...
+# Add here more files containing hooks...
+HOOKS="
+    pre-commit-forbidden
+    pre-commit-annotation
+    pre-commit-ap-formatting
+    pre-commit-prevent-fixme"
 
 for hook in $HOOKS; do
 	path_to_hook="$HOME/.config/git/hooks/$hook"

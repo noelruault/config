@@ -13,6 +13,15 @@ Giving that the folder that contains the hooks is under `.config/git/hooks`...
 
 *Useful reference*: [pre-commit-hooks](https://coderwall.com/p/vt0lpg/pre-commit-hooks)
 
+Have in mind that git will be smart enough to use the pre-commit, pre-push and post-merge files. As far as this files are configure to iterate over some other files, the execution of this ones should be automatic.
+
+> e.g: pre-commit
+
+    # ...
+    HOOKS="pre-commit-forbidden pre-commit-annotation" # Add here more files containing hooks...
+    for hook in $HOOKS; do
+    # ...
+
 ---
 
 [SETUP]
@@ -66,4 +75,4 @@ Then they should be in format::
 
     TAG-1234_some_optional_text
 
-------------------------------
+---

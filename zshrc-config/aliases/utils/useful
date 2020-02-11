@@ -3,12 +3,9 @@
 alias hs='history | grep'
 alias hibernate="sudo systemctl hibernate"
 
-# dot_clean -> Remove dot-underscore files. Merges ._* files with corresponding native files. # https://ss64.com/osx/dot_clean.html
-alias ds_clean="find . -name '.DS_Store' -type f -delete"
-
 # IP ADDRESSES
 alias wanip='dig +short myip.opendns.com @resolver1.opendns.com'
-alias localhosts='ifconfig | grep "inet " | grep -v 127.0.0.1'  # https://stackoverflow.com/a/4779992
+alias localhosts='ifconfig | grep "inet " | grep -v 127.0.0.1' # https://stackoverflow.com/a/4779992
 
 # CP command, do rsync if file is a folder or higher than 50MB  // rsync -ah --progress
 alias cp='rsync -ah --progress'
@@ -21,19 +18,23 @@ alias cp='rsync -ah --progress'
 # alias emacs="/usr/local/bin/emacs"
 
 ### GIT
+# https://github.com/ohmyzsh/ohmyzsh/wiki/Cheatsheet#git
 alias gamod="git ls-files --modified | xargs git add"
 # Remove all your local git branches but keep master and the current branch:
-alias greset='git branch | egrep -v "(master|\*)" | xargs git branch -D'
+alias gbreset='git branch | egrep -v "(master|\*)" | xargs git branch -D'
 alias githooksconfig='git config --global core.hooksPath ~/.config/git/hooks/'
+# USEFUL COMMANDS:
+#   - git diff origin/master --name-only -- '*.go' ':(exclude)vendor/*'
+
 ### Vagrant
 alias vagrantclean="vagrant box list | cut -f 1 -d ' ' | xargs -L 1 vagrant box remove -f"
 
 function search() { find / -name "$@" | echo; }
 
-function pro_rebase(){
+function pro_rebase() {
     # https://stackoverflow.com/a/927386
     regex='^[0-9]+$'
-    if [[ $@ =~ $regex ]] ; then
+    if [[ $@ =~ $regex ]]; then
         git rebase -i HEAD~"$@"
         echo "Remember to push with --force flag."
     else
@@ -44,32 +45,37 @@ function pro_rebase(){
     fi
 }
 
-alias awesome='cat $ZSH_CUSTOM_CONFIG_FILES/awesome.txt'
+alias awesome='cat $ZSH_CUSTOM_CONFIG_FILES/nruault/assets/awesome.txt'
 
 ### GOLANG
 # alias gotest='go test ./... -p 1 -v'
 # TODO:
 # https://stackoverflow.com/a/30033822/4349318
-gotest(){
+gotest() {
 
     # if [[ "$1" == "color" ]]; then
-    go test ./... -p 1 -count 1 -v \
-    | sed ''/PASS/s//$(printf "\033[32mPASS\033[0m")/'' \
-    | sed ''/FAIL/s//$(printf "\033[31mFAIL\033[0m")/'' # \
+    go test ./... -p 1 -count 1 -v |
+        sed ''/PASS/s//$(printf "\033[32mPASS\033[0m")/'' |
+        sed ''/FAIL/s//$(printf "\033[31mFAIL\033[0m")/'' # \
     ## | GREP_COLOR="01;33" egrep --color=always '\s*[a-zA-Z0-9\-_.]+[:][0-9]+[:]|^'
     # return
 
     if [[ "$1" == "e2e" ]]; then
-        go test ./test/endtoend -tags=endtoend -count=1 -timeout 120s \
-        | sed ''/PASS/s//$(printf "\033[32mPASS\033[0m")/'' \
-        | sed ''/FAIL/s//$(printf "\033[31mFAIL\033[0m")/''
+        go test ./test/endtoend -tags=endtoend -count=1 -timeout 120s |
+            sed ''/PASS/s//$(printf "\033[32mPASS\033[0m")/'' |
+            sed ''/FAIL/s//$(printf "\033[31mFAIL\033[0m")/''
     fi
 }
 
-gocover () {
-  local t=$(mktemp -t cover)
-  go test $COVERFLAGS -coverprofile=$t $@ && go tool cover -func=$t && unlink $t
+####
+# USE: gocover -run TestUpdateSomethingExample -count=1
+#
+gocover() {
+    # go test route/to/test -run TestUpdateSomethingExample -count=1 -coverprofile cover.out; go tool cover -html=cover.out
+    local t=$(mktemp -t cover)
+    go test $COVERFLAGS -coverprofile=$t $@ && go tool cover -func=$t && unlink $t
 }
+
 # for pkg in *; do go test "./$pkg"; done
 # go clean -testcache # https://golang.org/pkg/cmd/go/internal/clean/
 
@@ -82,8 +88,8 @@ alias goa=go_to_dir_on_specific_folder # A $COMPANY_DIRECTORY needs to be config
 # go_to_dir_on_specific_folder will try to find a directory that matches
 # with the given parameters inside of an specific folder.
 #
-# Note: WORK_FOLDER variable could be changed to something else, more specific
-# and without evaluations or commands. It's done this way for confidentiality.
+# NOTE: WORK_FOLDER variable could be changed to something else, more specific
+# and without evaluations or commands.
 #
 # Used uncommon commands :
 # - https://ss64.com/bash/wc.html
@@ -93,16 +99,16 @@ function go_to_dir_on_specific_folder() {
     WORK_FOLDER=$(eval echo $(go env GOPATH)/src/$COMPANY_DIRECTORY/) # eval will store the desired payments path.
 
     # If there is no arguments, just go to $COMPANY_DIRECTORY
-    if [[ $# -eq 0 ]] ; then
+    if [[ $# -eq 0 ]]; then
         cd $WORK_FOLDER
         return
     fi
 
     counter=$(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | wc -l) # wc is used for counting the lines
-    if (( $counter == 0 )); then
+    if (($counter == 0)); then
         # An inverted counter will try to find matches inverting the order of the params.
         inverted_counter=$(find $WORK_FOLDER -type d -name "*$2*$1*" -print -maxdepth 1 | wc -l)
-        if (( $inverted_counter > 0 )); then
+        if (($inverted_counter > 0)); then
             # If something matches, will display the results in addition to a tip.
             echo "Better try \e[0;33m$2 $1\e[0m"
             echo "Found:\n\e[0;34m$(find $WORK_FOLDER -type d -name "*$2*$1*" -print -maxdepth 1 | awk -F/ '{print $NF}')\e[0m"
@@ -112,14 +118,46 @@ function go_to_dir_on_specific_folder() {
         echo "No matches."
         return
 
-    elif (( $counter > 1 )); then
-        # If more than one folder were found, print the results
-        find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}' # awk is used for getting the name of the folder without the path
+    elif (($counter > 1)); then
+        # AWK is used in the next command to get the name of the folder without the path
+        # The parenthesis at the begining will make this an array.
+        search=($(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}'))
+
+        # This loop will check if the input matches exactly with the name of the folder,
+        # if there is an exact match, will cd and end the function.
+        for i in "${search[@]}"; do
+            if [ $i = $1 ]; then
+                cd $WORK_FOLDER$1
+                return
+            fi
+        done
+
+        # If more than one folder were found and there is not a clear candidate, print the results.
+        # The loop is used to print them in different lines.
+        for i in "${search[@]}"; do echo $i; done
         return
     else
         # If only one folder was found, change to the found directory
         cd $WORK_FOLDER$(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}')
-    fi;
+    fi
 }
 
-alias crypto\?='go run $ZSH_CUSTOM_CONFIG_FILES/crypto.go &'
+alias rm="rm -i"
+alias python='python3'
+alias ipython='python -m IPython'
+
+# FIX PIP
+alias pip=pip3_func
+alias pip3=pip3_func
+function pip3_func() {
+    $HOME/Library/Python/3.7/bin/pip3 "$@"
+    echo """
+\e[1;33m
+pip version: $($HOME/Library/Python/3.7/bin/pip3 --version)
+WARNING! Remember that pip path is hardcoded, due to incompatibilities. Check at $ZSH_CUSTOM_CONFIG_ALIASES/hacky to change its behaviour.
+\e[0m
+    """
+}
+
+# Export pipenv, virtualenv....
+export PATH=$PATH:$HOME/Library/Python/3.7/bin

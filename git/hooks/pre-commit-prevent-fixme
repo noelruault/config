@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# [INFO]
+# pre-commit-prevent-fixme hook for git.
+# Hook that prevents the user to commit FIXME's.
+
+if git diff --cached | egrep -q '\+(?:FIXME)'
+then
+  git grep -En --cached '^(FIXME)'
+  echo -e "[PREVENT] --> ✋ You shouldn't commit to master!"
+  echo "The files above have merge FIXME markers"
+  exit 1
+fi

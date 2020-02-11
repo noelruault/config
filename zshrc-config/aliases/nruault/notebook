@@ -64,7 +64,7 @@ function copy_doc() {
 	"""
 }
 
-alias crypto\?='go run $ZSH_CUSTOM_CONFIG_FILES/crypto.go'
+alias crypto\?='go run $ZSH_CUSTOM_CONFIG_FILES/nruault/assets/crypto.go'
 
 # ========== D
 alias dd\?='dd_doc'

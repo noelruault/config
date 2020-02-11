@@ -6,6 +6,8 @@
 	<true/>
 	<key>AppleAntiAliasingThreshold</key>
 	<integer>1</integer>
+	<key>ApplePressAndHoldEnabled</key>
+	<false/>
 	<key>AppleScrollAnimationEnabled</key>
 	<integer>0</integer>
 	<key>AppleSmoothFixedFontsSizeThreshold</key>
@@ -1730,13 +1732,15 @@ Restart Session</string>
 	<key>LoadPrefsFromCustomFolder</key>
 	<true/>
 	<key>NSNavLastRootDirectory</key>
-	<string>~/Documents</string>
+	<string>~/Projects/config/iTerm2/color-schemes</string>
 	<key>NSNavLastUserSetHideExtensionButtonState</key>
 	<false/>
 	<key>NSNavPanelExpandedSizeForOpenMode</key>
 	<string>{799, 448}</string>
 	<key>NSNavPanelExpandedSizeForSaveMode</key>
 	<string>{712, 448}</string>
+	<key>NSNavPanelExpandedStateForSaveMode</key>
+	<true/>
 	<key>NSQuotedKeystrokeBinding</key>
 	<string></string>
 	<key>NSRepeatCountBinding</key>
@@ -1779,13 +1783,15 @@ Restart Session</string>
 		<integer>1</integer>
 	</dict>
 	<key>NSWindow Frame NSNavPanelAutosaveName</key>
-	<string>546 522 347 181 0 0 1440 877 </string>
+	<string>299 233 841 470 0 0 1440 877 </string>
 	<key>NSWindow Frame SUStatusFrame</key>
-	<string>526 1866 400 129 0 0 1440 877 </string>
+	<string>526 1866 400 129 -554 900 2560 1417 </string>
 	<key>NSWindow Frame SUUpdateAlert</key>
 	<string>416 1668 620 392 -554 900 2560 1417 </string>
+	<key>NSWindow Frame UKCrashReporter</key>
+	<string>99 293 592 584 0 0 1440 877 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>0 452 1440 425 0 0 1440 877 </string>
+	<string>0 412 570 463 0 0 1440 877 </string>
 	<key>New Bookmarks</key>
 	<array>
 		<dict>
@@ -3960,6 +3966,7 @@ Restart Session</string>
 	<array>
 		<string>3.3.6</string>
 		<string>3.3.7</string>
+		<string>3.3.8</string>
 	</array>
 	<key>NoSyncBFPFavorites</key>
 	<array>
@@ -3981,18 +3988,18 @@ Restart Session</string>
 	<key>NoSyncFrame_SharedPreferences</key>
 	<dict>
 		<key>screenFrame</key>
-		<string>{{0, 0}, {1440, 900}}</string>
+		<string>{{1440, 0}, {2560, 1440}}</string>
 		<key>topLeft</key>
-		<string>{216, 686}</string>
+		<string>{1810, 1027}</string>
 	</dict>
 	<key>NoSyncHaveUsedCopyMode</key>
 	<true/>
 	<key>NoSyncInstallationId</key>
 	<string>09D59361-7148-439A-A8B8-8FB1D51462F4</string>
 	<key>NoSyncLastTipTime</key>
-	<real>597030456.483639</real>
+	<real>602384238.29804003</real>
 	<key>NoSyncLaunchExperienceControllerRunCount</key>
-	<integer>28</integer>
+	<integer>43</integer>
 	<key>NoSyncNeverRemindPrefsChangesLostForFile</key>
 	<true/>
 	<key>NoSyncNeverRemindPrefsChangesLostForFile_selection</key>
@@ -4703,47 +4710,70 @@ Restart Session</string>
 	</dict>
 	<key>NoSyncSaveDocumentAsPathSet_saveDocumentAs:</key>
 	<true/>
-	<key>NoSyncSearchHistory2</key>
-	<array>
-		<string>gpg --</string>
-		<string>statuscode</string>
-		<string>statuscodes</string>
-		<string>vscode</string>
-		<string>:5432</string>
-		<string>docker</string>
-		<string>poweruser</string>
-		<string>wpoweruser</string>
-		<string>wbpoweruser</string>
-		<string>wbcpoweruser</string>
-	</array>
 	<key>NoSyncTipOfTheDayEligibilityBeganTime</key>
 	<real>594010908.546579</real>
 	<key>NoSyncTipsToNotShow</key>
 	<array>
-		<string>0010</string>
-		<string>0015</string>
-		<string>0004</string>
-		<string>0009</string>
-		<string>0013</string>
-		<string>0002</string>
-		<string>0018</string>
-		<string>0007</string>
-		<string>0011</string>
-		<string>0000</string>
+		<string>0030</string>
+		<string>0023</string>
 		<string>0016</string>
-		<string>0005</string>
-		<string>0020</string>
-		<string>0014</string>
-		<string>0003</string>
-		<string>0019</string>
-		<string>0008</string>
-		<string>0012</string>
-		<string>0001</string>
-		<string>000</string>
+		<string>0009</string>
+		<string>0002</string>
+		<string>0045</string>
+		<string>0038</string>
+		<string>0052</string>
 		<string>0017</string>
+		<string>0031</string>
+		<string>0024</string>
+		<string>0010</string>
+		<string>0046</string>
+		<string>0003</string>
+		<string>0039</string>
+		<string>0053</string>
+		<string>0025</string>
+		<string>0018</string>
+		<string>0032</string>
+		<string>0011</string>
+		<string>0047</string>
+		<string>0004</string>
+		<string>0054</string>
+		<string>0033</string>
+		<string>0026</string>
+		<string>0019</string>
+		<string>0040</string>
+		<string>0012</string>
+		<string>0048</string>
+		<string>0005</string>
+		<string>0055</string>
+		<string>0041</string>
+		<string>0034</string>
+		<string>0027</string>
+		<string>0013</string>
+		<string>0049</string>
 		<string>0006</string>
+		<string>0020</string>
+		<string>0056</string>
+		<string>0042</string>
+		<string>0035</string>
+		<string>0028</string>
 		<string>0021</string>
+		<string>0014</string>
+		<string>0007</string>
+		<string>0057</string>
+		<string>0000</string>
+		<string>0029</string>
+		<string>0050</string>
+		<string>0043</string>
+		<string>0036</string>
 		<string>0022</string>
+		<string>0015</string>
+		<string>0008</string>
+		<string>0001</string>
+		<string>0037</string>
+		<string>000</string>
+		<string>0044</string>
+		<string>0051</string>
+		<string>0058</string>
 	</array>
 	<key>OpenArrangementAtStartup</key>
 	<false/>
@@ -4805,7 +4835,7 @@ Restart Session</string>
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2019-12-03T04:38:33Z</date>
+	<date>2020-02-03T23:25:13Z</date>
 	<key>SUSendProfileInfo</key>
 	<false/>
 	<key>SUUpdateRelaunchingMarker</key>
@@ -4833,6 +4863,8 @@ Restart Session</string>
 		<string>Jobs</string>
 		<string>Notes</string>
 	</array>
+	<key>UKCrashReporterLastCrashReportDate</key>
+	<real>1578823296</real>
 	<key>VisualIndicatorForEsc</key>
 	<false/>
 	<key>WindowNumber</key>
@@ -4842,7 +4874,7 @@ Restart Session</string>
 	<key>findMode_iTerm</key>
 	<integer>0</integer>
 	<key>iTerm Version</key>
-	<string>3.3.7</string>
+	<string>3.3.8</string>
 	<key>kCPKSelectionViewPreferredModeKey</key>
 	<integer>0</integer>
 	<key>kCPKSelectionViewShowHSBTextFieldsKey</key>

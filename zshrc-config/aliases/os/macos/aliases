@@ -3,6 +3,9 @@
 # alias killport='netstat -vanp tcp | grep'
 alias notebook='/anaconda3/bin/jupyter_mac.command ; exit;'
 
+# dot_clean -> Remove dot-underscore files. Merges ._* files with corresponding native files. # https://ss64.com/osx/dot_clean.html
+alias ds_clean="find . -name '.DS_Store' -type f -delete"
+
 function whoamipro(){
     echo '*** $whoami ***' && whoami
     echo '*** $groups $(whoami) ***' && groups $(whoami) | cut -d' ' -f1
