@@ -1,6 +1,6 @@
 #!/bin/bash
 
-alias crypto\?='go run $ZSH_CUSTOM_CONFIG_FILES/crypto.go &'
+alias crypto\?='go run $ZSH_CUSTOM_CONFIG_FILES/aliases/nruault/assets/crypto.go &'
 
 function check_noelio_domain() {
     # Checks for internet connectivity.

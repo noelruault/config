@@ -26,3 +26,6 @@ Temporary Items
 .apdisk
 
 iTerm2/oh-my-zsh
+
+# Directories potentially created by vscode
+launch.json

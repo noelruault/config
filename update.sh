@@ -2,7 +2,7 @@
 
 
 # First time set-up:
- 
+
 # $ cd && git clone https://github.com/noelruault/config.git
 
 # A symbolic link, also termed a soft link, is a special kind of file
@@ -11,4 +11,3 @@
 #  .zshrc-config/ (the folder which would be changed by the user)
 
 # $ ln -s $HOME/.config/ $HOME/.zshrc-config/
-

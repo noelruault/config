@@ -1,44 +1,57 @@
 {
-    "terminal.integrated.fontFamily": "Source Code Pro for Powerline",
-    "terminal.integrated.copyOnSelection": true,
-    // "workbench.fontAliasing": "auto",
-    "workbench.colorTheme": "Atom One Dark",
-    "window.zoomLevel": 1,
-    "editor.formatOnPaste": true,
+    "breadcrumbs.enabled": true,
+    "editor.minimap.enabled": false,
+    // "editor.fontLigatures": true,
+    "editor.suggestSelection": "first",
     "editor.multiCursorModifier": "ctrlCmd",
     "editor.snippetSuggestions": "top",
+    "files.trimTrailingWhitespace": false,
+    "files.trimFinalNewlines": true,
+    "files.insertFinalNewline": true,
+    "terminal.integrated.fontFamily": "Source Code Pro for Powerline",
+    // "terminal.integrated.fontFamily": "Hack Nerd Font",
+    // "terminal.integrated.shell.osx": "/bin/zsh",
+    "terminal.integrated.copyOnSelection": true,
+    "terminal.integrated.env.osx": {
+        "GOPRIVATE": "github.com/mx51/*"
+    },
+    // "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+    "workbench.colorTheme": "Atom One Dark",
+    "window.zoomLevel": 0,
+    // "workbench.fontAliasing": "auto",
+    // "workbench.colorCustomizations": {},
+    // "python.jediEnabled": false,
+    // Specific config by language
+    "[go]": {
+        "editor.snippetSuggestions": "none",
+        "editor.formatOnSave": true,
+    },
     "[python]": {
         "editor.rulers": [
             79
         ]
     },
-    "[go]": {
-        // "editor.rulers": [
-        //     80
-        // ],
-        // "editor.formatOnSave": true, // REMOVEME
-        // "editor.codeActionsOnSave": { // REMOVEME
-        //     "source.organizeImports": true // REMOVEME
-        // }
-        // "go.formatTool": "goimports", // Default format tool. Will take care of formatting "on save"
-        // "editor.formatOnSave": true,
-    },
-    "[proto]": {
+    "[proto, proto3]": {
+        "editor.defaultFormatter": "xaver.clang-format",
         "editor.formatOnSave": false,
     },
-    "editor.suggestSelection": "first",
-
-    // "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
-    "breadcrumbs.enabled": true,
-    "files.trimTrailingWhitespace": false,
-    "files.trimFinalNewlines": true,
-    "editor.minimap.enabled": false,
-    // "workbench.colorCustomizations": {},
-    // "python.jediEnabled": false,
-
-    // (extension) To-do tree
+    "[sql]": {
+        "editor.formatOnSave": false,
+        "files.insertFinalNewline": false,
+        "editor.defaultFormatter": "mtxr.sqltools"
+    },
+    "go.delveConfig": {
+        "dlvLoadConfig": {
+            "followPointers": true,
+            "maxVariableRecurse": 1,
+            "maxStringLen": 200,
+        }
+    },
+    // ----- EXTENSIONS -----
+    // (extension) To-Do tree
+    "todo-tree.highlights.enabled": false,
     // todo-tree.general.tags adds the next tags to the TODO tree (sidebar)
-    "todo-tree.general.tags":[
+    "todo-tree.general.tags": [
         "TODO",
         "FIXME",
         "NOTE",
@@ -95,62 +108,91 @@
         //     "backgroundColor": "transparent"
         // }
     ],
-    "go.delveConfig": {
-        "dlvLoadConfig": {
-            "followPointers": true,
-            "maxVariableRecurse": 1,
-            "maxStringLen": 200,
-        }
+    "todo-tree.tree.showScanModeButton": false,
+    // (extension) Clang-format
+    "[proto3]": {
+        "editor.defaultFormatter": "xaver.clang-format"
     },
+    "clang-format.language.proto.enable": true,
+    // (extension) Sync
     "sync.gist": "96c000cd39491f85f7bad4155f9d3eac",
     "sync.autoUpload": false,
     "sync.forceUpload": false,
-    "todo-tree.highlights.enabled": false,
-
-    // Assembly Payments config
-    "go.testTags": "endtoend",
-    "go.buildTags": "endtoend integration",
-    // "window.zoomLevel": 0,
-    "go.testEnvVars": {
-        "DB_HOST": "localhost",
-    },
+    // (extension) Git
+    "git.autofetch": false,
+    // (extension) Gremlins tracker aka. '\u200b' tracker
+    // The extension will track zero-width spaces: https://codepen.io/chriscoyier/pen/iLKwm
+    // (extension) Git Lens
+    "gitlens.currentLine.enabled": false,
+    "gitlens.hovers.currentLine.over": "line",
+    "gitlens.blame.avatars": false,
+    "gitlens.codeLens.authors.enabled": false,
+    "gitlens.hovers.enabled": false,
+    // (extension) Golang
+    "go.useLanguageServer": true,
+    "go.lintOnSave": "file",
+    "go.vetOnSave": "package",
+    "go.lintFlags": [
+        "--fast"
+    ],
     "go.formatTool": "goimports",
+    "go.formatFlags": [
+        "-local=github.com/mx51"
+    ],
+    "go.toolsEnvVars": {
+        "GOFLAGS": "-mod=vendor"
+    },
+    "go.enableCodeLens": {
+        "references": false,
+        "runtest": false
+    },
     "go.gocodeFlags": [
         "-builtin",
         "-ignore-case",
         "-unimported-packages",
         "-exclude-docs"
     ],
-    "go.lintOnSave": "package",
     "go.lintTool": "golangci-lint",
-    "go.lintFlags": [
-        "--fast",
-        "-D",
-        "scopelint"
+    "go.autocompleteUnimportedPackages": true,
+    "gopls": {
+        "usePlaceholders": false, // add parameter placeholders when completing a function
+    },
+    "go.languageServerFlags": [
+        "-rpc.trace", // for more detailed debug logging
     ],
-    "go.testFlags": [
-        "-count=1"
-    ],
-    "files.insertFinalNewline": true,
-    "terminal.integrated.env.osx": {
-        "GOPRIVATE": "github.com/AssemblyPayments/*"
+    "go.languageServerExperimentalFeatures": {
+        "format": false,
+        "diagnostics": false,
+        "documentLink": false
     },
-    "git.autofetch": false,
-
-    // Clang formatter for proto files.
-    "clang-format.language.proto.enable": true,
-    "[proto3]": {
-        "editor.defaultFormatter": "xaver.clang-format"
-    },
-    "[sql]": {
-        "editor.formatOnSave": false,
-        // "editor.defaultFormatter": "mtxr.sqltools"
-    },
-    "go.useLanguageServer": false,
-    "gitlens.currentLine.enabled": false,
-    "gitlens.hovers.currentLine.over": "line",
-
-    // Fix imports for Assembly Payments on save.
+    // ------------------
+    // "go.testTags": "endtoend",
+    // "go.buildTags": "endtoend integration",
+    // // "window.zoomLevel": 0,`
+    // "go.testEnvVars": {
+    //     "DB_HOST": "localhost",
+    // },
+    // "go.formatTool": "goimports",
+    // "go.gocodeFlags": [
+    //     "-builtin",
+    //     "-ignore-case",
+    //     "-unimported-packages",
+    //     "-exclude-docs"
+    // ],
+    // "go.lintOnSave": "package",
+    // "go.lintTool": "golangci-lint",
+    // "go.lintFlags": [
+    //     "--fast",
+    //     "-D",
+    //     "scopelint"
+    // ],
+    // "go.testFlags": [
+    //     "-count=1"
+    // ],
+    // "go.useLanguageServer": false,
+    // ---
+    // UNUSED EXTENSIONS
+    // Fix imports on save.
     "emeraldwalk.runonsave": {
         "commands": [
             {
@@ -162,127 +204,4 @@
             }
         ]
     },
-    "gitlens.blame.avatars": false,
-    "gitlens.codeLens.authors.enabled": false,
-    "gitlens.hovers.enabled": false,
-    "peacock.favoriteColors": [
-        {
-            "name": "Angular Red",
-            "value": "#b52e31"
-        },
-        {
-            "name": "Auth0 Orange",
-            "value": "#eb5424"
-        },
-        {
-            "name": "Azure Blue",
-            "value": "#007fff"
-        },
-        {
-            "name": "C# Purple",
-            "value": "#68217A"
-        },
-        {
-            "name": "Gatsby Purple",
-            "value": "#639"
-        },
-        {
-            "name": "Go Cyan",
-            "value": "#5dc9e2"
-        },
-        {
-            "name": "Java Blue-Gray",
-            "value": "#557c9b"
-        },
-        {
-            "name": "JavaScript Yellow",
-            "value": "#f9e64f"
-        },
-        {
-            "name": "Mandalorian Blue",
-            "value": "#1857a4"
-        },
-        {
-            "name": "Node Green",
-            "value": "#215732"
-        },
-        {
-            "name": "React Blue",
-            "value": "#00b3e6"
-        },
-        {
-            "name": "Something Different",
-            "value": "#832561"
-        },
-        {
-            "name": "Vue Green",
-            "value": "#42b883"
-        }
-    ],
 }
-
-// {
-//     "editor.fontLigatures": true,
-//     "editor.fontFamily": "Fira Code",
-//     "workbench.colorTheme": "Dracula",
-//     "window.zoomLevel": 3,
-//     "files.insertFinalNewline": true,
-//     "files.eol": "\n",
-//     "editor.formatOnSave": false,
-//     "[go]": {
-//         "editor.formatOnSave": true
-//     },
-//     "[typescript]": {
-//         "editor.formatOnSave": false,
-//         "editor.defaultFormatter": "esbenp.prettier-vscode"
-//     },
-//     "code-eol.style": {
-//         "opacity": 1.0
-//     },
-//     "code-eol.crlfCharacter": "←",
-//     "code-eol.returnCharacter": "↵",
-//     "code-eol.newlineCharacter": "↓",
-//     "go.buildTags": "endtoend backbook skip zipscraper integration purger",
-
-//     "go.autocompleteUnimportedPackages": true,
-
-//     "editor.renderControlCharacters": true,
-//     "breadcrumbs.enabled": true,
-
-//     "workbench.activityBar.visible": true,
-//     "editor.minimap.enabled": false,
-//     "gitlens.currentLine.enabled": true,
-//     "terminal.integrated.shell.osx": "/bin/zsh",
-//     "terminal.integrated.fontFamily": "Hack Nerd Font",
-//     "workbench.editor.showTabs": true,
-//     "editor.renderWhitespace": "all",
-
-//     "[json]": {
-//         "editor.defaultFormatter": "vscode.json-language-features"
-//     },
-//     "go.useLanguageServer": true,
-//     "vscode_custom_css.imports": [
-//         "file:///Users/jaime/dev/synthwave.css"
-//     ],
-//     "ruby.rubocop.executePath": "/Users/jaime/.rvm/gems/ruby-2.6.3/wrappers/",
-//     "rufo.exe": "/Users/jaime/.rvm/gems/ruby-2.6.3/wrappers/rufo",
-//     "[javascript]": {
-//         "editor.defaultFormatter": "esbenp.prettier-vscode"
-//     },
-//     "explorer.openEditors.visible": 0,
-//     "[ruby]": {
-//         "editor.defaultFormatter": "jnbt.vscode-rufo",
-//         "editor.formatOnSave": true,
-//     },
-//     "ruby.lint": {
-//         "rubocop": false,
-//         "ruby": false
-//     },
-//     "[javascriptreact]": {
-//         "editor.defaultFormatter": "esbenp.prettier-vscode"
-//     },
-
-//     "[html]": {
-//         "editor.defaultFormatter": "esbenp.prettier-vscode"
-//     }
-// }

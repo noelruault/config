@@ -64,8 +64,6 @@ function copy_doc() {
 	"""
 }
 
-alias crypto\?='go run $ZSH_CUSTOM_CONFIG_FILES/nruault/assets/crypto.go'
-
 # ========== D
 alias dd\?='dd_doc'
 function dd_doc() {
@@ -154,7 +152,7 @@ function git_doc() {
 
 	[[Source: https://www.educative.io/edpresso/how-to-delete-remote-branches-in-git]]
 
-	Remove existing `.DS_Store` files from the repository:
+	Remove existing $(.DS_Store) files from the repository:
 	find . -name .DS_Store -print0 | xargs -0 git rm -f --ignore-unmatch
 
 	"""
@@ -239,6 +237,14 @@ function go-naming_doc() {
 	- Don’t mix and match long and short formal parameters in the same declaration.
 
 	[Reference]: https://dave.cheney.net/practical-go/presentations/qcon-china.html#_identifiers
+	"""
+}
+
+alias go-fmt\?='go-fmt_doc'
+function go-fmt_doc() {
+	go doc fmt | head -60
+	echo """
+	SOURCE: go doc fmt | head -60
 	"""
 }
 

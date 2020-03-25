@@ -8,3 +8,9 @@
 [user]
 	name = Noel Ruault
 	email = noelou.93@gmail.com
+
+# Change public key and email for specific directories:
+[includeIf "gitdir:~/go/src/github.com/AssemblyPayments/"]
+    path = ~/go/src/github.com/AssemblyPayments/.gitconfig
+[includeIf "gitdir:~/go/src/github.com/mx51/"]
+    path = ~/go/src/github.com/mx51/.gitconfig

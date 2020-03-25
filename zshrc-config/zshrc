@@ -67,11 +67,11 @@ else
 fi
 
 ## Personal aliases
-source $ZSH_CUSTOM_CONFIG_ALIASES/nruault
+for f in $(ls $ZSH_CUSTOM_CONFIG_ALIASES/nruault/); do source "$ZSH_CUSTOM_CONFIG_ALIASES/nruault/$f"; done
 
 ## Private aliases
-PRIV_FILES=($(ls $ZSH_CUSTOM_CONFIG_ALIASES/private | grep -v '\.')) # Trick to discard the non-aliases files
-for file in $PRIV_FILES; do
+PRIVATE_FILES=($(ls $ZSH_CUSTOM_CONFIG_ALIASES/private | grep -v '\.')) # Trick to disregard the non-aliases files
+for file in $PRIVATE_FILES; do
     source "$ZSH_CUSTOM_CONFIG_ALIASES/private/$file"
 done
 

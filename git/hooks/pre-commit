@@ -8,7 +8,7 @@
 HOOKS="
     pre-commit-forbidden
     pre-commit-annotation
-    pre-commit-ap-formatting
+    pre-commit-goimports-formatting
     pre-commit-prevent-fixme"
 
 for hook in $HOOKS; do
