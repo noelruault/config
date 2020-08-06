@@ -8,16 +8,16 @@ function check_noelio_domain() {
 
     domain_expiry_date=$(whois noel.io | grep "Expiry" | grep -oE '(\d{4})-(\d\d)-(\d\d)' | sed 's/[\._-]//g')
     current_date=$(date +%Y%m%d)
-    time_until_expiration=$((domain_expiry_date - $(date +%Y%m%d)))
+    time_until_expiration=$(( ($domain_expiry_date - $current_date) / 24 ))
 
     if [[ "$1" == "bash:request" ]]; then
-        if (($time_until_expiration < 7)); then
+        if (($time_until_expiration < 30)); then
             echo "DOMAIN ABOUT TO EXPIRE, $time_until_expiration days left."
         fi
     else
         echo "Domain expiration is $time_until_expiration days ahead."
     fi
-    exit 0
+    # exit 0
 }
 
 (check_noelio_domain "bash:request" &) # https://stackoverflow.com/a/7687722/4349318

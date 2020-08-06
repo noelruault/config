@@ -10,4 +10,4 @@
 #  .config/ (the folder that will be sync with the repository)
 #  .zshrc-config/ (the folder which would be changed by the user)
 
-# $ ln -s $HOME/.config/ $HOME/.zshrc-config/
+# $ ln -sF $HOME/.config/zshrc-config $HOME/.zshrc-config

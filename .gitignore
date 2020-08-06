@@ -29,3 +29,7 @@ iTerm2/oh-my-zsh
 
 # Directories potentially created by vscode
 launch.json
+
+# Directories created by 3rd party auth providers
+gcloud/
+configstore/ # firebase

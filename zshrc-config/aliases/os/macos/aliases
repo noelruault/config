@@ -77,7 +77,7 @@ function findapp() {
         echo $NO_PARAM_ERROR
         return
     else
-        apps=$(ps axc | grep "$@")
+        apps=$(ps axc | grep --ignore-case "$@")
 
         if [[ -z "$apps" ]]; then
             echo "Couldn't be found any PID related to the given app name."

@@ -12,9 +12,6 @@
     // "terminal.integrated.fontFamily": "Hack Nerd Font",
     // "terminal.integrated.shell.osx": "/bin/zsh",
     "terminal.integrated.copyOnSelection": true,
-    "terminal.integrated.env.osx": {
-        "GOPRIVATE": "github.com/mx51/*"
-    },
     // "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
     "workbench.colorTheme": "Atom One Dark",
     "window.zoomLevel": 0,

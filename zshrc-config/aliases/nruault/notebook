@@ -13,7 +13,7 @@
 # Function to display howto possibilities by typing 'howto?'
 alias howto\?='howto_possibilities'
 function howto_possibilities() {
-	grep -E '^alias.*\?' $ZSH_CUSTOM_CONFIG_FILES/aliases/howto | awk '{print $2}' | awk -F'=' '{print $1}'
+	grep -E '^alias.*\?' $ZSH_CUSTOM_CONFIG_FILES/aliases/nruault/notebook | awk '{print $2}' | awk -F '\' '{print $1}'
 }
 
 # ========================
@@ -56,7 +56,22 @@ function bashrc_doc() {
 	"""
 }
 
+alias bash-exit\?='bash-exit_doc'
+function bash-exit_doc() {
+	echo """
+	Exit code 0        Success
+	Exit code 1        General errors, Miscellaneous errors, such as "divide by zero" and other impermissible operations
+	Exit code 2        Misuse of shell builtins (according to Bash documentation)
+		Example: empty_function() {}
+
+	SOURCE: http://www.tldp.org/LDP/abs/html/exitcodes.html
+	"""
+}
+
 # ========== C
+alias chmod\?='permission_doc'
+alias chown\?='permission_doc'
+
 alias copy\?='copy_doc'
 function copy_doc() {
 	echo """
@@ -162,7 +177,11 @@ alias go\?='go_doc'
 function go_doc() {
 	echo """
 	go-comments?
+	go-mock?
 	go-mod?
+	go-naming?
+	go-fmt?
+	go-versions?
 	"""
 }
 
@@ -219,6 +238,16 @@ function go-mod_doc() {
 	go mod vendor
 
 	[Reference]: https://www.kablamo.com.au/blog/2018/12/10/just-tell-me-how-to-use-go-modules
+
+	IF Errors when go mod and the repository is private...
+	eg:
+		$ fatal: could not read Username for 'https://github.com': terminal prompts disabled
+		$ reading https://sum.golang.org/lookup/github.com/<name>/<repo_name>@v0.0.0-XXXXXXXXXXXXXX-XXXXXXXXXXXX: 410 Gone
+		$ server response: not found: github.com/<name>/<repo_name>@v1.0.0: invalid version: unknown revision v1.0.0
+
+	export GOPRIVATE=github.com/<company_name>/*
+
+	[Reference]: https://stackoverflow.com/a/60323360/4349318
 	"""
 }
 
@@ -229,12 +258,12 @@ function go-naming_doc() {
 	- Short variable names work well when the distance between their declaration and last use is short.
 	- Long variable names need to justify themselves; the longer they are the more value they need to provide.
 		Lengthy bureaucratic names carry a low amount of signal compared to their weight on the page.
-	- Don’t include the name of your type in the name of your variable.
+	- Don't include the name of your type in the name of your variable.
 	- Constants should describe the value they hold, not how that value is used.
 	- Prefer single letter variables for loops and branches, single words for parameters and return values, multiple words for functions and package level declaration.
 	- Prefer single words for methods, interfaces, and packages.
 	- Remember that the name of a package is part of the name the caller uses to to refer to it, so make use of that.
-	- Don’t mix and match long and short formal parameters in the same declaration.
+	- Don't mix and match long and short formal parameters in the same declaration.
 
 	[Reference]: https://dave.cheney.net/practical-go/presentations/qcon-china.html#_identifiers
 	"""
@@ -244,7 +273,29 @@ alias go-fmt\?='go-fmt_doc'
 function go-fmt_doc() {
 	go doc fmt | head -60
 	echo """
-	SOURCE: go doc fmt | head -60
+	CODE RAN: go doc fmt | head -60
+	"""
+}
+
+alias go-versions\?='go-versions_doc'
+function go-versions_doc() {
+	echo """
+	Installing extra Go versions
+
+	It may be useful to have multiple Go versions installed on the same machine, for example, to ensure that a package's tests pass on multiple Go versions. Once you have one Go version installed, you can install another (such as 1.10.7) as follows:
+
+		$ go get golang.org/dl/go1.10.7
+		$ go1.10.7 download
+
+	The newly downloaded version can be used like go:
+
+		$ go1.10.7 version
+		go version go1.10.7 linux/amd64
+
+	All Go versions available via this method are listed on the download page. You can find where each of these extra Go versions is installed by looking at its GOROOT; for example, go1.10.7 env GOROOT. To uninstall a downloaded version, just remove its GOROOT directory and the goX.Y.Z binary.
+
+
+	SOURCE: https://golang.org/doc/install#extra_versions
 	"""
 }
 
@@ -259,6 +310,11 @@ alias grep\?='grep_doc'
 function grep_doc() {
 	echo """
 	[[Docs:]] https://www.thegeekstuff.com/2011/10/grep-or-and-not-operators/
+
+	Find all files containing specific text on Linux
+
+		grep -rnw '/path/to/somewhere/' -e 'pattern'
+
 	"""
 }
 
@@ -306,6 +362,24 @@ function npm_doc() {
 # ========== P
 alias paths\?='echo /etc/paths/ && echo /etc/paths.d/ && echo $HOME/.bashrc && echo $HOME/.zshrc'
 
+alias permission\?='permission_doc'
+function permission_doc() {
+	echo """
+	Please, don't use 777 for permissions, it's a security risk.
+
+		sudo chown \$USER:\`id -gn\` <path/to/folder>
+
+	- \$USER will be expanded into your current username.
+	- \`id -gn\` will returns the main group of your current user.
+
+	If any file is owned by root, then it'll require sudo.
+
+	You can check permissions by running:
+
+		ls -l <path/to/folder>
+"""
+}
+
 alias psql\?='postgres_doc'
 alias postgres\?='postgres_doc'
 function postgres_doc() {
@@ -316,30 +390,50 @@ function postgres_doc() {
 		- psql [-U/--username] <user_name> [(optional)--dbname]<database_name> --host localhost
 		- psql ... [-W/--password] # force password prompt (should happen automatically)
 
-	[SELECT]
-	Current DB:
-	- SELECT current_database();
+	[RULES]
+	Show all rules in the database
+		SELECT * from pg_rules;
 
-	\dt ; \dt+  	# shows all tables in the current schema
-	\d <table_name> # shows a table and its rules
-	SELECT * from pg_rules; # shows all rules in the database
+	[TABLES]
+	List tables
+		- \dt
+	Show a table and its rules
+		- \d <table_name>
 
-	[e.g]:
-	SELECT * FROM portal_user WHERE user_id = 1;
-	UPDATE portal_user SET password = abc1234... WHERE user_id = 1;
+	[DATABASES]
+	List databases (shows all tables in the current schema)
+		- \l
+	Connect to database
+		- \\\c <database_name>
 
-	UPDATE <table> SET <column> = <value> WHERE <column> = <value>;
+	[SCHEMA]
+	List schemas
+		- \dn
+	Display/describe schema:
+		- \dt <schema_name>.*
+		* https://stackoverflow.com/a/15644918/4349318
 
 	[DROP]
 	(ALL TABLES):
-		- drop schema public cascade;
-		- create schema public;
-
+		- drop schema <schema_name> cascade;
+		- create schema <schema_name>;
 
 	*** DAEMONS
-		brew services <start/stop> postgresql
-		pg_ctl -D /usr/local/var/postgres <start/stop> # -D flags the location of the database storage area
+		# To migrate existing data from a previous major version of PostgreSQL run:
+		#   brew postgresql-upgrade-database
 
+		# To have launchd start postgresql now and restart at login:
+		#   brew services <start/stop> postgresql
+		# Or, if you don't want/need a background service you can just run:
+		#   pg_ctl -D /usr/local/var/postgres <start/stop> # -D flags the location of the database storage area
+
+	[EXAMPLES]
+	Select query examples:
+		$ SELECT current_database(); # Displays name of current DB
+		$ SELECT * FROM portal_user WHERE user_id = 1;
+
+		$ UPDATE portal_user SET password = abc1234... WHERE user_id = 1;
+		$ UPDATE <table> SET <column> = <value> WHERE <column> = <value>;
 	"""
 }
 

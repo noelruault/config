@@ -13,17 +13,19 @@ source /etc/profile # System-wide .profile for sh(1)
 
 NPM_CONFIG_PREFIX=~/.npm-global
 
-### GO ###
-# export GOPATH=$HOME/go
-# export PATH=$PATH:/usr/local/go/bin
-# (gopaths are in 'go env')
-# GO Aliases
+### GO (config) Paths ###
+
 # https://golang.org/doc/code.html#GOPATH
-export GOPATH=$(go env GOPATH)
-alias go='/usr/local/go/bin/go'
-alias gosrc='cd $GOPATH/src'
-alias gobin='cd $GOPATH/bin'
+export GOPATH=$(go env GOPATH) # (gopaths are in 'go env')
 export PATH=$PATH:$GOPATH/bin
+alias go='/usr/local/go/bin/go'
+# export GOROOT=$HOME/go
+# export PATH=$PATH:$GOROOT/bin
+
+# Setting up git for golang
+# https://stackoverflow.com/questions/32232655/go-get-results-in-terminal-prompts-disabled-error-for-github-private-repo
+
+
 
 ### ZSH advice (?)###
 # If you come from bash you might have to change your $PATH.

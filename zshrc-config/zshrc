@@ -42,7 +42,9 @@ source $ZSH/oh-my-zsh.sh
 # Path to your custom configuration.
 export ZSH_CUSTOM_CONFIG_FILES="$HOME/.config/zshrc-config"
 export ZSH_CUSTOM_CONFIG_ALIASES="$ZSH_CUSTOM_CONFIG_FILES/aliases"
-alias zshrc='code $ZSH_CUSTOM_CONFIG_FILES'
+alias zshrc="code $ZSH_CUSTOM_CONFIG_FILES"
+alias .config="code $HOME/.config"
+alias vscode-settings="$HOME/Library/Application\ Support/Code/User/settings.json"
 
 source $ZSH_CUSTOM_CONFIG_FILES/config/default
 
@@ -84,3 +86,33 @@ test -e "$ZSH_CUSTOM_CONFIG_FILES/config/.iterm2_shell_integration.zsh" && \
 # end=$(($(date +'%s * 1000 + %-N / 1000000'))); runtime=$((end-start)); echo "Runtime of zshrc was $runtime ms." # GNU
 end=$(python3 -c 'from time import time; print(int(round(time() * 1000)))'); runtime=$((end-start)); echo "Runtime of zshrc was $runtime ms." # OSX
 ## ------------------------- END OF CUSTOM ZSHRC -------------------------
+
+source $HOME/.config/zshrc-config/config/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/noelruault/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/noelruault/Downloads/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/noelruault/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/noelruault/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
+
+# brew install mysql mysql-client # It is important to include both, server and client
+export PATH="/usr/local/opt/mysql-client/bin:$PATH"
+
+# MySQL is configured to only allow connections from localhost by default
+# To connect run:
+#     mysql -uroot
+
+# To have launchd start mysql now and restart at login:
+#   brew services start mysql
+# Or, if you don't want/need a background service you can just run:
+#   mysql.server start
+#   /usr/local/bin/mysql.server start
+
+# https://stackoverflow.com/a/55692783/4349318
+
+# ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/tmp/mysql.sock' ?
+#   - https://stackoverflow.com/a/34709790/4349318
+
+export NVM_DIR="$HOME/.nvm"
+  [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
+  [ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion

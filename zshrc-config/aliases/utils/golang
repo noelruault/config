@@ -1,0 +1,33 @@
+#!/bin/bash
+
+### GOLANG
+# alias gotest='go test ./... -p 1 -v'
+# TODO:
+# https://stackoverflow.com/a/30033822/4349318
+gotest() {
+
+    # if [[ "$1" == "color" ]]; then
+    go test ./... -p 1 -count 1 -v |
+        sed ''/PASS/s//$(printf "\033[32mPASS\033[0m")/'' |
+        sed ''/FAIL/s//$(printf "\033[31mFAIL\033[0m")/'' # \
+    ## | GREP_COLOR="01;33" egrep --color=always '\s*[a-zA-Z0-9\-_.]+[:][0-9]+[:]|^'
+    # return
+
+    if [[ "$1" == "e2e" ]]; then
+        go test ./test/endtoend -tags=endtoend -count=1 -timeout 120s |
+            sed ''/PASS/s//$(printf "\033[32mPASS\033[0m")/'' |
+            sed ''/FAIL/s//$(printf "\033[31mFAIL\033[0m")/''
+    fi
+}
+
+####
+# USE: gocover -run TestUpdateSomethingExample -count=1
+#
+gocover() {
+    # go test route/to/test -run TestUpdateSomethingExample -count=1 -coverprofile cover.out; go tool cover -html=cover.out
+    local t=$(mktemp -t cover)
+    go test $COVERFLAGS -coverprofile=$t $@ && go tool cover -func=$t && unlink $t
+}
+
+# for pkg in *; do go test "./$pkg"; done
+# go clean -testcache # https://golang.org/pkg/cmd/go/internal/clean/

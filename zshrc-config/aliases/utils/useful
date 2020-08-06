@@ -25,6 +25,7 @@ alias gbreset='git branch | egrep -v "(master|\*)" | xargs git branch -D'
 alias githooksconfig='git config --global core.hooksPath ~/.config/git/hooks/'
 # USEFUL COMMANDS:
 #   - git diff origin/master --name-only -- '*.go' ':(exclude)vendor/*'
+#   - git config --global alias.dirdiff 'diff -p --stat -w --no-index'
 
 ### Vagrant
 alias vagrantclean="vagrant box list | cut -f 1 -d ' ' | xargs -L 1 vagrant box remove -f"
@@ -46,38 +47,6 @@ function pro_rebase() {
 }
 
 alias awesome='cat $ZSH_CUSTOM_CONFIG_FILES/nruault/assets/awesome.txt'
-
-### GOLANG
-# alias gotest='go test ./... -p 1 -v'
-# TODO:
-# https://stackoverflow.com/a/30033822/4349318
-gotest() {
-
-    # if [[ "$1" == "color" ]]; then
-    go test ./... -p 1 -count 1 -v |
-        sed ''/PASS/s//$(printf "\033[32mPASS\033[0m")/'' |
-        sed ''/FAIL/s//$(printf "\033[31mFAIL\033[0m")/'' # \
-    ## | GREP_COLOR="01;33" egrep --color=always '\s*[a-zA-Z0-9\-_.]+[:][0-9]+[:]|^'
-    # return
-
-    if [[ "$1" == "e2e" ]]; then
-        go test ./test/endtoend -tags=endtoend -count=1 -timeout 120s |
-            sed ''/PASS/s//$(printf "\033[32mPASS\033[0m")/'' |
-            sed ''/FAIL/s//$(printf "\033[31mFAIL\033[0m")/''
-    fi
-}
-
-####
-# USE: gocover -run TestUpdateSomethingExample -count=1
-#
-gocover() {
-    # go test route/to/test -run TestUpdateSomethingExample -count=1 -coverprofile cover.out; go tool cover -html=cover.out
-    local t=$(mktemp -t cover)
-    go test $COVERFLAGS -coverprofile=$t $@ && go tool cover -func=$t && unlink $t
-}
-
-# for pkg in *; do go test "./$pkg"; done
-# go clean -testcache # https://golang.org/pkg/cmd/go/internal/clean/
 
 # CD ANYWHERE aliases
 alias gow='cd ~/Work'
@@ -154,21 +123,12 @@ function go_to_dir_on_specific_folder() {
 }
 
 alias rm="rm -i"
-alias python='python3'
+# alias python='python3'
 alias ipython='python -m IPython'
 
 # FIX PIP
-alias pip=pip3_func
-alias pip3=pip3_func
-function pip3_func() {
-    $HOME/Library/Python/3.7/bin/pip3 "$@"
-    echo """
-\e[1;33m
-pip version: $($HOME/Library/Python/3.7/bin/pip3 --version)
-WARNING! Remember that pip path is hardcoded, due to incompatibilities. Check at $ZSH_CUSTOM_CONFIG_ALIASES/utils/useful to change its behaviour.
-\e[0m
-    """
-}
+alias pip="python -m pip"
+alias pip3="python3 -m pip"
 
 # Export pipenv, virtualenv....
 export PATH=$PATH:$HOME/Library/Python/3.7/bin
