@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DOCKER_SCRIPTS_PATH="docker/scripts"
+DOCKER_SCRIPTS_PATH="integrations/docker_scripts"
 
 alias dk="$HOME/<PATH>/run.sh $@"
 alias dkclean="sh $ZSH_CUSTOM_CONFIG_ALIASES/$DOCKER_SCRIPTS_PATH/docker_clean_all.sh"

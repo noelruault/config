@@ -26,6 +26,14 @@ spacer1='\t'
 
 # ========== A
 # ========== B
+alias bash\?='bash_doc'
+function bash_doc() {
+	echo """
+	How to get latest bash version on MACOSX
+	- https://stackoverflow.com/a/11704224
+	"""
+}
+
 alias bashrc\?='bashrc_doc'
 function bashrc_doc() {
 	echo """

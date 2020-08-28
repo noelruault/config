@@ -1,5 +1,6 @@
 #/bin/bash
 
+cat update.sh
 
 # First time set-up:
 

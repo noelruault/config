@@ -1,7 +1,8 @@
 #!/bin/bash
 
-alias hs='history | grep'
+alias hs='history | grep' # commands history for non-interactive terminals or terminals without fzf
 alias hibernate="sudo systemctl hibernate"
+# use type -a <alias/command> to check where is sourced
 
 # IP ADDRESSES
 alias wanip='dig +short myip.opendns.com @resolver1.opendns.com'
@@ -52,7 +53,7 @@ alias awesome='cat $ZSH_CUSTOM_CONFIG_FILES/nruault/assets/awesome.txt'
 alias gow='cd ~/Work'
 alias gopath='cd $(go env GOPATH)'
 alias gosrc='cd $(go env GOPATH)/src/'
-alias goa=go_to_dir_on_specific_folder # A $COMPANY_DIRECTORY needs to be configured
+alias goto=go_to_dir_on_specific_folder # A $COMPANY_DIRECTORY needs to be configured
 
 # go_to_dir_on_specific_folder will try to find a directory that matches
 # with the given parameters inside of an specific folder.
@@ -65,8 +66,14 @@ alias goa=go_to_dir_on_specific_folder # A $COMPANY_DIRECTORY needs to be config
 # - https://ss64.com/bash/awk.html
 # - Colors: https://www.tldp.org/HOWTO/Bash-Prompt-HOWTO/x329.html https://www.shellhacks.com/bash-colors/
 function go_to_dir_on_specific_folder() {
+    if env_var_is_empty $COMPANY_DIRECTORY; then
+        echo "Environment variable COMPANY_DIRECTORY is not defined"
+        return
+    fi
+
+
     echo $pwd # TODO(nruault): Remove-me
-    WORK_FOLDER=$(eval echo $(go env GOPATH)/src/$COMPANY_DIRECTORY/) # eval will store the desired payments path.
+    WORK_FOLDER=$(eval echo $(go env GOPATH)/src/$COMPANY_DIRECTORY) # eval will store the desired payments path.
 
     # If there is no arguments, just go to $COMPANY_DIRECTORY
     if [[ $# -eq 0 ]]; then
@@ -110,16 +117,20 @@ function go_to_dir_on_specific_folder() {
         # If only one folder was found, change to the found directory
         # cd $WORK_FOLDER$(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}')
 
-        ## REMOVE ME -----------------------
+        ## TODO(nruault): REMOVE ME -----------------------
         FOLDER=$(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}')
-        WORK_FOLDER=$(eval echo $(go env GOPATH)/src/github.com/mx51/)
-        MX51=$(find $WORK_FOLDER -type d -name "$FOLDER" -print -maxdepth 1 | awk -F/ '{print $NF}')
-        if [ -z "$MX51" ]; then
-            go get $WORK_FOLDER$FOLDER
+        WORK_FOLDER=$(eval echo $(go env GOPATH)/src/$COMPANY_DIRECTORY)
+        COM=$(find $WORK_FOLDER -type d -name "$FOLDER" -print -maxdepth 1 | awk -F/ '{print $NF}')
+        if [ -z "$COM" ]; then
+            cd $WORK_FOLDER$FOLDER
         fi
         cd $WORK_FOLDER$(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}')
          ## REMOVE ME -----------------------
     fi
+}
+
+function env_var_is_empty() {
+    [ -z "$1" ]
 }
 
 alias rm="rm -i"

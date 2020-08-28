@@ -1,6 +1,6 @@
 #!/bin/bash
 
-## ------------------------- BEGINING OF CUSTOM ZSHRC -------------------------
+## ------------------------- BEGINING OF ZSHRC -------------------------
 # start=$(($(date +'%s * 1000 + %-N / 1000000'))) # GNU
 # https://apple.stackexchange.com/questions/135742/time-in-milliseconds-since-epoch-in-the-terminal
 start=$(python3 -c 'from time import time; print(int(round(time() * 1000)))') # OSX
@@ -57,9 +57,6 @@ source $ZSH_CUSTOM_CONFIG_FILES/config/default
 ## Useful aliases
 source $ZSH_CUSTOM_CONFIG_ALIASES/utils/useful
 
-## Docker aliases
-source $ZSH_CUSTOM_CONFIG_ALIASES/docker/aliases
-
 ## Operating System aliases
 CURRENT_OS="$(uname -a | awk '{print $1}')"
 if [ $CURRENT_OS = "Darwin" ]; then
@@ -83,21 +80,15 @@ source $ZSH_CUSTOM_CONFIG_FILES/config/fix_zsh
 test -e "$ZSH_CUSTOM_CONFIG_FILES/config/.iterm2_shell_integration.zsh" && \
     source "$ZSH_CUSTOM_CONFIG_FILES/config/.iterm2_shell_integration.zsh"
 
-# end=$(($(date +'%s * 1000 + %-N / 1000000'))); runtime=$((end-start)); echo "Runtime of zshrc was $runtime ms." # GNU
-end=$(python3 -c 'from time import time; print(int(round(time() * 1000)))'); runtime=$((end-start)); echo "Runtime of zshrc was $runtime ms." # OSX
-## ------------------------- END OF CUSTOM ZSHRC -------------------------
-
 source $HOME/.config/zshrc-config/config/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/noelruault/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/noelruault/Downloads/google-cloud-sdk/path.zsh.inc'; fi
-
-# The next line enables shell command completion for gcloud.
-if [ -f '/Users/noelruault/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/noelruault/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
+## 3rd party integration aliases
+source_integrations(){
+    for f in $(ls $ZSH_CUSTOM_CONFIG_ALIASES/integrations/); do source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/$f"; done
+}
 
 # brew install mysql mysql-client # It is important to include both, server and client
 export PATH="/usr/local/opt/mysql-client/bin:$PATH"
-
 # MySQL is configured to only allow connections from localhost by default
 # To connect run:
 #     mysql -uroot
@@ -113,6 +104,6 @@ export PATH="/usr/local/opt/mysql-client/bin:$PATH"
 # ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/tmp/mysql.sock' ?
 #   - https://stackoverflow.com/a/34709790/4349318
 
-export NVM_DIR="$HOME/.nvm"
-  [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
-  [ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+## ------------------------- THE END OF ZSHRC -------------------------
+# end=$(($(date +'%s * 1000 + %-N / 1000000'))); runtime=$((end-start)); echo "Runtime of zshrc was $runtime ms." # GNU
+end=$(python3 -c 'from time import time; print(int(round(time() * 1000)))'); runtime=$((end-start)); echo "Runtime of zshrc was $runtime ms." # OSX

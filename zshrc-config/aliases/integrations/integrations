@@ -1,0 +1,62 @@
+#!/bin/bash
+
+## TODO(nruault): Describe how to use of integrations_source command
+# example:
+# $ source_integrations aws nvm
+
+## Timestamp
+start=$(python3 -c 'from time import time; print(int(round(time() * 1000)))') # OSX
+
+## ----------- GCloud SDK -----------
+if [[ "$*" == *gcloud* ]] || [ -z "$1" ]; then
+  echo 'Loading GCloud integration'
+  # The next line updates PATH for the Google Cloud SDK.
+  if [ -f "/usr/local/opt/google-cloud-sdk/path.zsh.inc" ]; then . "/usr/local/opt/google-cloud-sdk/path.zsh.inc"; fi
+  # The next line enables shell command completion for gcloud.
+  if [ -f "/usr/local/opt/google-cloud-sdk/completion.zsh.inc" ]; then . "/usr/local/opt/google-cloud-sdk/completion.zsh.inc"; fi
+fi
+
+## ----------- NVM ------------------
+if [[ "$*" == *nvm* ]] || [ -z "$1" ]; then
+  echo 'Loading NVM integration'
+  export NVM_DIR="$HOME/.nvm"
+    [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
+    [ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+fi
+
+## ----------- AWS -------------------
+if [[ "$*" == 'aws' ]]; then
+  echo 'AWS integration needs to have more info to be sourced:'
+  echo 'possible values: aws-dev, aws-prod, aws-personal'
+fi
+
+## ----------- AWS ENTERPRISE DEV -------------------
+if [[ "$*" == *aws-dev* ]] || [ -z "$1" ]; then
+  echo 'Loading AWS enterprise/dev integration'
+  # AWS credentials of the nospoon dev account, under the name of nruault
+  export AWS_DEFAULT_REGION=$DEV_ENTERPRISE_AWS_DEFAULT_REGION
+  export AWS_ACCESS_KEY_ID=$DEV_ENTERPRISE_AWS_ACCESS_KEY_ID
+  export AWS_SECRET_ACCESS_KEY=$DEV_ENTERPRISE_AWS_SECRET_ACCESS_KEY
+fi
+
+## ----------- AWS ENTERPRISE PROD -------------------
+if [[ "$*" == *aws-prod* ]] || [ -z "$1" ]; then
+  echo 'Loading AWS enterprise/prod integration'
+  # AWS credentials of the nospoon dev account, under the name of nruault
+  export AWS_DEFAULT_REGION=$PROD_ENTERPRISE_AWS_DEFAULT_REGION
+  export AWS_ACCESS_KEY_ID=$PROD_ENTERPRISE_AWS_ACCESS_KEY_ID
+  export AWS_SECRET_ACCESS_KEY=$PROD_ENTERPRISE_AWS_SECRET_ACCESS_KEY
+fi
+
+## ----------- AWS PERSONAL -------------------
+if [[ "$*" == *aws-personal* ]]; then
+  echo 'Loading AWS personal integration'
+  # AWS credentials of the nospoon dev account, under the name of nruault
+  export AWS_DEFAULT_REGION=$PERSONAL_AWS_DEFAULT_REGION
+  export AWS_ACCESS_KEY_ID=$PERSONAL_AWS_ACCESS_KEY_ID
+  export AWS_SECRET_ACCESS_KEY=$PERSONAL_AWS_SECRET_ACCESS_KEY
+fi
+
+## Timestamp
+end=$(python3 -c 'from time import time; print(int(round(time() * 1000)))');
+runtime=$((end-start)); echo "Runtime of sourcing integrations was $runtime ms." # OSX
