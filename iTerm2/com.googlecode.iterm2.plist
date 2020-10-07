@@ -2143,7 +2143,7 @@ Restart Session</string>
 	<key>NSWindow Frame NSNavPanelAutosaveName</key>
 	<string>320 321 799 448 0 0 1440 877 </string>
 	<key>NSWindow Frame SUStatusFrame</key>
-	<string>520 581 400 129 0 0 1440 877 </string>
+	<string>2520 1240 400 135 1440 280 2560 1415 </string>
 	<key>NSWindow Frame SUUpdateAlert</key>
 	<string>410 363 620 392 0 0 1920 1057 </string>
 	<key>NSWindow Frame SessionsPreferences</key>
@@ -2151,7 +2151,7 @@ Restart Session</string>
 	<key>NSWindow Frame SharedPreferences</key>
 	<string>424 363 937 514 0 0 1440 877 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>0 452 1440 425 0 0 1440 877 </string>
+	<string>0 268 1440 607 0 0 1440 875 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
 	<string>176 70 650 452 0 0 1440 877 </string>
 	<key>New Bookmarks</key>
@@ -4329,12 +4329,12 @@ Restart Session</string>
 		<string>3.3.6</string>
 		<string>3.3.11</string>
 		<string>3.3.12</string>
-		<string>3.3.2</string>
+		<string>3.2.9</string>
 		<string>3.3.1</string>
 		<string>3.3.3</string>
 		<string>3.3.9</string>
 		<string>3.3.0</string>
-		<string>3.2.9</string>
+		<string>3.3.2</string>
 		<string>3.3.4</string>
 	</array>
 	<key>NoSyncBFPFavorites</key>
@@ -4358,9 +4358,9 @@ Restart Session</string>
 	<key>NoSyncFrame_SharedPreferences</key>
 	<dict>
 		<key>screenFrame</key>
-		<string>{{0, 0}, {1440, 900}}</string>
+		<string>{{1440, 280}, {2560, 1440}}</string>
 		<key>topLeft</key>
-		<string>{521, 877}</string>
+		<string>{2292, 1060}</string>
 	</dict>
 	<key>NoSyncHaveRequestedFullDiskAccess</key>
 	<true/>
@@ -4373,7 +4373,7 @@ Restart Session</string>
 	<key>NoSyncLastTipTime</key>
 	<real>590287154.01050103</real>
 	<key>NoSyncLaunchExperienceControllerRunCount</key>
-	<integer>97</integer>
+	<integer>107</integer>
 	<key>NoSyncNeverRemindPrefsChangesLostForFile</key>
 	<true/>
 	<key>NoSyncNeverRemindPrefsChangesLostForFile_selection</key>
@@ -5240,7 +5240,7 @@ Restart Session</string>
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2020-08-31T17:21:01Z</date>
+	<date>2020-10-07T08:19:00Z</date>
 	<key>SUSendProfileInfo</key>
 	<false/>
 	<key>SUUpdateGroupIdentifier</key>
