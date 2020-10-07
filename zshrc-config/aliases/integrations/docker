@@ -1,6 +1,5 @@
 #!/bin/bash
-
-DOCKER_SCRIPTS_PATH="integrations/docker_scripts"
+export DOCKER_SCRIPTS_PATH="integrations/docker_scripts"
 
 alias dk="$HOME/<PATH>/run.sh $@"
 alias dkclean="sh $ZSH_CUSTOM_CONFIG_ALIASES/$DOCKER_SCRIPTS_PATH/docker_clean_all.sh"
@@ -15,7 +14,7 @@ alias dkstop='docker stop $(docker ps -aq)'
 # how-to-remove-docker-images-containers-and-volumes
 # https://www.digitalocean.com/community/tutorials/how-to-remove-docker-images-containers-and-volumes
 
-function dklist(){
+function dklist() {
     echo '\n*** images ***' && docker images -a
     echo '\n*** volumes ***' && docker volume ls
     echo '\n*** containers ***' && docker ps -a

@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 
 cat configure.sh
 

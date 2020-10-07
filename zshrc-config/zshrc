@@ -17,7 +17,7 @@ export ZSH_CUSTOM="$HOME/.oh-my-zsh/custom"
 # will load a random theme each time that oh-my-zsh is loaded.
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 # ZSH_THEME="robbyrussell"  # (default)
-ZSH_THEME="spaceship"  # https://github.com/denysdovhan/spaceship-zsh-theme
+ZSH_THEME="spaceship" # https://github.com/denysdovhan/spaceship-zsh-theme
 
 # ... And give some custom COLOR output with already tested color profiles
 # https://github.com/mbadolato/iTerm2-Color-Schemes#installation-instructions
@@ -30,20 +30,31 @@ SPACESHIP_BATTERY_SHOW='never'
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
     docker
-    fzf                         # https://github.com/junegunn/fzf#using-homebrew-or-linuxbrew
+    fzf # https://github.com/junegunn/fzf#using-homebrew-or-linuxbrew
     git
     golang
-    zsh-autosuggestions         # https://github.com/zsh-users/zsh-autosuggestions#oh-my-zsh
-    zsh-syntax-highlighting     # https://github.com/zsh-users/zsh-syntax-highlighting
+    zsh-autosuggestions     # https://github.com/zsh-users/zsh-autosuggestions#oh-my-zsh
+    zsh-syntax-highlighting # https://github.com/zsh-users/zsh-syntax-highlighting
 )
 # LOAD oh-my-zsh. This will load all the plugins.
 source $ZSH/oh-my-zsh.sh
 
+## Some aliases to fix zsh history
+test -e "$ZSH_CUSTOM_CONFIG_FILES/config/fix_zsh" &&
+    source $ZSH_CUSTOM_CONFIG_FILES/config/fix_zsh
+
+test -e "$ZSH_CUSTOM_CONFIG_FILES/config/.iterm2_shell_integration.zsh" &&
+    source "$ZSH_CUSTOM_CONFIG_FILES/config/.iterm2_shell_integration.zsh"
+
+test -e "$ZSH_CUSTOM_CONFIG_FILES/config/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" &&
+    source "$ZSH_CUSTOM_CONFIG_FILES/config/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+
 # Path to your custom configuration.
 export ZSH_CUSTOM_CONFIG_FILES="$HOME/.config/zshrc-config"
 export ZSH_CUSTOM_CONFIG_ALIASES="$ZSH_CUSTOM_CONFIG_FILES/aliases"
+
 alias zshrc="code $ZSH_CUSTOM_CONFIG_FILES"
-alias .config="code $HOME/.config"
+alias .config="code $HOME/.config ~/.aws/"
 alias vscode-settings="$HOME/Library/Application\ Support/Code/User/settings.json"
 
 source $ZSH_CUSTOM_CONFIG_FILES/config/default
@@ -74,18 +85,12 @@ for file in $PRIVATE_FILES; do
     source "$ZSH_CUSTOM_CONFIG_ALIASES/private/$file"
 done
 
-## Some aliases to fix zsh history
-source $ZSH_CUSTOM_CONFIG_FILES/config/fix_zsh
-
-test -e "$ZSH_CUSTOM_CONFIG_FILES/config/.iterm2_shell_integration.zsh" && \
-    source "$ZSH_CUSTOM_CONFIG_FILES/config/.iterm2_shell_integration.zsh"
-
-source $HOME/.config/zshrc-config/config/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
 ## 3rd party integration aliases
-source_integrations(){
+source_integrations() {
     for f in $(ls $ZSH_CUSTOM_CONFIG_ALIASES/integrations/); do source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/$f"; done
 }
+## Docker integration is activated by default
+source $ZSH_CUSTOM_CONFIG_ALIASES/integrations/docker
 
 # brew install mysql mysql-client # It is important to include both, server and client
 export PATH="/usr/local/opt/mysql-client/bin:$PATH"
@@ -106,4 +111,4 @@ export PATH="/usr/local/opt/mysql-client/bin:$PATH"
 
 ## ------------------------- THE END OF ZSHRC -------------------------
 # end=$(($(date +'%s * 1000 + %-N / 1000000'))); runtime=$((end-start)); echo "Runtime of zshrc was $runtime ms." # GNU
-end=$(python3 -c 'from time import time; print(int(round(time() * 1000)))'); runtime=$((end-start)); echo "Runtime of zshrc was $runtime ms." # OSX
+end=$(python3 -c 'from time import time; print(int(round(time() * 1000)))'); runtime=$((end - start)); echo "Runtime of zshrc was $runtime ms." # OSX

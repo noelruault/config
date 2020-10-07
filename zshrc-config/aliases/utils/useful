@@ -71,8 +71,7 @@ function go_to_dir_on_specific_folder() {
         return
     fi
 
-
-    echo $pwd # TODO(nruault): Remove-me
+    echo $pwd                                                        # TODO(nruault): Remove-me
     WORK_FOLDER=$(eval echo $(go env GOPATH)/src/$COMPANY_DIRECTORY) # eval will store the desired payments path.
 
     # If there is no arguments, just go to $COMPANY_DIRECTORY
@@ -125,7 +124,7 @@ function go_to_dir_on_specific_folder() {
             cd $WORK_FOLDER$FOLDER
         fi
         cd $WORK_FOLDER$(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}')
-         ## REMOVE ME -----------------------
+        ## REMOVE ME -----------------------
     fi
 }
 
