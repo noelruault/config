@@ -3,6 +3,7 @@ export DOCKER_SCRIPTS_PATH="integrations/docker_scripts"
 
 alias dk="$HOME/<PATH>/run.sh $@"
 alias dkclean="sh $ZSH_CUSTOM_CONFIG_ALIASES/$DOCKER_SCRIPTS_PATH/docker_clean_all.sh"
+alias dkpurge="sh $ZSH_CUSTOM_CONFIG_ALIASES/$DOCKER_SCRIPTS_PATH/docker_purge.sh"
 alias dkcreate="sh $ZSH_CUSTOM_CONFIG_ALIASES/$DOCKER_SCRIPTS_PATH/docker_turn_on.sh"
 alias dklightclean="sh $ZSH_CUSTOM_CONFIG_ALIASES/$DOCKER_SCRIPTS_PATH/docker_light_clean.sh"
 alias dkprune='docker system prune --volumes'

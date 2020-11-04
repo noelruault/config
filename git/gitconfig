@@ -1,14 +1,22 @@
+[include]
+    path = private/gitconfig_secrets
+
 [alias]
-    pat = !git add -N . && git add --patch # 'git pat' = !git add -N . && git add --patch
     aliases = !git config -l | grep alias | cut -c 7-
+    dirdiff = diff -p --stat -w --no-index
+    pat = !git add -N . && git add --patch
 
-# Resource: # https://gist.github.com/pksunkara/988716
-[url "git@github.com:"]
-	insteadOf = https://github.com/
 [user]
-	name = Noel Ruault
 	email = noelou.93@gmail.com
+	name = Noel Ruault
 
-# Change public key and email for specific directories:
-[includeIf "gitdir:~/go/src/github.com/lerningamessl/"]
-    path = ~/go/src/github.com/lerningamessl/.gitconfig
+[url "git@github.com:"] # Resource: # https://gist.github.com/pksunkara/988716
+	insteadOf = https://github.com/
+
+# Enforce SSH
+[url "ssh://git@github.com/"]
+	insteadOf = https://github.com/
+[url "ssh://git@gitlab.com/"]
+	insteadOf = https://gitlab.com/
+[url "ssh://git@bitbucket.org/"]
+  	insteadOf = https://bitbucket.org/

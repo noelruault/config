@@ -94,21 +94,11 @@ source $ZSH_CUSTOM_CONFIG_ALIASES/integrations/docker
 
 # brew install mysql mysql-client # It is important to include both, server and client
 export PATH="/usr/local/opt/mysql-client/bin:$PATH"
-# MySQL is configured to only allow connections from localhost by default
-# To connect run:
-#     mysql -uroot
-
-# To have launchd start mysql now and restart at login:
-#   brew services start mysql
-# Or, if you don't want/need a background service you can just run:
-#   mysql.server start
-#   /usr/local/bin/mysql.server start
-
-# https://stackoverflow.com/a/55692783/4349318
-
-# ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/tmp/mysql.sock' ?
-#   - https://stackoverflow.com/a/34709790/4349318
 
 ## ------------------------- THE END OF ZSHRC -------------------------
 # end=$(($(date +'%s * 1000 + %-N / 1000000'))); runtime=$((end-start)); echo "Runtime of zshrc was $runtime ms." # GNU
 end=$(python3 -c 'from time import time; print(int(round(time() * 1000)))'); runtime=$((end - start)); echo "Runtime of zshrc was $runtime ms." # OSX
+
+# TODO:
+# Properly handle routing. I mean, vars like ZSH_CUSTOM_CONFIG_ALIASES start to be annoying.
+# I need to do a proper routes system that eventually can be tested when the terminal starts.

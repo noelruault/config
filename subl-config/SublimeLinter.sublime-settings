@@ -1,8 +1,0 @@
-// SublimeLinter Settings - User
-{
-    "linters": {
-        "rubocop": {
-            "args": ["--config", "/Library/Ruby/Gems/2.3.0/gems/rubocop-0.59.2/config/default.yml"]
-        }
-    }
-}

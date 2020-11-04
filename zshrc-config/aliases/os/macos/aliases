@@ -6,24 +6,24 @@ alias notebook='/anaconda3/bin/jupyter_mac.command ; exit;'
 # dot_clean -> Remove dot-underscore files. Merges ._* files with corresponding native files. # https://ss64.com/osx/dot_clean.html
 alias ds_clean="find . -name '.DS_Store' -type f -delete"
 
-function whoamipro(){
+function whoamipro() {
     echo '*** $whoami ***' && whoami
     echo '*** $groups $(whoami) ***' && groups $(whoami) | cut -d' ' -f1
     echo '*** $id ***' && id
 }
 
-function myip(){
+function myip() {
     echo ">> public ip / curl <remote_url>"
-    curl http://ipecho.net/plain;echo
+    curl http://ipecho.net/plain
+    echo
 
     echo ">> private ip / ipconfig"
     ## MACOS
-    ipconfig getifaddr en0  # ifconfig | grep "inet "
+    ipconfig getifaddr en0 # ifconfig | grep "inet "
 
     echo ">> default gateway (usually router) / netstat"
     netstat -nr | grep -E "default.*en0" --color=never
 }
-
 
 SPIDER="""
     _
@@ -58,7 +58,7 @@ function killport() {
         echo $NO_PARAM_ERROR
         return
     else
-        pids=$(netstat -vanp tcp| grep "$@" | awk '{print $9}')
+        pids=$(netstat -vanp tcp | grep "$@" | awk '{print $9}')
 
         if [[ -z "$pids" ]]; then
             echo "Couldn't be found any PID related to the given port."
@@ -66,7 +66,7 @@ function killport() {
         else
             echo $SPIDER
             echo "Related PIDS found:\n$pids"
-            kill -9 $(netstat -vanp tcp| grep "$@" | awk '{print $9}')
+            kill -9 $(netstat -vanp tcp | grep "$@" | awk '{print $9}')
             return
         fi
     fi
@@ -90,9 +90,28 @@ function findapp() {
 }
 
 function getUDID() {
-    system_profiler SPUSBDataType | sed -n -e '/iPad/,/Serial/p' -e '/iPhone/,/Serial/p' | grep "Serial Number:" | awk -F ": " '{print $2}'
+    # xctrace list lists capabilities of the current running environment, such as devices or templates
+    xcrun xctrace list devices
+
+    # system_profiler reports system hardware and software configuration
+    # system_profiler SPUSBDataType | sed -n -e '/iPad/,/Serial/p' -e '/iPhone/,/Serial/p' | grep "Serial Number:" | awk -F ": " '{print $2}'
 }
 
+function memusg() {
+    echo "Which type of mem usage reporter do you want to use? < time / script >:"
+    read memusg_source
+
+    case $memusg_source in
+    time)
+        echo "alias for /usr/bin/time -l $@"
+        /usr/bin/time -l $@
+        echo "\n Maximum resident set size reports the peak RAM usage."
+        ;;
+    script)
+        sh $ZSH_CUSTOM_CONFIG_ALIASES/nruault/assets/memusg.sh $@
+        ;;
+    esac
+}
 
 # $ZSH_CUSTOM/plugins/zsh-syntax-highlighting/highlighters/brackets/brackets-highlighter.zsh
 

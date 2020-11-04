@@ -25,12 +25,34 @@ spacer1='\t'
 # ====HOW-TO Commands=====
 
 # ========== A
+
+alias awk\?='awk_doc'
+function awk_doc() {
+	echo """
+	gsub -> http://www.endmemo.com/r/gsub.php
+		go test ./... | awk '{ gsub("PASS", "\033[0;32m&\033[0m"); print }'
+	"""
+}
+
 # ========== B
 alias bash\?='bash_doc'
 function bash_doc() {
 	echo """
 	How to get latest bash version on MACOSX
 	- https://stackoverflow.com/a/11704224
+
+	2467
+
+	ANSI escape codes:
+
+	Black        0;30     Dark Gray     1;30
+	Red          0;31     Light Red     1;31
+	Green        0;32     Light Green   1;32
+	Brown/Orange 0;33     Yellow        1;33
+	Blue         0;34     Light Blue    1;34
+	Purple       0;35     Light Purple  1;35
+	Cyan         0;36     Light Cyan    1;36
+	Light Gray   0;37     White         1;37
 	"""
 }
 
@@ -185,10 +207,11 @@ alias go\?='go_doc'
 function go_doc() {
 	echo """
 	go-comments?
+	go-encode?
+	go-fmt?
 	go-mock?
 	go-mod?
 	go-naming?
-	go-fmt?
 	go-versions?
 	"""
 }
@@ -201,6 +224,44 @@ function go-comments_doc() {
 	3. The comment should explain why the thing is why it is.
 
 	[Reference]: https://dave.cheney.net/practical-go/presentations/qcon-china.html#_comments
+	"""
+}
+
+alias go-encode\?='go-encode_doc'
+function go-encode_doc() {
+	echo """
+
+	// Here&#39;s the string we&#39;ll encode/decode.
+	data := &#34;abc123!?\$*&amp;()&#39;-=@~&#34;
+
+	// Go supports both standard and URL-compatible base64.
+	// Here&#39;s how to encode using the standard encoder.
+	// The encoder requires a []byte so we convert our string to that type.
+	sEnc := b64.StdEncoding.EncodeToString([]byte(data))
+	fmt.Println(sEnc)
+
+	// Decoding may return an error, which you can check
+	// if you don&#39;t already know the input to be well-formed.
+	sDec, _ := b64.StdEncoding.DecodeString(sEnc)
+	fmt.Println(string(sDec))
+	fmt.Println()
+
+	// This encodes/decodes using a URL-compatible base64 format.
+	uEnc := b64.URLEncoding.EncodeToString([]byte(data))
+	fmt.Println(uEnc)
+	uDec, _ := b64.URLEncoding.DecodeString(uEnc)
+	fmt.Println(string(uDec))
+
+	// TIP: Sometimes is safer to encode an already read file
+
+	jsonKeyFile, err := ioutil.ReadFile(fmt.Sprintf('.keys/production-credentials-file.json'))
+	if err != nil {
+		log.Fatal(err)
+	}
+	encKey := base64.URLEncoding.EncodeToString(jsonKeyFile)
+	fmt.Println(encKey) // Getting the encode of an already read file. Nothing can go wrong.
+
+	[Reference]: https://play.golang.org/p/S7ff3UgzNlG
 	"""
 }
 
@@ -326,6 +387,8 @@ function grep_doc() {
 	"""
 }
 
+
+
 # ========== H
 alias hosts\?='echo /etc/hosts && echo ~/.ssh/config'
 
@@ -353,6 +416,45 @@ function mkdir_doc() {
 	mkdir -p ./{proto,server/proto,database/proto} # -p Creates intermediate directories as required.
 			     └── proto  └── server     └── database
 							  └── proto		 └── proto
+	"""
+}
+
+alias mysql\?="mysql_doc"
+function mysql_doc(){
+	echo """
+	As an advice, just install mysql client and let the server to be instantiated by Docker.
+		$ brew install mysql-client
+	To find out where is the file 'my.cnf' being loaded, run the next command:
+		$ mysql --help | grep my.cnf -B2
+
+	An usual error like the next can be found when using mysql:
+		MySQL said: Authentication plugin 'caching_sha2_password' cannot be loaded:
+		dlopen(/usr/local/lib/plugin/caching_sha2_password.so, 2): image not found
+	Can be fixed by adding the next lines to the my.cnf file:
+		[mysqld]
+		default-authentication-plugin=mysql_native_password
+
+	Login to mysql server from terminal: run mysql -u root -p, then inside shell execute this command
+	(replacing [password] with your actual password): ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '[password]';
+		$ ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '';
+
+	exit from mysql shell with exit and run:
+		$ brew services restart mysql
+
+-----------
+	When insalling the server, MySQL is configured to only allow
+	connections from localhost by default, to connect run:
+	    $ mysql -uroot
+	To have launchd start mysql now and restart at login:
+		$ brew services start mysql
+	Or, if you don't want/need a background service you can just run:
+		$ mysql.server start
+	   	$ /usr/local/bin/mysql.server start
+
+		https://stackoverflow.com/a/55692783/4349318
+
+	ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/tmp/mysql.sock' ?
+		- https://stackoverflow.com/a/34709790/4349318
 	"""
 }
 

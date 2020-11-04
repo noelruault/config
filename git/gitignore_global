@@ -31,3 +31,7 @@ launch.json
 # Visual studio code related files
 .vscode/*
 !.vscode/settings.json
+
+# Private and secret files and folders
+*private*
+*secret*
