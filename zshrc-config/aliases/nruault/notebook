@@ -53,6 +53,10 @@ function bash_doc() {
 	Purple       0;35     Light Purple  1;35
 	Cyan         0;36     Light Cyan    1;36
 	Light Gray   0;37     White         1;37
+
+
+	BASH GUIDE: Square brackets
+	- https://stackoverflow.com/a/47576482
 	"""
 }
 

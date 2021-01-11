@@ -21,10 +21,13 @@ fi
 
 ## ----------- NVM ------------------
 if [[ "$*" == *nvm* ]] || [ -z "$1" ]; then
+  # https://github.com/nvm-sh/nvm#uninstalling--removal
+  # To remove nvm manually, execute the following:
+  #   $ rm -rf "$NVM_DIR"
   echo 'Loading NVM integration'
   export NVM_DIR="$HOME/.nvm"
-    [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
-    [ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 fi
 
 ## ----------- AWS -------------------
@@ -33,29 +36,11 @@ if [[ "$*" == 'aws' ]]; then
   echo 'All the profiles are sourced from `~/.aws/credentials`'
 fi
 
-# ## ----------- AWS ENTERPRISE DEV -------------------
-# if [[ "$*" == *aws-dev* ]] || [ -z "$1" ]; then
-#   echo 'Loading AWS enterprise/dev integration'
-#   export AWS_DEFAULT_REGION=$DEV_ENTERPRISE_AWS_DEFAULT_REGION
-#   export AWS_ACCESS_KEY_ID=$DEV_ENTERPRISE_AWS_ACCESS_KEY_ID
-#   export AWS_SECRET_ACCESS_KEY=$DEV_ENTERPRISE_AWS_SECRET_ACCESS_KEY
-# fi
-
-# ## ----------- AWS ENTERPRISE PROD -------------------
-# if [[ "$*" == *aws-prod* ]] || [ -z "$1" ]; then
-#   echo 'Loading AWS enterprise/prod integration'
-#   export AWS_DEFAULT_REGION=$PROD_ENTERPRISE_AWS_DEFAULT_REGION
-#   export AWS_ACCESS_KEY_ID=$PROD_ENTERPRISE_AWS_ACCESS_KEY_ID
-#   export AWS_SECRET_ACCESS_KEY=$PROD_ENTERPRISE_AWS_SECRET_ACCESS_KEY
-# fi
-
-# ## ----------- AWS PERSONAL -------------------
-# if [[ "$*" == *aws-personal* ]]; then
-#   echo 'Loading AWS personal integration'
-#   export AWS_DEFAULT_REGION=$PERSONAL_AWS_DEFAULT_REGION
-#   export AWS_ACCESS_KEY_ID=$PERSONAL_AWS_ACCESS_KEY_ID
-#   export AWS_SECRET_ACCESS_KEY=$PERSONAL_AWS_SECRET_ACCESS_KEY
-# fi
+## ----------- FLUTTER -------------------
+if [[ "$*" == *flutter* ]] || [ -z "$1" ]; then
+  echo 'Loading Flutter integration'
+  [ -s "$HOME/flutter/bin/flutter" ] && export PATH="$PATH:$HOME/flutter/bin"  # This exports Flutter dir
+fi
 
 ## Timestamp
 end=$(python3 -c 'from time import time; print(int(round(time() * 1000)))');
