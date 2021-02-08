@@ -27,6 +27,7 @@ alias githooksconfig='git config --global core.hooksPath ~/.config/git/hooks/'
 # USEFUL COMMANDS:
 #   - git diff origin/master --name-only -- '*.go' ':(exclude)vendor/*'
 #   - git config --global alias.dirdiff 'diff -p --stat -w --no-index'
+alias gl='git log --graph --decorate --pretty=oneline --abbrev-commit'
 
 ### Vagrant
 alias vagrantclean="vagrant box list | cut -f 1 -d ' ' | xargs -L 1 vagrant box remove -f"

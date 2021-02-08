@@ -6,16 +6,19 @@ function check_noelio_domain() {
     # Checks for internet connectivity.
     if ping -q -c 1 -W 1 8.8.8.8 >/dev/null; then; else exit 1; fi
 
-    domain_expiry_date=$(whois noel.io | grep "Expiry" | grep -oE '(\d{4})-(\d\d)-(\d\d)' | sed 's/[\._-]//g')
-    current_date=$(date +%Y%m%d)
-    time_until_expiration=$(( ($domain_expiry_date - $current_date) / 24 ))
+    domain_expiry_date=$(whois noel.io | grep "Registry Expiry Date" | grep -oE '(\d{4})-(\d\d)-(\d\d)' | sed 's/[\._-]//g')
+
+    current_epoch_time=`date -jf %Y%m%d $(date +%Y%m%d) +%s`
+    domain_expity_date_epoch=`date -jf %Y%m%d $domain_expiry_date +%s`
+
+    days_until_expiration=$(( (domain_expity_date_epoch - current_epoch_time) / 86400 ))
 
     if [[ "$1" == "bash:request" ]]; then
-        if (($time_until_expiration < 30)); then
-            echo "DOMAIN ABOUT TO EXPIRE, $time_until_expiration days left."
+        if ((days_until_expiration < 30)); then
+            echo "DOMAIN ABOUT TO EXPIRE, $days_until_expiration days left."
         fi
     else
-        echo "Domain expiration is $time_until_expiration days ahead."
+        echo "Domain expiration is $days_until_expiration days ahead."
     fi
     # exit 0
 }

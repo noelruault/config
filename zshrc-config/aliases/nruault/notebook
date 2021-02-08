@@ -13,7 +13,7 @@
 # Function to display howto possibilities by typing 'howto?'
 alias howto\?='howto_possibilities'
 function howto_possibilities() {
-	grep -E '^alias.*\?' $ZSH_CUSTOM_CONFIG_FILES/aliases/nruault/notebook | awk '{print $2}' | awk -F '\' '{print $1}'
+  grep -E '^alias.*\?' $ZSH_CUSTOM_CONFIG_FILES/aliases/nruault/notebook | awk '{print $2}' | awk -F '\' '{print $1}'
 }
 
 # ========================
@@ -28,41 +28,54 @@ spacer1='\t'
 
 alias awk\?='awk_doc'
 function awk_doc() {
-	echo """
-	gsub -> http://www.endmemo.com/r/gsub.php
-		go test ./... | awk '{ gsub("PASS", "\033[0;32m&\033[0m"); print }'
-	"""
+  echo """
+gsub -> http://www.endmemo.com/r/gsub.php
+e.g:
+    $ go test ./... | awk '{ gsub(\"PASS\", \"\\\033[0;32m&\\\033[0m\"); print }'
+  """
 }
 
 # ========== B
 alias bash\?='bash_doc'
 function bash_doc() {
-	echo """
-	How to get latest bash version on MACOSX
-	- https://stackoverflow.com/a/11704224
+  bash_colors
+  echo """
+How to get latest bash version on MACOSX
+- https://stackoverflow.com/a/11704224
+- https://itnext.io/upgrading-bash-on-macos-7138bd1066ba
 
-	2467
+From here on, the shell you're in is Bash 3.2, but 'bash' command points to Bash 5.X
+To change your login shell, add /usr/local/bin/bash to /etc/shells and change the default shell with
+   chsh -s /usr/local/bin/bash
+   sudo chsh -s /usr/local/bin/bash
 
-	ANSI escape codes:
+Note that '#!/bin/bash' shebang explicitly refers to the old version of Bash.
+Point to '#!/usr/bin/env bash'. It's portable and will use the first Bash in your '\$PATH'
 
-	Black        0;30     Dark Gray     1;30
-	Red          0;31     Light Red     1;31
-	Green        0;32     Light Green   1;32
-	Brown/Orange 0;33     Yellow        1;33
-	Blue         0;34     Light Blue    1;34
-	Purple       0;35     Light Purple  1;35
-	Cyan         0;36     Light Cyan    1;36
-	Light Gray   0;37     White         1;37
+BASH GUIDE: Square brackets
+- https://stackoverflow.com/a/47576482
 
+  """
+}
 
-	BASH GUIDE: Square brackets
-	- https://stackoverflow.com/a/47576482
-	"""
+function bash_colors() {
+  echo """
+  ANSI escape codes:
+
+  Black        0;30     Dark Gray     1;30
+  Red          0;31     Light Red     1;31
+  Green        0;32     Light Green   1;32
+  Brown/Orange 0;33     Yellow        1;33
+  Blue         0;34     Light Blue    1;34
+  Purple       0;35     Light Purple  1;35
+  Cyan         0;36     Light Cyan    1;36
+  Light Gray   0;37     White         1;37
+  """
 }
 
 alias bashrc\?='bashrc_doc'
 function bashrc_doc() {
-	echo """
+  echo """
     ## interactive login shell, or with --login
     /etc/profile
     ~/.bash_profile
@@ -87,308 +100,316 @@ function bashrc_doc() {
 
     [[Source: https://www.gnu.org/software/bash/manual/bash.pdf]]
     ???: Why dotfiles and /etc/* files?? I mean, why two definitions of the same file?
-	"""
+  """
 }
 
 alias bash-exit\?='bash-exit_doc'
 function bash-exit_doc() {
-	echo """
-	Exit code 0        Success
-	Exit code 1        General errors, Miscellaneous errors, such as "divide by zero" and other impermissible operations
-	Exit code 2        Misuse of shell builtins (according to Bash documentation)
-		Example: empty_function() {}
+  echo """
+  Exit code 0        Success
+  Exit code 1        General errors, Miscellaneous errors, such as "divide by zero" and other impermissible operations
+  Exit code 2        Misuse of shell builtins (according to Bash documentation)
+    Example: empty_function() {}
 
-	SOURCE: http://www.tldp.org/LDP/abs/html/exitcodes.html
-	"""
+  SOURCE: http://www.tldp.org/LDP/abs/html/exitcodes.html
+  """
 }
 
 # ========== C
 alias chmod\?='permission_doc'
 alias chown\?='permission_doc'
 
+alias code\?='copy_doc'
+function vscode_doc() {
+  echo """
+  Reference: https://keycombiner.com/collections/vscode/macos/
+  """
+}
+
+
 alias copy\?='copy_doc'
 function copy_doc() {
-	echo """
-	cp ~/.<file-name>{,-<extension>}
-	"""
+  echo """
+  cp ~/.<file-name>{,-<extension>}
+  """
 }
 
 # ========== D
 alias dd\?='dd_doc'
 function dd_doc() {
-	echo """
-	dd if=/<path>/<file.iso> of=/dev/diskXYZ status=progress
-	"""
+  echo """
+  dd if=/<path>/<file.iso> of=/dev/diskXYZ status=progress
+  """
 }
 
 alias diskutil\?='diskutil_doc'
 function diskutil_doc() {
-	echo """
-	diskutil list
+  echo """
+  diskutil list
 
-	diskutil unmount 		/dev/diskXYZ
-			 unmountDisk	...
-			 eject			...
+  diskutil unmount 		/dev/diskXYZ
+       unmountDisk	...
+       eject			...
 
-	diskutil eraseDisk FAT32 SDCARD /dev/diskXYZ
+  diskutil eraseDisk FAT32 SDCARD /dev/diskXYZ
 
-	[[Docs: https://www.dssw.co.uk/reference/diskutil.html]]
-	"""
+  [[Docs: https://www.dssw.co.uk/reference/diskutil.html]]
+  """
 }
 
 alias docker\?='docker_doc'
 function docker_doc() {
-	echo """
-	docker exec -it <container1> ping <container2> # names in docker ps and docker compose
+  echo """
+  docker exec -it <container1> ping <container2> # names in docker ps and docker compose
 
-	try dkps & dki to inspect containers and images, in a cleaner way.
-	#####
-	# DOCKER PERMISSION ISSUES?
-	# - docker-compose run --rm --service-ports -u root devenv-node-cp
-	# - docker run -u root devenv-node-cp
-	"""
+  try dkps & dki to inspect containers and images, in a cleaner way.
+  #####
+  # DOCKER PERMISSION ISSUES?
+  # - docker-compose run --rm --service-ports -u root devenv-node-cp
+  # - docker run -u root devenv-node-cp
+  """
 }
 
 alias docker-compose\?='docker-compose_doc'
 function docker-compose_doc() {
-	echo """
-	docker-compose run --rm --service-ports --name <name> <name>
-	go build -mod=vendor ./cmd/<name> && ./<name> -v
-	"""
+  echo """
+  docker-compose run --rm --service-ports --name <name> <name>
+  go build -mod=vendor ./cmd/<name> && ./<name> -v
+  """
 }
 
 alias django\?='django-migrations_doc'
 alias django-migrations\?='django-migrations_doc'
 function django-migrations_doc() {
-	echo """
-	[MIGRATIONS]
+  echo """
+  [MIGRATIONS]
 
-	[ROLLBACK]
-	python manage.py showmigrations
-	python manage.py migrate <app_name> <old_migration>
-	rm <app_name>/migrations/<last_migration>.py
+  [ROLLBACK]
+  python manage.py showmigrations
+  python manage.py migrate <app_name> <old_migration>
+  rm <app_name>/migrations/<last_migration>.py
 
-	[MIGRATE]
-	python manage.py makemigrations <app_name> --name=<name>  # python manage.py makemigrations
-	python manage.py migrate <app_name>  # python manage.py migrate
+  [MIGRATE]
+  python manage.py makemigrations <app_name> --name=<name>  # python manage.py makemigrations
+  python manage.py migrate <app_name>  # python manage.py migrate
 
-	[[Source: https://stackoverflow.com/questions/32123477/django-revert-last-migration]]
-	"""
+  [[Source: https://stackoverflow.com/questions/32123477/django-revert-last-migration]]
+  """
 }
 # ========== E
 # ========== F
 # ========== G
 alias git\?='git_doc'
 function git_doc() {
-	echo """
-	(1) git fetch origin
-	(1) git reset origin
-	(2) git fetch origin
-	(2) git reset --hard origin
-	(?) git reset --hard HEAD
-	# Remove all untracked files Git
-	git clean -df
-	#	-d  :remove whole directories
-	# 	-f  :force
-	[[Source: https://stackoverflow.com/a/102309/4349318]]
+  echo """
+  (1) git fetch origin
+  (1) git reset origin
+  (2) git fetch origin
+  (2) git reset --hard origin
+  (?) git reset --hard HEAD
+  # Remove all untracked files Git
+  git clean -df
+  #	-d  :remove whole directories
+  # 	-f  :force
+  [[Source: https://stackoverflow.com/a/102309/4349318]]
 
-	Remove branches?
-	* Deleting local branches
-		git branch -d <branch_name>
-	* Deleting remote branches
-		git push origin :<branch_name>
-		git push origin --delete <branch_name>
+  Remove branches?
+  * Deleting local branches
+    git branch -d <branch_name>
+  * Deleting remote branches
+    git push origin :<branch_name>
+    git push origin --delete <branch_name>
 
-	[[Source: https://www.educative.io/edpresso/how-to-delete-remote-branches-in-git]]
+  [[Source: https://www.educative.io/edpresso/how-to-delete-remote-branches-in-git]]
 
-	Remove existing $(.DS_Store) files from the repository:
-	find . -name .DS_Store -print0 | xargs -0 git rm -f --ignore-unmatch
+  Remove existing $(.DS_Store) files from the repository:
+  find . -name .DS_Store -print0 | xargs -0 git rm -f --ignore-unmatch
 
-	"""
+  """
 }
 
 alias go\?='go_doc'
 function go_doc() {
-	echo """
-	go-comments?
-	go-encode?
-	go-fmt?
-	go-mock?
-	go-mod?
-	go-naming?
-	go-versions?
-	"""
+  echo """
+  go-comments?
+  go-encode?
+  go-fmt?
+  go-mock?
+  go-mod?
+  go-naming?
+  go-versions?
+  """
 }
 
 alias go-comments\?='go-comments_doc'
 function go-comments_doc() {
-	echo """
-	1. The comment should explain what the thing does.
-	2. The comment should explain how the thing does what it does.
-	3. The comment should explain why the thing is why it is.
+  echo """
+  1. The comment should explain what the thing does.
+  2. The comment should explain how the thing does what it does.
+  3. The comment should explain why the thing is why it is.
 
-	[Reference]: https://dave.cheney.net/practical-go/presentations/qcon-china.html#_comments
-	"""
+  [Reference]: https://dave.cheney.net/practical-go/presentations/qcon-china.html#_comments
+  """
 }
 
 alias go-encode\?='go-encode_doc'
 function go-encode_doc() {
-	echo """
+  echo """
 
-	// Here&#39;s the string we&#39;ll encode/decode.
-	data := &#34;abc123!?\$*&amp;()&#39;-=@~&#34;
+  // Here&#39;s the string we&#39;ll encode/decode.
+  data := &#34;abc123!?\$*&amp;()&#39;-=@~&#34;
 
-	// Go supports both standard and URL-compatible base64.
-	// Here&#39;s how to encode using the standard encoder.
-	// The encoder requires a []byte so we convert our string to that type.
-	sEnc := b64.StdEncoding.EncodeToString([]byte(data))
-	fmt.Println(sEnc)
+  // Go supports both standard and URL-compatible base64.
+  // Here&#39;s how to encode using the standard encoder.
+  // The encoder requires a []byte so we convert our string to that type.
+  sEnc := b64.StdEncoding.EncodeToString([]byte(data))
+  fmt.Println(sEnc)
 
-	// Decoding may return an error, which you can check
-	// if you don&#39;t already know the input to be well-formed.
-	sDec, _ := b64.StdEncoding.DecodeString(sEnc)
-	fmt.Println(string(sDec))
-	fmt.Println()
+  // Decoding may return an error, which you can check
+  // if you don&#39;t already know the input to be well-formed.
+  sDec, _ := b64.StdEncoding.DecodeString(sEnc)
+  fmt.Println(string(sDec))
+  fmt.Println()
 
-	// This encodes/decodes using a URL-compatible base64 format.
-	uEnc := b64.URLEncoding.EncodeToString([]byte(data))
-	fmt.Println(uEnc)
-	uDec, _ := b64.URLEncoding.DecodeString(uEnc)
-	fmt.Println(string(uDec))
+  // This encodes/decodes using a URL-compatible base64 format.
+  uEnc := b64.URLEncoding.EncodeToString([]byte(data))
+  fmt.Println(uEnc)
+  uDec, _ := b64.URLEncoding.DecodeString(uEnc)
+  fmt.Println(string(uDec))
 
-	// TIP: Sometimes is safer to encode an already read file
+  // TIP: Sometimes is safer to encode an already read file
 
-	jsonKeyFile, err := ioutil.ReadFile(fmt.Sprintf('.keys/production-credentials-file.json'))
-	if err != nil {
-		log.Fatal(err)
-	}
-	encKey := base64.URLEncoding.EncodeToString(jsonKeyFile)
-	fmt.Println(encKey) // Getting the encode of an already read file. Nothing can go wrong.
+  jsonKeyFile, err := ioutil.ReadFile(fmt.Sprintf('.keys/production-credentials-file.json'))
+  if err != nil {
+    log.Fatal(err)
+  }
+  encKey := base64.URLEncoding.EncodeToString(jsonKeyFile)
+  fmt.Println(encKey) // Getting the encode of an already read file. Nothing can go wrong.
 
-	[Reference]: https://play.golang.org/p/S7ff3UgzNlG
-	"""
+  [Reference]: https://play.golang.org/p/S7ff3UgzNlG
+  """
 }
 
 alias go-mock\?='go-mock_doc'
 function go-mock_doc() {
-	echo '''
-	-----
-	if err != nil {
-		stats.Incr("internal.errors", stats.T("error_code", "tokenization.UpdateTokenTransaction"))
-	}
-	-----
+  echo '''
+  -----
+  if err != nil {
+    stats.Incr("internal.errors", stats.T("error_code", "tokenization.UpdateTokenTransaction"))
+  }
+  -----
 
-	* (??) How to MOCK stats.Incr:
+  * (??) How to MOCK stats.Incr:
 
-	`api.go`
+  `api.go`
 
-	type statsEngine interface {
-		Incr(name string, tags ...stats.Tag)
-	}
+  type statsEngine interface {
+    Incr(name string, tags ...stats.Tag)
+  }
 
-	`api_test.go`
+  `api_test.go`
 
-	type statsEngineMock struct{}
-	func (sem *statsEngineMock) Incr(name string, tags ...stats.Tag) {}
+  type statsEngineMock struct{}
+  func (sem *statsEngineMock) Incr(name string, tags ...stats.Tag) {}
 
-	'''
+  '''
 }
 
 alias go-mod\?='go-mod_doc'
 function go-mod_doc() {
-	echo """
-	[INITIALISE GO MODULES]
-	go mod init # go mod init <modulename>
+  echo """
+  [INITIALISE GO MODULES]
+  go mod init # go mod init <modulename>
 
-	[ADD THE DEPENDENCIES TO THE GO.MOD FILE]
-	go get [-v] -u ./...
+  [ADD THE DEPENDENCIES TO THE GO.MOD FILE]
+  go get [-v] -u ./...
 
-	[VENDOR THOSE DEPENDENCIES]
-	go mod vendor
+  [VENDOR THOSE DEPENDENCIES]
+  go mod vendor
 
-	[UPDATE A DEPENDENCY]
-	go get -u <repo url>
-	go mod vendor
+  [UPDATE A DEPENDENCY]
+  go get -u <repo url>
+  go mod vendor
 
-	[Reference]: https://www.kablamo.com.au/blog/2018/12/10/just-tell-me-how-to-use-go-modules
+  [Reference]: https://www.kablamo.com.au/blog/2018/12/10/just-tell-me-how-to-use-go-modules
 
-	IF Errors when go mod and the repository is private...
-	eg:
-		$ fatal: could not read Username for 'https://github.com': terminal prompts disabled
-		$ reading https://sum.golang.org/lookup/github.com/<name>/<repo_name>@v0.0.0-XXXXXXXXXXXXXX-XXXXXXXXXXXX: 410 Gone
-		$ server response: not found: github.com/<name>/<repo_name>@v1.0.0: invalid version: unknown revision v1.0.0
+  IF Errors when go mod and the repository is private...
+  eg:
+    $ fatal: could not read Username for 'https://github.com': terminal prompts disabled
+    $ reading https://sum.golang.org/lookup/github.com/<name>/<repo_name>@v0.0.0-XXXXXXXXXXXXXX-XXXXXXXXXXXX: 410 Gone
+    $ server response: not found: github.com/<name>/<repo_name>@v1.0.0: invalid version: unknown revision v1.0.0
 
-	export GOPRIVATE=github.com/<company_name>/*
+  export GOPRIVATE=github.com/<company_name>/*
 
-	[Reference]: https://stackoverflow.com/a/60323360/4349318
-	"""
+  [Reference]: https://stackoverflow.com/a/60323360/4349318
+  """
 }
 
 alias go-naming\?='go-naming_doc'
 function go-naming_doc() {
-	echo """
-	- Name everything for what it provides, not what it contains.
-	- Short variable names work well when the distance between their declaration and last use is short.
-	- Long variable names need to justify themselves; the longer they are the more value they need to provide.
-		Lengthy bureaucratic names carry a low amount of signal compared to their weight on the page.
-	- Don't include the name of your type in the name of your variable.
-	- Constants should describe the value they hold, not how that value is used.
-	- Prefer single letter variables for loops and branches, single words for parameters and return values, multiple words for functions and package level declaration.
-	- Prefer single words for methods, interfaces, and packages.
-	- Remember that the name of a package is part of the name the caller uses to to refer to it, so make use of that.
-	- Don't mix and match long and short formal parameters in the same declaration.
+  echo """
+  - Name everything for what it provides, not what it contains.
+  - Short variable names work well when the distance between their declaration and last use is short.
+  - Long variable names need to justify themselves; the longer they are the more value they need to provide.
+    Lengthy bureaucratic names carry a low amount of signal compared to their weight on the page.
+  - Don't include the name of your type in the name of your variable.
+  - Constants should describe the value they hold, not how that value is used.
+  - Prefer single letter variables for loops and branches, single words for parameters and return values, multiple words for functions and package level declaration.
+  - Prefer single words for methods, interfaces, and packages.
+  - Remember that the name of a package is part of the name the caller uses to to refer to it, so make use of that.
+  - Don't mix and match long and short formal parameters in the same declaration.
 
-	[Reference]: https://dave.cheney.net/practical-go/presentations/qcon-china.html#_identifiers
-	"""
+  [Reference]: https://dave.cheney.net/practical-go/presentations/qcon-china.html#_identifiers
+  """
 }
 
 alias go-fmt\?='go-fmt_doc'
 function go-fmt_doc() {
-	go doc fmt | head -60
-	echo """
-	CODE RAN: go doc fmt | head -60
-	"""
+  go doc fmt | head -60
+  echo """
+  CODE RAN: go doc fmt | head -60
+  """
 }
 
 alias go-versions\?='go-versions_doc'
 function go-versions_doc() {
-	echo """
-	Installing extra Go versions
+  echo """
+  Installing extra Go versions
 
-	It may be useful to have multiple Go versions installed on the same machine, for example, to ensure that a package's tests pass on multiple Go versions. Once you have one Go version installed, you can install another (such as 1.10.7) as follows:
+  It may be useful to have multiple Go versions installed on the same machine, for example, to ensure that a package's tests pass on multiple Go versions. Once you have one Go version installed, you can install another (such as 1.10.7) as follows:
 
-		$ go get golang.org/dl/go1.10.7
-		$ go1.10.7 download
+    $ go get golang.org/dl/go1.10.7
+    $ go1.10.7 download
 
-	The newly downloaded version can be used like go:
+  The newly downloaded version can be used like go:
 
-		$ go1.10.7 version
-		go version go1.10.7 linux/amd64
+    $ go1.10.7 version
+    go version go1.10.7 linux/amd64
 
-	All Go versions available via this method are listed on the download page. You can find where each of these extra Go versions is installed by looking at its GOROOT; for example, go1.10.7 env GOROOT. To uninstall a downloaded version, just remove its GOROOT directory and the goX.Y.Z binary.
+  All Go versions available via this method are listed on the download page. You can find where each of these extra Go versions is installed by looking at its GOROOT; for example, go1.10.7 env GOROOT. To uninstall a downloaded version, just remove its GOROOT directory and the goX.Y.Z binary.
 
 
-	SOURCE: https://golang.org/doc/install#extra_versions
-	"""
+  SOURCE: https://golang.org/doc/install#extra_versions
+  """
 }
 
 alias gpg\?='gpg_doc'
 function gpg_doc() {
-	echo """
-	GENERATE:	gpg --export --armor <user>@<domain>.com > <user>.asc
-	"""
+  echo """
+  GENERATE:	gpg --export --armor <user>@<domain>.com > <user>.asc
+  """
 }
 
 alias grep\?='grep_doc'
 function grep_doc() {
-	echo """
-	[[Docs:]] https://www.thegeekstuff.com/2011/10/grep-or-and-not-operators/
+  echo """
+  [[Docs:]] https://www.thegeekstuff.com/2011/10/grep-or-and-not-operators/
 
-	Find all files containing specific text on Linux
+  Find all files containing specific text on Linux
 
-		grep -rnw '/path/to/somewhere/' -e 'pattern'
+    grep -rnw '/path/to/somewhere/' -e 'pattern'
 
-	"""
+  """
 }
 
 
@@ -399,15 +420,15 @@ alias hosts\?='echo /etc/hosts && echo ~/.ssh/config'
 # ========== I
 alias iterm\?='iterm_doc'
 function iterm_doc() {
-	echo """
+  echo """
 
-	⌘ ⇧ C ${spacer1}| Enter copy mode.
-	- ${spacer2} v    select by character.
-	- ${spacer2} ⇧ v  select by line.
+  ⌘ ⇧ C ${spacer1}| Enter copy mode.
+  - ${spacer2} v    select by character.
+  - ${spacer2} ⇧ v  select by line.
 
-	[[Reference:] copy-mode ] https://kevinjalbert.com/iterm2-mouseless-copy/
+  [[Reference:] copy-mode ] https://kevinjalbert.com/iterm2-mouseless-copy/
 
-	"""
+  """
 }
 
 # ========== J
@@ -416,60 +437,60 @@ function iterm_doc() {
 # ========== M
 alias mkdir\?='mkdir_doc'
 function mkdir_doc() {
-	echo """
-	mkdir -p ./{proto,server/proto,database/proto} # -p Creates intermediate directories as required.
-			     └── proto  └── server     └── database
-							  └── proto		 └── proto
-	"""
+  echo """
+  mkdir -p ./{proto,server/proto,database/proto} # -p Creates intermediate directories as required.
+           └── proto  └── server     └── database
+                └── proto		 └── proto
+  """
 }
 
 alias mysql\?="mysql_doc"
 function mysql_doc(){
-	echo """
-	As an advice, just install mysql client and let the server to be instantiated by Docker.
-		$ brew install mysql-client
-	To find out where is the file 'my.cnf' being loaded, run the next command:
-		$ mysql --help | grep my.cnf -B2
+  echo """
+  As an advice, just install mysql client and let the server to be instantiated by Docker.
+    $ brew install mysql-client
+  To find out where is the file 'my.cnf' being loaded, run the next command:
+    $ mysql --help | grep my.cnf -B2
 
-	An usual error like the next can be found when using mysql:
-		MySQL said: Authentication plugin 'caching_sha2_password' cannot be loaded:
-		dlopen(/usr/local/lib/plugin/caching_sha2_password.so, 2): image not found
-	Can be fixed by adding the next lines to the my.cnf file:
-		[mysqld]
-		default-authentication-plugin=mysql_native_password
+  An usual error like the next can be found when using mysql:
+    MySQL said: Authentication plugin 'caching_sha2_password' cannot be loaded:
+    dlopen(/usr/local/lib/plugin/caching_sha2_password.so, 2): image not found
+  Can be fixed by adding the next lines to the my.cnf file:
+    [mysqld]
+    default-authentication-plugin=mysql_native_password
 
-	Login to mysql server from terminal: run mysql -u root -p, then inside shell execute this command
-	(replacing [password] with your actual password): ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '[password]';
-		$ ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '';
+  Login to mysql server from terminal: run mysql -u root -p, then inside shell execute this command
+  (replacing [password] with your actual password): ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '[password]';
+    $ ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '';
 
-	exit from mysql shell with exit and run:
-		$ brew services restart mysql
+  exit from mysql shell with exit and run:
+    $ brew services restart mysql
 
 -----------
-	When insalling the server, MySQL is configured to only allow
-	connections from localhost by default, to connect run:
-	    $ mysql -uroot
-	To have launchd start mysql now and restart at login:
-		$ brew services start mysql
-	Or, if you don't want/need a background service you can just run:
-		$ mysql.server start
-	   	$ /usr/local/bin/mysql.server start
+  When insalling the server, MySQL is configured to only allow
+  connections from localhost by default, to connect run:
+      $ mysql -uroot
+  To have launchd start mysql now and restart at login:
+    $ brew services start mysql
+  Or, if you don't want/need a background service you can just run:
+    $ mysql.server start
+      $ /usr/local/bin/mysql.server start
 
-		https://stackoverflow.com/a/55692783/4349318
+    https://stackoverflow.com/a/55692783/4349318
 
-	ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/tmp/mysql.sock' ?
-		- https://stackoverflow.com/a/34709790/4349318
-	"""
+  ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/tmp/mysql.sock' ?
+    - https://stackoverflow.com/a/34709790/4349318
+  """
 }
 
 # ========== N
 alias npm\?='npm_doc'
 function npm_doc() {
-	echo """
-	All packages are in node_modules folder.
-	npm list <package>
-	npm view <package> version
-	"""
+  echo """
+  All packages are in node_modules folder.
+  npm list <package>
+  npm view <package> version
+  """
 }
 
 # ========== O
@@ -478,275 +499,275 @@ alias paths\?='echo /etc/paths/ && echo /etc/paths.d/ && echo $HOME/.bashrc && e
 
 alias permission\?='permission_doc'
 function permission_doc() {
-	echo """
-	Please, don't use 777 for permissions, it's a security risk.
+  echo """
+  Please, don't use 777 for permissions, it's a security risk.
 
-		sudo chown \$USER:\`id -gn\` <path/to/folder>
+    sudo chown \$USER:\`id -gn\` <path/to/folder>
 
-	- \$USER will be expanded into your current username.
-	- \`id -gn\` will returns the main group of your current user.
+  - \$USER will be expanded into your current username.
+  - \`id -gn\` will returns the main group of your current user.
 
-	If any file is owned by root, then it'll require sudo.
+  If any file is owned by root, then it'll require sudo.
 
-	You can check permissions by running:
+  You can check permissions by running:
 
-		ls -l <path/to/folder>
+    ls -l <path/to/folder>
 """
 }
 
 alias psql\?='postgres_doc'
 alias postgres\?='postgres_doc'
 function postgres_doc() {
-	echo """
-	[ https://hackernoon.com/dont-install-postgres_docker-pull-postgres-bee20e200198 ]
+  echo """
+  [ https://hackernoon.com/dont-install-postgres_docker-pull-postgres-bee20e200198 ]
 
-	[CONNECT]
-		- psql [-U/--username] <user_name> [(optional)--dbname]<database_name> --host localhost
-		- psql ... [-W/--password] # force password prompt (should happen automatically)
+  [CONNECT]
+    - psql [-U/--username] <user_name> [(optional)--dbname]<database_name> --host localhost
+    - psql ... [-W/--password] # force password prompt (should happen automatically)
 
-	[RULES]
-	Show all rules in the database
-		SELECT * from pg_rules;
+  [RULES]
+  Show all rules in the database
+    SELECT * from pg_rules;
 
-	[TABLES]
-	List tables
-		- \dt
-	Show a table and its rules
-		- \d <table_name>
+  [TABLES]
+  List tables
+    - \dt
+  Show a table and its rules
+    - \d <table_name>
 
-	[DATABASES]
-	List databases (shows all tables in the current schema)
-		- \l
-	Connect to database
-		- \\\c <database_name>
+  [DATABASES]
+  List databases (shows all tables in the current schema)
+    - \l
+  Connect to database
+    - \\\c <database_name>
 
-	[SCHEMA]
-	List schemas
-		- \dn
-	Display/describe schema:
-		- \dt <schema_name>.*
-		* https://stackoverflow.com/a/15644918/4349318
+  [SCHEMA]
+  List schemas
+    - \dn
+  Display/describe schema:
+    - \dt <schema_name>.*
+    * https://stackoverflow.com/a/15644918/4349318
 
-	[DROP]
-	(ALL TABLES):
-		- drop schema <schema_name> cascade;
-		- create schema <schema_name>;
+  [DROP]
+  (ALL TABLES):
+    - drop schema <schema_name> cascade;
+    - create schema <schema_name>;
 
-	*** DAEMONS
-		# To migrate existing data from a previous major version of PostgreSQL run:
-		#   brew postgresql-upgrade-database
+  *** DAEMONS
+    # To migrate existing data from a previous major version of PostgreSQL run:
+    #   brew postgresql-upgrade-database
 
-		# To have launchd start postgresql now and restart at login:
-		#   brew services <start/stop> postgresql
-		# Or, if you don't want/need a background service you can just run:
-		#   pg_ctl -D /usr/local/var/postgres <start/stop> # -D flags the location of the database storage area
+    # To have launchd start postgresql now and restart at login:
+    #   brew services <start/stop> postgresql
+    # Or, if you don't want/need a background service you can just run:
+    #   pg_ctl -D /usr/local/var/postgres <start/stop> # -D flags the location of the database storage area
 
-	[EXAMPLES]
-	Select query examples:
-		$ SELECT current_database(); # Displays name of current DB
-		$ SELECT * FROM portal_user WHERE user_id = 1;
+  [EXAMPLES]
+  Select query examples:
+    $ SELECT current_database(); # Displays name of current DB
+    $ SELECT * FROM portal_user WHERE user_id = 1;
 
-		$ UPDATE portal_user SET password = abc1234... WHERE user_id = 1;
-		$ UPDATE <table> SET <column> = <value> WHERE <column> = <value>;
-	"""
+    $ UPDATE portal_user SET password = abc1234... WHERE user_id = 1;
+    $ UPDATE <table> SET <column> = <value> WHERE <column> = <value>;
+  """
 }
 
 alias pkg\?='pkg_doc'
 function pkg_doc() {
-	echo """
-	pkgutil --pkgs # list all installed packages
-	pkgutil --pkgs | grep -i {keyword}
-	pkgutil --pkg-info package-name.pkg # find the package location
-	pkgutil --files package-name.pkg # list the packages installed files
+  echo """
+  pkgutil --pkgs # list all installed packages
+  pkgutil --pkgs | grep -i {keyword}
+  pkgutil --pkg-info package-name.pkg # find the package location
+  pkgutil --files package-name.pkg # list the packages installed files
 
-	locate psql | grep /bin
+  locate psql | grep /bin
 
-	[[Source: https://stackoverflow.com/a/27546100/4349318]]
-	"""
+  [[Source: https://stackoverflow.com/a/27546100/4349318]]
+  """
 }
 
 # ========== Q
 # ========== R
 alias ram\?='ram_doc'
 function ram_doc() {
-	echo """
-	top -o MEM
-	cleanup # https://github.com/fwartner/mac-cleanup
-	"""
+  echo """
+  top -o MEM
+  cleanup # https://github.com/fwartner/mac-cleanup
+  """
 }
 
 # ========== S
 alias safari\?='safari_doc'
 function safari_doc() {
-	echo """
-	⌘ + ⇧ + \\ ${spacer1}| Show tab overview
-	"""
+  echo """
+  ⌘ + ⇧ + \\ ${spacer1}| Show tab overview
+  """
 }
 
 alias shebang\?='shebang_doc'
 function shebang_doc() {
-	echo """
-	There are two ways to use the Shebang directive and set the interpreter:
+  echo """
+  There are two ways to use the Shebang directive and set the interpreter:
 
-	Using the absolute path to the bash binary:
-		/bin/bash
+  Using the absolute path to the bash binary:
+    /bin/bash
 
-	Using the env utility:
-		/usr/bin/env bash
-	The advantage of using the second approach is that it will search for the bash
-	executable in the user's \$PATH environmental variable. If there are more than
-	one paths to bash, the first one will be used by the script.
-	"""
+  Using the env utility:
+    /usr/bin/env bash
+  The advantage of using the second approach is that it will search for the bash
+  executable in the user's \$PATH environmental variable. If there are more than
+  one paths to bash, the first one will be used by the script.
+  """
 }
 
 alias ssh\?='ssh_doc'
 function ssh_doc() {
-	echo """
-	GENERATE:	ssh-keygen -t rsa -b 4096 # -m PEM
-	COPY:		pbcopy < ~/.ssh/id_rsa.pub
-	SSH CONFIG:
-	  - (optional) git config --global --add url."git@github.com:".insteadOf "https://github.com/"
-	  - ssh-add -K ~/.ssh/[your-private-key]
-	  - In .ssh/config file, add the following lines:
-			Host *
-			UseKeychain yes
-			AddKeysToAgent yes
-			IdentityFile ~/.ssh/id_rsa
+  echo """
+  GENERATE:	ssh-keygen -t rsa -b 4096 # -m PEM
+  COPY:		pbcopy < ~/.ssh/id_rsa.pub
+  SSH CONFIG:
+    - (optional) git config --global --add url."git@github.com:".insteadOf "https://github.com/"
+    - ssh-add -K ~/.ssh/[your-private-key]
+    - In .ssh/config file, add the following lines:
+        Host *
+        UseKeychain yes
+        AddKeysToAgent yes
+        IdentityFile ~/.ssh/id_rsa
 
-	  Reference: https://apple.stackexchange.com/a/250572
-	  Referende: https://help.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account
-	  *(Golang issues with ssh keys) Reference: https://github.com/golang/go/issues/18692
-	"""
+    Reference: https://apple.stackexchange.com/a/250572
+    Referende: https://help.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account
+    *(Golang issues with ssh keys) Reference: https://github.com/golang/go/issues/18692
+  """
 }
 
 alias statuscodes\?='statuscodes_doc'
 function statuscodes_doc() {
 
-	echo """
-	StatusContinue           = 100 // RFC 7231, 6.2.1
-	StatusSwitchingProtocols = 101 // RFC 7231, 6.2.2
-	StatusProcessing         = 102 // RFC 2518, 10.1
-	"""
+  echo """
+  StatusContinue           = 100 // RFC 7231, 6.2.1
+  StatusSwitchingProtocols = 101 // RFC 7231, 6.2.2
+  StatusProcessing         = 102 // RFC 2518, 10.1
+  """
 
-	echo """
-	StatusOK                   = 200 // RFC 7231, 6.3.1
-	StatusCreated              = 201 // RFC 7231, 6.3.2
-	StatusAccepted             = 202 // RFC 7231, 6.3.3
-	StatusNonAuthoritativeInfo = 203 // RFC 7231, 6.3.4
-	StatusNoContent            = 204 // RFC 7231, 6.3.5
-	StatusResetContent         = 205 // RFC 7231, 6.3.6
-	StatusPartialContent       = 206 // RFC 7233, 4.1
-	StatusMultiStatus          = 207 // RFC 4918, 11.1
-	StatusAlreadyReported      = 208 // RFC 5842, 7.1
-	StatusIMUsed               = 226 // RFC 3229, 10.4.1
-	"""
+  echo """
+  StatusOK                   = 200 // RFC 7231, 6.3.1
+  StatusCreated              = 201 // RFC 7231, 6.3.2
+  StatusAccepted             = 202 // RFC 7231, 6.3.3
+  StatusNonAuthoritativeInfo = 203 // RFC 7231, 6.3.4
+  StatusNoContent            = 204 // RFC 7231, 6.3.5
+  StatusResetContent         = 205 // RFC 7231, 6.3.6
+  StatusPartialContent       = 206 // RFC 7233, 4.1
+  StatusMultiStatus          = 207 // RFC 4918, 11.1
+  StatusAlreadyReported      = 208 // RFC 5842, 7.1
+  StatusIMUsed               = 226 // RFC 3229, 10.4.1
+  """
 
-	echo """
-	StatusMultipleChoices   = 300 // RFC 7231, 6.4.1
-	StatusMovedPermanently  = 301 // RFC 7231, 6.4.2
-	StatusFound             = 302 // RFC 7231, 6.4.3
-	StatusSeeOther          = 303 // RFC 7231, 6.4.4
-	StatusNotModified       = 304 // RFC 7232, 4.1
-	StatusUseProxy          = 305 // RFC 7231, 6.4.5
-	_                       = 306 // RFC 7231, 6.4.6 (Unused)
-	StatusTemporaryRedirect = 307 // RFC 7231, 6.4.7
-	StatusPermanentRedirect = 308 // RFC 7538, 3
-	"""
+  echo """
+  StatusMultipleChoices   = 300 // RFC 7231, 6.4.1
+  StatusMovedPermanently  = 301 // RFC 7231, 6.4.2
+  StatusFound             = 302 // RFC 7231, 6.4.3
+  StatusSeeOther          = 303 // RFC 7231, 6.4.4
+  StatusNotModified       = 304 // RFC 7232, 4.1
+  StatusUseProxy          = 305 // RFC 7231, 6.4.5
+  _                       = 306 // RFC 7231, 6.4.6 (Unused)
+  StatusTemporaryRedirect = 307 // RFC 7231, 6.4.7
+  StatusPermanentRedirect = 308 // RFC 7538, 3
+  """
 
-	echo """
-	StatusBadRequest                   = 400 // RFC 7231, 6.5.1
-	StatusUnauthorized                 = 401 // RFC 7235, 3.1
-	StatusPaymentRequired              = 402 // RFC 7231, 6.5.2
-	StatusForbidden                    = 403 // RFC 7231, 6.5.3
-	StatusNotFound                     = 404 // RFC 7231, 6.5.4
-	StatusMethodNotAllowed             = 405 // RFC 7231, 6.5.5
-	StatusNotAcceptable                = 406 // RFC 7231, 6.5.6
-	StatusProxyAuthRequired            = 407 // RFC 7235, 3.2
-	StatusRequestTimeout               = 408 // RFC 7231, 6.5.7
-	StatusConflict                     = 409 // RFC 7231, 6.5.8
-	StatusGone                         = 410 // RFC 7231, 6.5.9
-	StatusLengthRequired               = 411 // RFC 7231, 6.5.10
-	StatusPreconditionFailed           = 412 // RFC 7232, 4.2
-	StatusRequestEntityTooLarge        = 413 // RFC 7231, 6.5.11
-	StatusRequestURITooLong            = 414 // RFC 7231, 6.5.12
-	StatusUnsupportedMediaType         = 415 // RFC 7231, 6.5.13
-	StatusRequestedRangeNotSatisfiable = 416 // RFC 7233, 4.4
-	StatusExpectationFailed            = 417 // RFC 7231, 6.5.14
-	StatusTeapot                       = 418 // RFC 7168, 2.3.3
-	StatusMisdirectedRequest           = 421 // RFC 7540, 9.1.2
-	StatusUnprocessableEntity          = 422 // RFC 4918, 11.2
-	StatusLocked                       = 423 // RFC 4918, 11.3
-	StatusFailedDependency             = 424 // RFC 4918, 11.4
-	StatusTooEarly                     = 425 // RFC 8470, 5.2.
-	StatusUpgradeRequired              = 426 // RFC 7231, 6.5.15
-	StatusPreconditionRequired         = 428 // RFC 6585, 3
-	StatusTooManyRequests              = 429 // RFC 6585, 4
-	StatusRequestHeaderFieldsTooLarge  = 431 // RFC 6585, 5
-	StatusUnavailableForLegalReasons   = 451 // RFC 7725, 3
-	"""
+  echo """
+  StatusBadRequest                   = 400 // RFC 7231, 6.5.1
+  StatusUnauthorized                 = 401 // RFC 7235, 3.1
+  StatusPaymentRequired              = 402 // RFC 7231, 6.5.2
+  StatusForbidden                    = 403 // RFC 7231, 6.5.3
+  StatusNotFound                     = 404 // RFC 7231, 6.5.4
+  StatusMethodNotAllowed             = 405 // RFC 7231, 6.5.5
+  StatusNotAcceptable                = 406 // RFC 7231, 6.5.6
+  StatusProxyAuthRequired            = 407 // RFC 7235, 3.2
+  StatusRequestTimeout               = 408 // RFC 7231, 6.5.7
+  StatusConflict                     = 409 // RFC 7231, 6.5.8
+  StatusGone                         = 410 // RFC 7231, 6.5.9
+  StatusLengthRequired               = 411 // RFC 7231, 6.5.10
+  StatusPreconditionFailed           = 412 // RFC 7232, 4.2
+  StatusRequestEntityTooLarge        = 413 // RFC 7231, 6.5.11
+  StatusRequestURITooLong            = 414 // RFC 7231, 6.5.12
+  StatusUnsupportedMediaType         = 415 // RFC 7231, 6.5.13
+  StatusRequestedRangeNotSatisfiable = 416 // RFC 7233, 4.4
+  StatusExpectationFailed            = 417 // RFC 7231, 6.5.14
+  StatusTeapot                       = 418 // RFC 7168, 2.3.3
+  StatusMisdirectedRequest           = 421 // RFC 7540, 9.1.2
+  StatusUnprocessableEntity          = 422 // RFC 4918, 11.2
+  StatusLocked                       = 423 // RFC 4918, 11.3
+  StatusFailedDependency             = 424 // RFC 4918, 11.4
+  StatusTooEarly                     = 425 // RFC 8470, 5.2.
+  StatusUpgradeRequired              = 426 // RFC 7231, 6.5.15
+  StatusPreconditionRequired         = 428 // RFC 6585, 3
+  StatusTooManyRequests              = 429 // RFC 6585, 4
+  StatusRequestHeaderFieldsTooLarge  = 431 // RFC 6585, 5
+  StatusUnavailableForLegalReasons   = 451 // RFC 7725, 3
+  """
 
-	echo """
-	StatusInternalServerError           = 500 // RFC 7231, 6.6.1
-	StatusNotImplemented                = 501 // RFC 7231, 6.6.2
-	StatusBadGateway                    = 502 // RFC 7231, 6.6.3
-	StatusServiceUnavailable            = 503 // RFC 7231, 6.6.4
-	StatusGatewayTimeout                = 504 // RFC 7231, 6.6.5
-	StatusHTTPVersionNotSupported       = 505 // RFC 7231, 6.6.6
-	StatusVariantAlsoNegotiates         = 506 // RFC 2295, 8.1
-	StatusInsufficientStorage           = 507 // RFC 4918, 11.5
-	StatusLoopDetected                  = 508 // RFC 5842, 7.2
-	StatusNotExtended                   = 510 // RFC 2774, 7
-	StatusNetworkAuthenticationRequired = 511 // RFC 6585, 6
-	"""
+  echo """
+  StatusInternalServerError           = 500 // RFC 7231, 6.6.1
+  StatusNotImplemented                = 501 // RFC 7231, 6.6.2
+  StatusBadGateway                    = 502 // RFC 7231, 6.6.3
+  StatusServiceUnavailable            = 503 // RFC 7231, 6.6.4
+  StatusGatewayTimeout                = 504 // RFC 7231, 6.6.5
+  StatusHTTPVersionNotSupported       = 505 // RFC 7231, 6.6.6
+  StatusVariantAlsoNegotiates         = 506 // RFC 2295, 8.1
+  StatusInsufficientStorage           = 507 // RFC 4918, 11.5
+  StatusLoopDetected                  = 508 // RFC 5842, 7.2
+  StatusNotExtended                   = 510 // RFC 2774, 7
+  StatusNetworkAuthenticationRequired = 511 // RFC 6585, 6
+  """
 }
 
 alias subl\?='subl_doc'
 function subl_doc() {
-	echo """
-	[Reference]: https://superuser.com/questions/1100918/how-can-i-prevent-the-iterm2-hotkey-window-from-losing-focus#answer-1259726
-	"""
+  echo """
+  [Reference]: https://superuser.com/questions/1100918/how-can-i-prevent-the-iterm2-hotkey-window-from-losing-focus#answer-1259726
+  """
 }
 
 # ========== T
 alias tar\?='tar_doc'
 function tar_doc() {
-	echo "tar -zxvf <file_name>.tar"
+  echo "tar -zxvf <file_name>.tar"
 }
 
 alias thread\?='thread_doc'
 function thread_doc() {
-	echo """
-	> means truncate and write
-	>> means append
-	( appending to or writing to /dev/null has the same net effect )
+  echo """
+  > means truncate and write
+  >> means append
+  ( appending to or writing to /dev/null has the same net effect )
 
-	2>&1 redirects standard error STDERR (2) to standard output STDOUT (1),
-	which then discards it as well since standard output has already been redirected.
+  2>&1 redirects standard error STDERR (2) to standard output STDOUT (1),
+  which then discards it as well since standard output has already been redirected.
 
-	[[Source: https://stackoverflow.com/a/10508862/4349318]]
-	"""
+  [[Source: https://stackoverflow.com/a/10508862/4349318]]
+  """
 }
 
 # ========== U
 # ========== V
 alias virtualenv\?='virtualenv_doc'
 function virtualenv_doc() {
-	echo """
-	1. virtualenv <venv_name>
-	2. source <venv_name>/bin/activate
-	3. deactivate
-	"""
+  echo """
+  1. virtualenv <venv_name>
+  2. source <venv_name>/bin/activate
+  3. deactivate
+  """
 }
 
 alias vscode\?='vscode_doc'
 function vscode_doc() {
-	echo """
-	⌘ ⇧ \\ ${spacer3}| Beginning / End of containing function
-	⌃ Tab / ⌃ ⇧ Tab ${spacer1}| Open previous / next file
-	⌃ \` ${spacer3}| Show integrated terminal
+  echo """
+  ⌘ ⇧ \\ ${spacer3}| Beginning / End of containing function
+  ⌃ Tab / ⌃ ⇧ Tab ${spacer1}| Open previous / next file
+  ⌃ \` ${spacer3}| Show integrated terminal
 
-	[Reference]: https://code.visualstudio.com/shortcuts/keyboard-shortcuts-macos.pdf
-	"""
+  [Reference]: https://code.visualstudio.com/shortcuts/keyboard-shortcuts-macos.pdf
+  """
 }
 
 # ========== W

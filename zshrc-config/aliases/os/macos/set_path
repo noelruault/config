@@ -4,14 +4,13 @@ PATH=$(getconf PATH)
 PATH="$PATH:/usr/local/bin"
 PATH="$PATH:/usr/local/sbin"
 PATH="$PATH:$HOME/bin"
-PATH="$PATH:/usr/local/opt/fzf/bin"  # fuzzy finder: https://github.com/junegunn/fzf
+PATH="$PATH:/usr/local/opt/fzf/bin"              # fuzzy finder: https://github.com/junegunn/fzf
 PATH="$PATH:/usr/local/opt/grep/libexec/gnubin"  # Using another grep function
-# PATH="$PATH:/opt/X11/bin"  # Quartz: https://www.xquartz.org/Developer-Info.html
+# PATH="$PATH:/opt/X11/bin"                      # Quartz: https://www.xquartz.org/Developer-Info.html
 
+## BASH
 ### SET PROFILE ###
 source /etc/profile # System-wide .profile for sh(1)
-
-NPM_CONFIG_PREFIX=~/.npm-global
 
 ### Golang (config) Paths ###
 # https://golang.org/doc/code.html#GOPATH

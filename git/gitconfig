@@ -1,22 +1,19 @@
+; To track what is being load on the global Git settings type:
+;    $ git config --list --show-origin
+
+[core]
+	excludesfile = /Users/noelruault/.config/git/gitignore_global
+
 [include]
-    path = private/gitconfig_secrets
+    path = /Users/noelruault/.config/git/private/secrets
 
 [alias]
     aliases = !git config -l | grep alias | cut -c 7-
     dirdiff = diff -p --stat -w --no-index
     pat = !git add -N . && git add --patch
 
-[user]
-	email = noelou.93@gmail.com
-	name = Noel Ruault
-
-[url "git@github.com:"] # Resource: # https://gist.github.com/pksunkara/988716
-	insteadOf = https://github.com/
-
 # Enforce SSH
-[url "ssh://git@github.com/"]
-	insteadOf = https://github.com/
-[url "ssh://git@gitlab.com/"]
-	insteadOf = https://gitlab.com/
-[url "ssh://git@bitbucket.org/"]
-  	insteadOf = https://bitbucket.org/
+[url "git@gitlab.emobg.tech:"]
+	insteadOf = https://gitlab.emobg.tech/
+[url "ssh://git@github.com/noelruault/"]
+	insteadOf = https://github.com/noelruault/

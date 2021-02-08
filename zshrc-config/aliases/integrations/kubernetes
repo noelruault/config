@@ -1,0 +1,20 @@
+#!/bin/bash
+
+alias kgpa="kubectl get pods --all-namespaces"
+alias k=kubectl
+alias kdev="kubectl config use-context ph-dev"
+alias kprod="kubectl config use-context ph-prod"
+alias kmk="kubectl config use-context minikube"
+alias kctx="kubectl config get-contexts"
+
+function kns {
+ kubectl config set-context "$(kubectl config current-context)" --namespace="$1"
+}
+
+function kport {
+ kubectl port-forward "$1" "$2"
+}
+
+function kl {
+kubectl logs -n "$1" "$2" --all-containers -f
+}

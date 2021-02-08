@@ -1,27 +1,24 @@
 #!/bin/bash
 
+# TODO:
+# Properly handle routing. I mean, vars like ZSH_CUSTOM_CONFIG_ALIASES start to be annoying.
+# I need to do a proper routes system that eventually can be tested when the terminal starts.
+
 ## ------------------------- BEGINING OF ZSHRC -------------------------
 # start=$(($(date +'%s * 1000 + %-N / 1000000'))) # GNU
 # https://apple.stackexchange.com/questions/135742/time-in-milliseconds-since-epoch-in-the-terminal
 start=$(python3 -c 'from time import time; print(int(round(time() * 1000)))') # OSX
 
-# TODO: If/else for checking the OS ?
-# bash --version # https://itnext.io/upgrading-bash-on-macos-7138bd1066ba
-source $HOME/.config/zshrc-config/aliases/os/macos/set_path
+ZSH_DISABLE_COMPFIX="true" # fixes error prompting "Insecure completion-dependent directories..."
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 export ZSH_CUSTOM="$HOME/.oh-my-zsh/custom"
 
-# Set name of the theme to load. Optionally, if you set this to "random",
-# will load a random theme each time that oh-my-zsh is loaded.
-# See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
-# ZSH_THEME="robbyrussell"  # (default)
-ZSH_THEME="spaceship" # https://github.com/denysdovhan/spaceship-zsh-theme
-
-# ... And give some custom COLOR output with already tested color profiles
+ZSH_THEME="spaceship"; SPACESHIP_BATTERY_SHOW='never'
+# https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
+# https://github.com/denysdovhan/spaceship-zsh-theme
 # https://github.com/mbadolato/iTerm2-Color-Schemes#installation-instructions
-SPACESHIP_BATTERY_SHOW='never'
 
 # IMPORTANT: oh-my-zsh must be installed for making next section work.
 # What add-ons do you want to use? (plugins can be found in ~/.oh-my-zsh/plugins/*)
@@ -30,34 +27,34 @@ SPACESHIP_BATTERY_SHOW='never'
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
     docker
-    fzf # https://github.com/junegunn/fzf#using-homebrew-or-linuxbrew
+    kubectl
+    fzf                     # https://github.com/junegunn/fzf#using-homebrew-or-linuxbrew
     git
     golang
     zsh-autosuggestions     # https://github.com/zsh-users/zsh-autosuggestions#oh-my-zsh
     zsh-syntax-highlighting # https://github.com/zsh-users/zsh-syntax-highlighting
 )
-# LOAD oh-my-zsh. This will load all the plugins.
-source $ZSH/oh-my-zsh.sh
+source "$ZSH/oh-my-zsh.sh" # LOAD oh-my-zsh. This will load all the plugins.
 
 ## Some aliases to fix zsh history
 test -e "$ZSH_CUSTOM_CONFIG_FILES/config/fix_zsh" &&
-    source $ZSH_CUSTOM_CONFIG_FILES/config/fix_zsh
-
+    source "$ZSH_CUSTOM_CONFIG_FILES/config/fix_zsh"
 test -e "$ZSH_CUSTOM_CONFIG_FILES/config/.iterm2_shell_integration.zsh" &&
     source "$ZSH_CUSTOM_CONFIG_FILES/config/.iterm2_shell_integration.zsh"
-
-test -e "$ZSH_CUSTOM_CONFIG_FILES/config/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" &&
-    source "$ZSH_CUSTOM_CONFIG_FILES/config/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+test -e ~/.fzf.zsh &&
+    source ~/.fzf.zsh
 
 # Path to your custom configuration.
 export ZSH_CUSTOM_CONFIG_FILES="$HOME/.config/zshrc-config"
 export ZSH_CUSTOM_CONFIG_ALIASES="$ZSH_CUSTOM_CONFIG_FILES/aliases"
 
+alias goland='/usr/local/bin/goland'
+alias code='/usr/local/bin/code' # Can be configured by using the vscode palette "Shell command: install 'code'..."
 alias zshrc="code $ZSH_CUSTOM_CONFIG_FILES"
 alias .config="code $HOME/.config ~/.aws/"
 alias vscode-settings="$HOME/Library/Application\ Support/Code/User/settings.json"
 
-source $ZSH_CUSTOM_CONFIG_FILES/config/default
+source "$ZSH_CUSTOM_CONFIG_FILES/config/default"
 
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
@@ -66,39 +63,31 @@ source $ZSH_CUSTOM_CONFIG_FILES/config/default
 # To reload .zshrc: 'source .zshrc' or just type 'zsh'
 
 ## Useful aliases
-source $ZSH_CUSTOM_CONFIG_ALIASES/utils/useful
+for f in "$ZSH_CUSTOM_CONFIG_ALIASES"/utils/*; do source "$f"; done
 
 ## Operating System aliases
 CURRENT_OS="$(uname -a | awk '{print $1}')"
-if [ $CURRENT_OS = "Darwin" ]; then
-    source $ZSH_CUSTOM_CONFIG_ALIASES/os/macos/aliases
+if [ "$CURRENT_OS" = "Darwin" ]; then
+    source "$ZSH_CUSTOM_CONFIG_ALIASES/os/macos/set_path"
+    source "$ZSH_CUSTOM_CONFIG_ALIASES/os/macos/aliases"
 else
-    source $ZSH_CUSTOM_CONFIG_ALIASES/os/linux
+    source "$ZSH_CUSTOM_CONFIG_ALIASES"/os/linux
 fi
 
 ## Personal aliases
-for f in $(ls $ZSH_CUSTOM_CONFIG_ALIASES/nruault/); do source "$ZSH_CUSTOM_CONFIG_ALIASES/nruault/$f"; done
+for f in "$ZSH_CUSTOM_CONFIG_ALIASES"/nruault/*; do source "$f"; done
 
 ## Private aliases
-PRIVATE_FILES=($(ls $ZSH_CUSTOM_CONFIG_ALIASES/private | grep -v '\.')) # Trick to disregard the non-aliases files
+PRIVATE_FILES=($(ls "$ZSH_CUSTOM_CONFIG_ALIASES"/private | grep -v '\.')) # Trick to disregard the non-aliases files
 for file in $PRIVATE_FILES; do
     source "$ZSH_CUSTOM_CONFIG_ALIASES/private/$file"
 done
 
 ## 3rd party integration aliases
 source_integrations() {
-    for f in $(ls $ZSH_CUSTOM_CONFIG_ALIASES/integrations/); do source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/$f"; done
+    for f in "$ZSH_CUSTOM_CONFIG_ALIASES"/integrations/*; do source "$f"; done
 }
-## Docker integration is activated by default
-source $ZSH_CUSTOM_CONFIG_ALIASES/integrations/docker
-
-# brew install mysql mysql-client # It is important to include both, server and client
-export PATH="/usr/local/opt/mysql-client/bin:$PATH"
 
 ## ------------------------- THE END OF ZSHRC -------------------------
 # end=$(($(date +'%s * 1000 + %-N / 1000000'))); runtime=$((end-start)); echo "Runtime of zshrc was $runtime ms." # GNU
 end=$(python3 -c 'from time import time; print(int(round(time() * 1000)))'); runtime=$((end - start)); echo "Runtime of zshrc was $runtime ms." # OSX
-
-# TODO:
-# Properly handle routing. I mean, vars like ZSH_CUSTOM_CONFIG_ALIASES start to be annoying.
-# I need to do a proper routes system that eventually can be tested when the terminal starts.

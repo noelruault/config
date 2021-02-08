@@ -32,6 +32,12 @@ launch.json
 .vscode/*
 !.vscode/settings.json
 
+# Directories potentially created by Goland
+.idea
+
 # Private and secret files and folders
 *private*
 *secret*
+
+# Telepresence auto-gen files
+telepresence.log

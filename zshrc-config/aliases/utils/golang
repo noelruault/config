@@ -4,8 +4,7 @@
 # alias gotest='go test ./... -p 1 -v'
 # TODO:
 # https://stackoverflow.com/a/30033822/4349318
-gotest() {
-
+function gotest() {
     # if [[ "$1" == "color" ]]; then
     go test ./... -p 1 -count 1 -v |
         sed ''/PASS/s//$(printf "\033[32mPASS\033[0m")/'' |
@@ -23,7 +22,7 @@ gotest() {
 ####
 # USE: gocover -run TestUpdateSomethingExample -count=1
 #
-gocover() {
+function gocover() {
     # go test route/to/test -run TestUpdateSomethingExample -count=1 -coverprofile cover.out; go tool cover -html=cover.out
     local t=$(mktemp -t cover)
     go test $COVERFLAGS -coverprofile=$t $@ && go tool cover -func=$t && unlink $t

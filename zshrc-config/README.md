@@ -11,14 +11,3 @@
 **Remove dotfile:**
 
     mv $HOME/.zshrc-config $HOME/.backup-zshrc-config
-
-TO-DO:
-
-    - Personal folder (store awesome, crypto... etc.)
-
-Create makefile to ...
-
-    - install iterm
-    - install zsh
-    - install oh-my-zsh
-    - install plugins

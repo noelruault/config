@@ -25,11 +25,19 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-iTerm2/oh-my-zsh/
-
-# Directories potentially created by vscode
+# Files and directories potentially created by vscode
 launch.json
 
+# Files and directories potentially created by goland
+.idea
+
+# ignore everything exept specific directories
+/*
+!/applications
+!/git
+!/iTerm2
+!/vscode
+!/zshrc-config
+
 # Directories created by 3rd party auth providers
-gcloud/
-configstore/
+hub
