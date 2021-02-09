@@ -3,9 +3,6 @@
 .AppleDouble
 .LSOverride
 
-# Icon must end with two \r
-Icon
-
 # Thumbnails
 ._*
 
@@ -31,6 +28,9 @@ launch.json
 # Files and directories potentially created by goland
 .idea
 
+# Files and directories potentially created by iTerm2
+iTerm2/AppSupport
+
 # ignore everything exept specific directories
 /*
 !/applications
@@ -38,6 +38,7 @@ launch.json
 !/iTerm2
 !/vscode
 !/zshrc-config
+!/fonts
 
 # Directories created by 3rd party auth providers
 hub
