@@ -1,9 +1,12 @@
 #!/bin/bash
 
-### GOLANG
-# alias gotest='go test ./... -p 1 -v'
 # TODO:
 # https://stackoverflow.com/a/30033822/4349318
+
+alias gopath='cd $(go env GOPATH)'
+alias gosrc='cd $(go env GOPATH)/src/'
+
+### GOLANG
 function gotest() {
     # if [[ "$1" == "color" ]]; then
     go test ./... -p 1 -count 1 -v |

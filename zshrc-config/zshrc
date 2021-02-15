@@ -9,11 +9,16 @@
 # https://apple.stackexchange.com/questions/135742/time-in-milliseconds-since-epoch-in-the-terminal
 start=$(python3 -c 'from time import time; print(int(round(time() * 1000)))') # OSX
 
+# BUGFIX: Provisional fix for zsh errors
 ZSH_DISABLE_COMPFIX="true" # fixes error prompting "Insecure completion-dependent directories..."
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 export ZSH_CUSTOM="$HOME/.oh-my-zsh/custom"
+
+# Path to your custom configuration.
+export ZSH_CUSTOM_CONFIG_FILES="$HOME/.config/zshrc-config"
+export ZSH_CUSTOM_CONFIG_ALIASES="$ZSH_CUSTOM_CONFIG_FILES/aliases"
 
 ZSH_THEME="spaceship"; SPACESHIP_BATTERY_SHOW='never'
 # https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
@@ -44,16 +49,6 @@ test -e "$ZSH_CUSTOM_CONFIG_FILES/config/.iterm2_shell_integration.zsh" &&
 test -e ~/.fzf.zsh &&
     source ~/.fzf.zsh
 
-# Path to your custom configuration.
-export ZSH_CUSTOM_CONFIG_FILES="$HOME/.config/zshrc-config"
-export ZSH_CUSTOM_CONFIG_ALIASES="$ZSH_CUSTOM_CONFIG_FILES/aliases"
-
-alias goland='/usr/local/bin/goland'
-alias code='/usr/local/bin/code' # Can be configured by using the vscode palette "Shell command: install 'code'..."
-alias zshrc="code $ZSH_CUSTOM_CONFIG_FILES"
-alias .config="code $HOME/.config ~/.aws/"
-alias vscode-settings="$HOME/Library/Application\ Support/Code/User/settings.json"
-
 source "$ZSH_CUSTOM_CONFIG_FILES/config/default"
 
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
@@ -61,6 +56,9 @@ source "$ZSH_CUSTOM_CONFIG_FILES/config/default"
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
 # For a full list of active aliases, run `alias`.
 # To reload .zshrc: 'source .zshrc' or just type 'zsh'
+
+alias zshrc="code $ZSH_CUSTOM_CONFIG_FILES"
+alias .config="code $HOME/.config ~/.aws/"
 
 ## Useful aliases
 for f in "$ZSH_CUSTOM_CONFIG_ALIASES"/utils/*; do source "$f"; done
@@ -84,8 +82,9 @@ for file in $PRIVATE_FILES; do
 done
 
 ## 3rd party integration aliases
+source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/integrations"
 source_integrations() {
-    for f in "$ZSH_CUSTOM_CONFIG_ALIASES"/integrations/*; do source "$f"; done
+    for f in "$ZSH_CUSTOM_CONFIG_ALIASES"/integrations/*; do source "$f" --time; done
 }
 
 ## ------------------------- THE END OF ZSHRC -------------------------

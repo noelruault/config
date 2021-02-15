@@ -89,6 +89,7 @@ function findapp() {
     fi
 }
 
+# getUDID finds the UDID of a connected Apple device
 function getUDID() {
     # xctrace list lists capabilities of the current running environment, such as devices or templates
     xcrun xctrace list devices

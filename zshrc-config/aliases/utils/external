@@ -1,0 +1,18 @@
+#!/bin/bash
+
+alias code='/usr/local/bin/code' # Can be configured by using the vscode palette "Shell command: install 'code'..."
+alias goland='/usr/local/bin/goland'
+
+alias vscode-settings="$HOME/Library/Application\ Support/Code/User/settings.json"
+
+### Vagrant
+alias vagrantclean="vagrant box list | cut -f 1 -d ' ' | xargs -L 1 vagrant box remove -f"
+
+# alias python='python3'
+# alias ipython='python -m IPython'
+## fix pip
+# alias pip="python -m pip"
+# alias pip3="python3 -m pip"
+
+# Export pipenv, virtualenv....
+# export PATH=$PATH:$HOME/Library/Python/3.7/bin

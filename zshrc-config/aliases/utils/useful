@@ -2,144 +2,14 @@
 
 alias hs='history | grep' # commands history for non-interactive terminals or terminals without fzf
 alias hibernate="sudo systemctl hibernate"
-# use type -a <alias/command> to check where is sourced
+alias \?='type -a $*'
 
-# IP ADDRESSES
+# Networks
 alias wanip='dig +short myip.opendns.com @resolver1.opendns.com'
 alias localhosts='ifconfig | grep "inet " | grep -v 127.0.0.1' # https://stackoverflow.com/a/4779992
 
 # CP command, do rsync if file is a folder or higher than 50MB  // rsync -ah --progress
 alias cp='rsync -ah --progress'
-
-### Sublime
-# alias sublsettingsf="subl '$(find $HOME -type d -name "*Sublime*Text*" 2>&1 | grep -v "find")/Packages/User/'*sublime*"
-# alias sublsettings='subl '$(find $HOME -type d -name "*Sublime*Text*" 2>&1 | grep -v "find")/Packages/User/''
-
-### Emacs
-# alias emacs="/usr/local/bin/emacs"
-
-### GIT
-# https://github.com/ohmyzsh/ohmyzsh/wiki/Cheatsheet#git
-alias gamod="git ls-files --modified | xargs git add"
-# Remove all your local git branches but keep master and the current branch:
-alias gbreset='git branch | egrep -v "(master|\*)" | xargs git branch -D'
-alias githooksconfig='git config --global core.hooksPath ~/.config/git/hooks/'
-# USEFUL COMMANDS:
-#   - git diff origin/master --name-only -- '*.go' ':(exclude)vendor/*'
-#   - git config --global alias.dirdiff 'diff -p --stat -w --no-index'
-alias gl='git log --graph --decorate --pretty=oneline --abbrev-commit'
-
-### Vagrant
-alias vagrantclean="vagrant box list | cut -f 1 -d ' ' | xargs -L 1 vagrant box remove -f"
+alias rm="rm -i"
 
 function search() { find / -name "$@" | echo; }
-
-function pro_rebase() {
-    # https://stackoverflow.com/a/927386
-    regex='^[0-9]+$'
-    if [[ $@ =~ $regex ]]; then
-        git rebase -i HEAD~"$@"
-        echo "Remember to push with --force flag."
-    else
-        echo "How pro_rebase works:"
-        echo "  Put as first param the number of commits you want to cover (1-N)."
-        echo "  e.g: pro_rebase 3  == git rebase -i HEAD~3"
-        echo "  Squash commits or whatever and then push your chages with --force"
-    fi
-}
-
-alias awesome='cat $ZSH_CUSTOM_CONFIG_FILES/nruault/assets/awesome.txt'
-
-# CD ANYWHERE aliases
-alias gow='cd ~/Work'
-alias gopath='cd $(go env GOPATH)'
-alias gosrc='cd $(go env GOPATH)/src/'
-alias goto=go_to_dir_on_specific_folder # A $COMPANY_DIRECTORY needs to be configured
-
-# go_to_dir_on_specific_folder will try to find a directory that matches
-# with the given parameters inside of an specific folder.
-#
-# NOTE: WORK_FOLDER variable could be changed to something else, more specific
-# and without evaluations or commands.
-#
-# Used uncommon commands :
-# - https://ss64.com/bash/wc.html
-# - https://ss64.com/bash/awk.html
-# - Colors: https://www.tldp.org/HOWTO/Bash-Prompt-HOWTO/x329.html https://www.shellhacks.com/bash-colors/
-function go_to_dir_on_specific_folder() {
-    if env_var_is_empty $COMPANY_DIRECTORY; then
-        echo "Environment variable COMPANY_DIRECTORY is not defined"
-        return
-    fi
-
-    echo $pwd                                                        # TODO(nruault): Remove-me
-    WORK_FOLDER=$(eval echo $(go env GOPATH)/src/$COMPANY_DIRECTORY) # eval will store the desired payments path.
-
-    # If there is no arguments, just go to $COMPANY_DIRECTORY
-    if [[ $# -eq 0 ]]; then
-        cd $WORK_FOLDER
-        return
-    fi
-
-    counter=$(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | wc -l) # wc is used for counting the lines
-    if (($counter == 0)); then
-        # An inverted counter will try to find matches inverting the order of the params.
-        inverted_counter=$(find $WORK_FOLDER -type d -name "*$2*$1*" -print -maxdepth 1 | wc -l)
-        if (($inverted_counter > 0)); then
-            # If something matches, will display the results in addition to a tip.
-            echo "Better try \e[0;33m$2 $1\e[0m"
-            echo "Found:\n\e[0;34m$(find $WORK_FOLDER -type d -name "*$2*$1*" -print -maxdepth 1 | awk -F/ '{print $NF}')\e[0m"
-            return
-        fi
-
-        echo "No matches."
-        return
-
-    elif (($counter > 1)); then
-        # AWK is used in the next command to get the name of the folder without the path
-        # The parenthesis at the begining will make this an array.
-        search=($(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}'))
-
-        # This loop will check if the input matches exactly with the name of the folder,
-        # if there is an exact match, will cd and end the function.
-        for i in "${search[@]}"; do
-            if [ $i = $1 ]; then
-                cd $WORK_FOLDER$1
-                return
-            fi
-        done
-
-        # If more than one folder were found and there is not a clear candidate, print the results.
-        # The loop is used to print them in different lines.
-        for i in "${search[@]}"; do echo $i; done
-        return
-    else
-        # If only one folder was found, change to the found directory
-        # cd $WORK_FOLDER$(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}')
-
-        ## TODO(nruault): REMOVE ME -----------------------
-        FOLDER=$(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}')
-        WORK_FOLDER=$(eval echo $(go env GOPATH)/src/$COMPANY_DIRECTORY)
-        COM=$(find $WORK_FOLDER -type d -name "$FOLDER" -print -maxdepth 1 | awk -F/ '{print $NF}')
-        if [ -z "$COM" ]; then
-            cd $WORK_FOLDER$FOLDER
-        fi
-        cd $WORK_FOLDER$(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}')
-        ## REMOVE ME -----------------------
-    fi
-}
-
-function env_var_is_empty() {
-    [ -z "$1" ]
-}
-
-alias rm="rm -i"
-# alias python='python3'
-alias ipython='python -m IPython'
-
-# FIX PIP
-alias pip="python -m pip"
-alias pip3="python3 -m pip"
-
-# Export pipenv, virtualenv....
-export PATH=$PATH:$HOME/Library/Python/3.7/bin
