@@ -7,7 +7,7 @@
 ## ------------------------- BEGINING OF ZSHRC -------------------------
 # start=$(($(date +'%s * 1000 + %-N / 1000000'))) # GNU
 # https://apple.stackexchange.com/questions/135742/time-in-milliseconds-since-epoch-in-the-terminal
-start=$(python3 -c 'from time import time; print(int(round(time() * 1000)))') # OSX
+zsh_start=$(python3 -c 'from time import time; print(int(round(time() * 1000)))')
 
 # BUGFIX: Provisional fix for zsh errors
 ZSH_DISABLE_COMPFIX="true" # fixes error prompting "Insecure completion-dependent directories..."
@@ -61,7 +61,7 @@ alias zshrc="code $ZSH_CUSTOM_CONFIG_FILES"
 alias .config="code $HOME/.config ~/.aws/"
 
 ## Useful aliases
-for f in "$ZSH_CUSTOM_CONFIG_ALIASES"/utils/*; do source "$f"; done
+for file in "$ZSH_CUSTOM_CONFIG_ALIASES/utils/"*; do "$file"; done
 
 ## Operating System aliases
 CURRENT_OS="$(uname -a | awk '{print $1}')"
@@ -69,11 +69,11 @@ if [ "$CURRENT_OS" = "Darwin" ]; then
     source "$ZSH_CUSTOM_CONFIG_ALIASES/os/macos/set_path"
     source "$ZSH_CUSTOM_CONFIG_ALIASES/os/macos/aliases"
 else
-    source "$ZSH_CUSTOM_CONFIG_ALIASES"/os/linux
+    source "$ZSH_CUSTOM_CONFIG_ALIASES/os/linux"
 fi
 
 ## Personal aliases
-for f in "$ZSH_CUSTOM_CONFIG_ALIASES"/nruault/*; do source "$f"; done
+for file in "$ZSH_CUSTOM_CONFIG_ALIASES/nruault/"*; do "$file"; done
 
 ## Private aliases
 PRIVATE_FILES=($(ls "$ZSH_CUSTOM_CONFIG_ALIASES"/private | grep -v '\.')) # Trick to disregard the non-aliases files
@@ -82,11 +82,8 @@ for file in $PRIVATE_FILES; do
 done
 
 ## 3rd party integration aliases
-source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/integrations"
-source_integrations() {
-    for f in "$ZSH_CUSTOM_CONFIG_ALIASES"/integrations/*; do source "$f" --time; done
-}
+source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/general"
 
 ## ------------------------- THE END OF ZSHRC -------------------------
 # end=$(($(date +'%s * 1000 + %-N / 1000000'))); runtime=$((end-start)); echo "Runtime of zshrc was $runtime ms." # GNU
-end=$(python3 -c 'from time import time; print(int(round(time() * 1000)))'); runtime=$((end - start)); echo "Runtime of zshrc was $runtime ms." # OSX
+zsh_end=$(python3 -c 'from time import time; print(int(round(time() * 1000)))'); zsh_runtime=$((zsh_end - zsh_start)); echo "Runtime of zshrc was $zsh_runtime ms."

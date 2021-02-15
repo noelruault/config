@@ -22,7 +22,7 @@ alias dkps='docker ps --format "table {{.ID}}\t{{.Image}}\t{{.Ports}}\t{{.Names}
 # You can put this into ~/.docker/config.json to make it the default format.
 alias dki='echo "\n___DOCKER IMAGES____ " && docker images -a && echo "\n___DOCKER COMPOSE IMAGES____ " && docker-compose images'
 
-usage="dkmanage [-c] [-i] [-v] [-a] -- function to manage Docker resources within the system
+dkmanage_usage="dkmanage [-c] [-i] [-v] [-a] -- function to manage Docker resources within the system
 
 Options:
     -c, --containers     Stops and removes all the containers
@@ -34,7 +34,7 @@ Options:
 
 function dkmanage() {
     if [[ $# -eq 0 ]]; then
-       echo "$usage"; break;
+       echo "$dkmanage_usage"; break;
     fi
 
     while [ $# -gt 0 ]
@@ -63,8 +63,8 @@ function dkmanage() {
             echo "Deep cleaning docker: containers, images and volumes..."
             dkmanage -c -i -v ;;
 
-        (-*) echo "$0: error: unrecognized option $1"; echo "$0: $usage"; exit 1 ;;
-        (*)  echo "$0: $usage"; break ;;
+        (-*) echo "$0: error: unrecognized option $1"; echo "$0: $dkmanage_usage"; exit 1 ;;
+        (*)  echo "$0: $dkmanage_usage"; break ;;
         esac
         shift
     done

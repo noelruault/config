@@ -1,0 +1,15 @@
+#!/bin/bash
+
+## Conditional timestamp
+start_integration_timestamp=$(python3 -c 'from time import time; print(int(round(time() * 1000)))')
+
+## Docker & k8s integrations are activated by default
+source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/docker"
+source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/kubernetes"
+
+# brew install mysql mysql-client # It is important to include both, server and client
+if [ -f "/usr/local/opt/mysql-client/bin" ]; then export PATH="/usr/local/opt/mysql-client/bin:$PATH"; fi
+
+## Timestamp
+end_integration_timestamp=$(python3 -c 'from time import time; print(int(round(time() * 1000)))');
+integration_runtime=$((end_integration_timestamp-start_integration_timestamp)); echo "Runtime of sourcing integrations was $integration_runtime ms."
