@@ -12,8 +12,9 @@
     dirdiff = diff -p --stat -w --no-index
     pat = !git add -N . && git add --patch
 
+[pull]
+	rebase = true
+
 # Enforce SSH
-[url "git@gitlab.emobg.tech:"]
-	insteadOf = https://gitlab.emobg.tech/
 [url "ssh://git@github.com/noelruault/"]
 	insteadOf = https://github.com/noelruault/
