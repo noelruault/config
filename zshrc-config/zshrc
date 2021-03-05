@@ -1,13 +1,26 @@
-#!/bin/bash
+#!/usr/bin/env zsh
+# TODO checklist:
+# [] Handle routing properly. I mean, variables like ZSH_CUSTOM_CONFIG_ALIASES start to be annoying.
+#    I need to do a proper routes system that eventually can be tested when the terminal starts.
 
-# TODO:
-# Properly handle routing. I mean, vars like ZSH_CUSTOM_CONFIG_ALIASES start to be annoying.
-# I need to do a proper routes system that eventually can be tested when the terminal starts.
+declare -A logs=() # Associative array
+timelogger() {
+  local name=$1
+  local action=$2
+  if [ "$action" = "start" ]; then
+    log_start=$(($(gdate +%s%N)/1000000))
+    logs+=( [$name]=$log_start )
+  fi
+  if [ "$action" = "end" ]; then
+    log_end=$(($(gdate +%s%N)/1000000))
+    log_start=$logs[$name]
+    log_runtime=$((log_end - log_start)); echo "Runtime of $name was $log_runtime ms."
+    unset "logs[${(b)name}]"
+  fi
+}
+timelogger zsh start
 
-## ------------------------- BEGINING OF ZSHRC -------------------------
-# start=$(($(date +'%s * 1000 + %-N / 1000000'))) # GNU
-# https://apple.stackexchange.com/questions/135742/time-in-milliseconds-since-epoch-in-the-terminal
-zsh_start=$(python3 -c 'from time import time; print(int(round(time() * 1000)))')
+# zmodload zsh/zprof # This will enable the built in profiling. Recently used to analyse loading times.
 
 # BUGFIX: Provisional fix for zsh errors
 ZSH_DISABLE_COMPFIX="true" # fixes error prompting "Insecure completion-dependent directories..."
@@ -31,13 +44,14 @@ ZSH_THEME="spaceship"; SPACESHIP_BATTERY_SHOW='never'
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-    docker
-    kubectl
+    # docker
+    # kubectl
     fzf                     # https://github.com/junegunn/fzf#using-homebrew-or-linuxbrew
     git
     golang
     zsh-autosuggestions     # https://github.com/zsh-users/zsh-autosuggestions#oh-my-zsh
     zsh-syntax-highlighting # https://github.com/zsh-users/zsh-syntax-highlighting
+    alias-tips
 )
 source "$ZSH/oh-my-zsh.sh" # LOAD oh-my-zsh. This will load all the plugins.
 
@@ -58,32 +72,45 @@ source "$ZSH_CUSTOM_CONFIG_FILES/config/default"
 # To reload .zshrc: 'source .zshrc' or just type 'zsh'
 
 alias zshrc="code $ZSH_CUSTOM_CONFIG_FILES"
-alias .config="code $HOME/.config ~/.aws/"
+alias .config="code ~/.config/ ~/.ssh/config/ ~/.gitconfig $HOME/.config/git/gitconfig"
 
 ## Useful aliases
-for file in "$ZSH_CUSTOM_CONFIG_ALIASES/utils/"*; do "$file"; done
+for f in "$ZSH_CUSTOM_CONFIG_ALIASES"/utils/*; do source "$f"; done
 
 ## Operating System aliases
 CURRENT_OS="$(uname -a | awk '{print $1}')"
-if [ "$CURRENT_OS" = "Darwin" ]; then
-    source "$ZSH_CUSTOM_CONFIG_ALIASES/os/macos/set_path"
-    source "$ZSH_CUSTOM_CONFIG_ALIASES/os/macos/aliases"
+if [ -z "$CURRENT_OS" ]; then
+    echo "\$CURRENT_OS couldn't be found"
 else
-    source "$ZSH_CUSTOM_CONFIG_ALIASES/os/linux"
+    if [ "$CURRENT_OS" = "Darwin" ]; then
+        source "$ZSH_CUSTOM_CONFIG_ALIASES/os/macos/set_path"
+        source "$ZSH_CUSTOM_CONFIG_ALIASES/os/macos/aliases"
+    fi
 fi
+# source "$ZSH_CUSTOM_CONFIG_ALIASES/os/linux"
 
 ## Personal aliases
-for file in "$ZSH_CUSTOM_CONFIG_ALIASES/nruault/"*; do "$file"; done
+for f in "$ZSH_CUSTOM_CONFIG_ALIASES"/nruault/*; do source "$f"; done
 
 ## Private aliases
-PRIVATE_FILES=($(ls "$ZSH_CUSTOM_CONFIG_ALIASES"/private | grep -v '\.')) # Trick to disregard the non-aliases files
+PRIVATE_FILES=($(ls "$ZSH_CUSTOM_CONFIG_ALIASES/private" | grep -v '\.')) # Trick to disregard the non-aliases files
 for file in $PRIVATE_FILES; do
     source "$ZSH_CUSTOM_CONFIG_ALIASES/private/$file"
 done
 
 ## 3rd party integration aliases
+timelogger integrations start
 source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/general"
+integrations_ts=$(timelogger integrations end | tr -dc '0-9')
+if [ $integrations_ts -ge 500 ]; then; echo "Runtime of integrations was $integrations_ts ms."; fi
 
+alert_unused_logs(){
+    for log value in ${(kv)logs}; do
+      if [[ -n $logs[$value] ]]; then echo unused $key log value; fi
+    done
+}
+
+## ------------- Don't put anything (else) under this line ------------
+alert_unused_logs
+timelogger zsh end
 ## ------------------------- THE END OF ZSHRC -------------------------
-# end=$(($(date +'%s * 1000 + %-N / 1000000'))); runtime=$((end-start)); echo "Runtime of zshrc was $runtime ms." # GNU
-zsh_end=$(python3 -c 'from time import time; print(int(round(time() * 1000)))'); zsh_runtime=$((zsh_end - zsh_start)); echo "Runtime of zshrc was $zsh_runtime ms."

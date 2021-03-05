@@ -1,15 +1,3 @@
-/*
- TRX 	171.82800000
-
- ADA 	99.90000000
-
- BTT 	22.28903200
-
- ETH	0.00004131
-*/
-
-// url := "https://min-api.cryptocompare.com/data/pricemulti?fsyms=TRX,ADA,BTT,ETH&tsyms=EUR"
-
 package main
 
 import (
@@ -20,6 +8,14 @@ import (
 	"net/http"
 	"time"
 )
+
+var holdings = map[string]float32{
+	"TRX": 171.82800000,
+	"ADA": 349.23002481,
+	"BTT": 22.28903200,
+	"ETH": 0.00004131,
+	"XLM": 330.7423416,
+}
 
 type currencies struct {
 	TrxValue struct {
@@ -34,11 +30,14 @@ type currencies struct {
 	EthValue struct {
 		Eur float32 `json:"EUR"`
 	} `json:"ETH"`
+	XlmValue struct {
+		Eur float32 `json:"EUR"`
+	} `json:"XLM"`
 }
 
 func main() {
 
-	url := "https://min-api.cryptocompare.com/data/pricemulti?fsyms=TRX,ADA,BTT,ETH&tsyms=EUR"
+	url := "https://min-api.cryptocompare.com/data/pricemulti?fsyms=TRX,ADA,BTT,ETH,XLM&tsyms=EUR"
 
 	spaceClient := http.Client{
 		Timeout: time.Second * 5, // Maximum of 2 secs
@@ -61,14 +60,18 @@ func main() {
 		log.Fatal(readErr)
 	}
 
-	mytotal := &currencies{}
-	json.Unmarshal([]byte(body), &mytotal)
+	var currencyHoldings currencies
+	json.Unmarshal([]byte(body), &currencyHoldings)
 
 	total :=
-		mytotal.TrxValue.Eur*171.82800000 +
-			mytotal.AdaValue.Eur*99.90000000 +
-			mytotal.BttValue.Eur*22.28903200 +
-			mytotal.EthValue.Eur*0.00004131
+		currencyHoldings.TrxValue.Eur*holdings["TRX"] +
+			currencyHoldings.AdaValue.Eur*holdings["ADA"] +
+			currencyHoldings.BttValue.Eur*holdings["BTT"] +
+			currencyHoldings.EthValue.Eur*holdings["ETH"] +
+			currencyHoldings.XlmValue.Eur*holdings["XLM"]
 
-	fmt.Println(total, "€")
+	b, _ := json.MarshalIndent(currencyHoldings, "", "  ")
+	fmt.Print(string(b))
+
+	fmt.Print("\n", total, "€ / ~475 €")
 }

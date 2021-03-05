@@ -12,19 +12,6 @@ function whoamipro() {
     echo '*** $id ***' && id
 }
 
-function myip() {
-    echo ">> public ip / curl <remote_url>"
-    curl http://ipecho.net/plain
-    echo
-
-    echo ">> private ip / ipconfig"
-    ## MACOS
-    ipconfig getifaddr en0 # ifconfig | grep "inet "
-
-    echo ">> default gateway (usually router) / netstat"
-    netstat -nr | grep -E "default.*en0" --color=never
-}
-
 SPIDER="""
     _
  _\( )/_  Searching and killing
@@ -118,3 +105,42 @@ function memusg() {
 
 ### How to use Terminal to send keystrokes?
 ## osascript -e 'tell application "System Events" to keystroke "q" using {control down, command down}'
+
+# NETWORK ALIASES
+
+function myip() {
+    echo ">> public ip / curl <remote_url>"
+    curl http://ipecho.net/plain
+    echo
+
+    echo ">> private ip / ipconfig"
+    ## MACOS
+    ipconfig getifaddr en0 # ifconfig | grep "inet "
+
+    echo ">> default gateway (usually router) / netstat"
+    netstat -nr | grep -E "default.*en0" --color=never
+}
+
+# wifibounce restarts Wi-Fi network interface
+alias wifibounce='sudo networksetup -setv4off Wi-Fi;sudo  networksetup -setdhcp Wi-Fi'
+# currentnet prints the active network interface
+alias currentnet="echo $(route get default | grep interface | awk '{print $2}')"
+
+# netbounce will get the interface that is set to reach hosts from this machine and reset it
+netbounce(){
+    local net=$(route get default | grep interface | awk '{print $2}')
+    sudo ifconfig $net down
+    sudo ifconfig $net down
+}
+
+# enbounce needs a parameter argument to reset an interface
+# You can list interfaces by typing: << networksetup -listnetworkserviceorder >>
+# Other handful network commands are: << ifconfig ; scutil --dns ; networksetup -listnetworkserviceorder >>
+enbounce(){
+    if [ -z "$1" ]; then
+        echo "You should provide a network interface."
+    else
+        sudo ifconfig $1 down
+        sudo ifconfig $1 up
+    fi
+}

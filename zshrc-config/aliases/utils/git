@@ -11,16 +11,22 @@ alias githooksconfig='git config --global core.hooksPath ~/.config/git/hooks/'
 #   - git config --global alias.dirdiff 'diff -p --stat -w --no-index'
 alias gl='git log --graph --decorate --pretty=oneline --abbrev-commit'
 
-function pro_rebase() {
+
+
+grbs_usage="pro_rebase [<number] -- Sources any integration given a list
+
+How grbs works:
+  Put as first param the number of commits you want to cover (1-N).
+  e.g: 'pro_rebase 3' == (git rebase -i HEAD~3)
+  Squash commits or whatever and then push your chages with --force
+"
+function grbs() {
     # https://stackoverflow.com/a/927386
     regex='^[0-9]+$'
     if [[ $@ =~ $regex ]]; then
         git rebase -i HEAD~"$@"
         echo "Remember to push with --force flag."
     else
-        echo "How pro_rebase works:"
-        echo "  Put as first param the number of commits you want to cover (1-N)."
-        echo "  e.g: pro_rebase 3  == git rebase -i HEAD~3"
-        echo "  Squash commits or whatever and then push your chages with --force"
+        pro_rebase_usage
     fi
 }
