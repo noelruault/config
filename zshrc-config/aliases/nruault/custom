@@ -3,7 +3,7 @@
 ASSETS_URL="$ZSH_CUSTOM_CONFIG_ALIASES/nruault/assets"
 
 alias awesome="cat $ASSETS_URL/awesome.txt"
-alias crypto\?="go run $ASSETS_URL/crypto.go &"
+alias crypto\?="go run $ASSETS_URL/crypto.go"
 alias noel.io\?="bash $ASSETS_URL/noeliodomain.sh"
 { 2>&3 (bash $ASSETS_URL/noeliodomain.sh "bash:request" &) } 3>&2 2>/dev/null
 
@@ -116,22 +116,29 @@ source_integrations_usage="source_integrations [integrations...] -- Sources any 
 
 3rd party integrations must be added to this script manually. So far we can handle the next
 Options:
-    gcloud     Loads Google Cloud integration
-    nvm        Loads NVM integration
+    .          Loads general integrations
     aws        Prints how to load Amazon Web Service integration
     flutter    Loads Flutter integration
+    gcloud     Loads Google Cloud integration
+    nvm        Loads NVM integration
+    sql        Loads MySQL integration
 "
 
 function source_integrations() {
-    source_integrations_start=$(python3 -c 'from time import time; print(int(round(time() * 1000)))')
-
     if [[ $# -eq 0 ]]; then
         echo "$source_integrations_usage"
-        exit 0
+        exit 1
     fi
+
+    timelogger source_integrations start
 
     while [ $# -gt 0 ]; do
         case "$1" in
+        .)
+            echo "Loading general integrations"
+            source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/general"
+            ;;
+
         gcloud)
             echo "Loading GCloud integration"
             GCLOUD_SDK_PATH="/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk"
@@ -163,6 +170,12 @@ function source_integrations() {
             [ -s "$HOME/flutter/bin/flutter" ] && export PATH="$PATH:$HOME/flutter/bin"
             ;;
 
+        sql)
+            echo "Loading MySQL integration"
+            # brew install mysql mysql-client # It is important to include both, server and client
+            if [ -f "/usr/local/opt/mysql-client/bin" ]; then export PATH="/usr/local/opt/mysql-client/bin:$PATH"; fi
+            ;;
+
         *)
             echo "$0: error: unrecognized option $1"
             echo "$0: $source_integrations_usage"
@@ -174,8 +187,5 @@ function source_integrations() {
 
     done
 
-    # Make time only happen when triggered but in the end of the execution.
-    source_integrations_end=$(python3 -c 'from time import time; print(int(round(time() * 1000)))')
-    source_integrations_runtime=$((source_integrations_end - source_integrations_start))
-    echo "Runtime of sourcing integrations was $source_integrations_runtime ms."
+    timelogger source_integrations end
 }

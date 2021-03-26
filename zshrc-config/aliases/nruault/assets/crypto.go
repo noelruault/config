@@ -6,51 +6,49 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 )
 
-var holdings = map[string]float32{
-	"TRX": 171.82800000,
-	"ADA": 349.23002481,
-	"BTT": 22.28903200,
-	"ETH": 0.00004131,
-	"XLM": 330.7423416,
-}
+const (
+	spendTotal    = 975 // approximate expenses on cryptos so far
+	spendCurrency = "EUR"
+)
 
-type currencies struct {
-	TrxValue struct {
-		Eur float32 `json:"EUR"`
-	} `json:"TRX"`
-	AdaValue struct {
-		Eur float32 `json:"EUR"`
-	} `json:"ADA"`
-	BttValue struct {
-		Eur float32 `json:"EUR"`
-	} `json:"BTT"`
-	EthValue struct {
-		Eur float32 `json:"EUR"`
-	} `json:"ETH"`
-	XlmValue struct {
-		Eur float32 `json:"EUR"`
-	} `json:"XLM"`
-}
+var (
+	holdings = map[string]float32{
+		"ADA": 349.23002481, // ~350
+		"BTT": 22.28903200,
+		"ETH": 0.00004131,
+		"TRX": 180.44750201,
+		"VET": 6292,        // 393
+		"XLM": 330.7423416, // 134.72
+		"ZIL": 706.8,       // 100
+	}
+	currencyIcon = map[string]string{
+		"EUR": "€",
+		"USD": "US$",
+	}
+)
 
 func main() {
-
-	url := "https://min-api.cryptocompare.com/data/pricemulti?fsyms=TRX,ADA,BTT,ETH,XLM&tsyms=EUR"
-
-	spaceClient := http.Client{
-		Timeout: time.Second * 5, // Maximum of 2 secs
+	var cryptoAliases []string
+	for i := range holdings {
+		cryptoAliases = append(cryptoAliases, i)
 	}
 
+	url := fmt.Sprintf(
+		"https://min-api.cryptocompare.com/data/pricemulti?fsyms=%s&tsyms=%s",
+		strings.Join(cryptoAliases, ","),
+		spendCurrency,
+	)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	req.Header.Set("User-Agent", "spacecount-tutorial")
-
-	res, getErr := spaceClient.Do(req)
+	httpClient := http.Client{Timeout: time.Second * 5}
+	res, getErr := httpClient.Do(req)
 	if getErr != nil {
 		log.Fatal(getErr)
 	}
@@ -60,18 +58,16 @@ func main() {
 		log.Fatal(readErr)
 	}
 
-	var currencyHoldings currencies
-	json.Unmarshal([]byte(body), &currencyHoldings)
+	var cryptoCurrentValues map[string]map[string]float32
+	json.Unmarshal([]byte(body), &cryptoCurrentValues)
 
-	total :=
-		currencyHoldings.TrxValue.Eur*holdings["TRX"] +
-			currencyHoldings.AdaValue.Eur*holdings["ADA"] +
-			currencyHoldings.BttValue.Eur*holdings["BTT"] +
-			currencyHoldings.EthValue.Eur*holdings["ETH"] +
-			currencyHoldings.XlmValue.Eur*holdings["XLM"]
+	var holdingValues float32
+	for i := range holdings {
+		if cryptoCurrentValues[i][spendCurrency] == 0 {
+			log.Fatalf("%s: crypto not added yet or not handled correctly", i)
+		}
+		holdingValues += cryptoCurrentValues[i][spendCurrency] * holdings[i]
+	}
 
-	b, _ := json.MarshalIndent(currencyHoldings, "", "  ")
-	fmt.Print(string(b))
-
-	fmt.Print("\n", total, "€ / ~475 €")
+	fmt.Printf("\n%f%s / ~%d%s", holdingValues, currencyIcon[spendCurrency], spendTotal, currencyIcon[spendCurrency])
 }

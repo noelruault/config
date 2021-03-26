@@ -16,5 +16,7 @@
 	rebase = true
 
 # Enforce SSH
+# [url "alias@gitlab.company.io:"]
+	# insteadOf = https://gitlab.company.io/
 [url "ssh://git@github.com/noelruault/"]
 	insteadOf = https://github.com/noelruault/

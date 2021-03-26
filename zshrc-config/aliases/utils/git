@@ -11,8 +11,6 @@ alias githooksconfig='git config --global core.hooksPath ~/.config/git/hooks/'
 #   - git config --global alias.dirdiff 'diff -p --stat -w --no-index'
 alias gl='git log --graph --decorate --pretty=oneline --abbrev-commit'
 
-
-
 grbs_usage="pro_rebase [<number] -- Sources any integration given a list
 
 How grbs works:
@@ -30,3 +28,6 @@ function grbs() {
         pro_rebase_usage
     fi
 }
+
+alias gpo="git push origin $(git branch --show-current)"
+alias gpos="git push origin $(git branch --show-current) -o ci.skip" # Gitlab

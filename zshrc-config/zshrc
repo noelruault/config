@@ -100,9 +100,9 @@ done
 
 ## 3rd party integration aliases
 timelogger integrations start
-source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/general"
+# source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/general"
 integrations_ts=$(timelogger integrations end | tr -dc '0-9')
-if [ $integrations_ts -ge 500 ]; then; echo "Runtime of integrations was $integrations_ts ms."; fi
+if [ $integrations_ts -ge 500 ]; then; echo "Runtime of sourcing general integrations was $integrations_ts ms. A bit too high :{"; fi
 
 alert_unused_logs(){
     for log value in ${(kv)logs}; do
