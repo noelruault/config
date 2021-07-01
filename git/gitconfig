@@ -20,3 +20,7 @@
 	# insteadOf = https://gitlab.company.io/
 [url "ssh://git@github.com/noelruault/"]
 	insteadOf = https://github.com/noelruault/
+[url "ssh://git@github.com/brudi/"]
+	insteadOf = https://github.com/brudi/
+[url "ssh://git@github-hideandseek/hideandseek-store/"]
+	insteadOf = https://github.com/hideandseek-store/

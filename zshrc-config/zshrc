@@ -51,7 +51,7 @@ plugins=(
     golang
     zsh-autosuggestions     # https://github.com/zsh-users/zsh-autosuggestions#oh-my-zsh
     zsh-syntax-highlighting # https://github.com/zsh-users/zsh-syntax-highlighting
-    alias-tips
+    alias-tips              # https://github.com/djui/alias-tips
 )
 source "$ZSH/oh-my-zsh.sh" # LOAD oh-my-zsh. This will load all the plugins.
 

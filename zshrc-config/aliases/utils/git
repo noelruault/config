@@ -29,5 +29,5 @@ function grbs() {
     fi
 }
 
-alias gpo="git push origin $(git branch --show-current)"
-alias gpos="git push origin $(git branch --show-current) -o ci.skip" # Gitlab
+gpo() { git push origin $(git branch --show-current) }
+gpos() { git push origin $(git branch --show-current) -o ci.skip } # Gitlab

@@ -1,4 +1,4 @@
-# Checks for internet connectivity.
+# Checks for internet connectivity. Silent exit if no connection
 if nc -zw1 google.com 443 &>/dev/null; then echo; else exit 1; fi
 
 domain_expiry_date=$(whois noel.io | grep "Registry Expiry Date" | grep -oE '(\d{4})-(\d\d)-(\d\d)' | sed 's/[\._-]//g')
