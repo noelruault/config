@@ -1,9 +1,16 @@
 #!/usr/bin/env zsh
 # TODO checklist:
 # [] Handle routing properly. I mean, variables like ZSH_CUSTOM_CONFIG_ALIASES start to be annoying.
-#    I need to do a proper routes system that eventually can be tested when the terminal starts.
+#    I need to do a proper routes system that eventually can be tested when the terminal starts,
+#    checking if a directory/file exists and raising an error/warning otherwise.
+# [] zmodload zsh/zprof # This will enable the built in profiling. Recently used to analyse loading times.
 
-declare -A logs=() # Associative array
+declare -A logs=() # -A: Associative (array)
+# timelogger can be used to start/end time logs. mainly used to display time intervals when running heavy processes.
+#
+# eg:
+#   timelogger heavyprocess start
+#   timelogger heavyprocess end
 timelogger() {
   local name=$1
   local action=$2
@@ -20,7 +27,12 @@ timelogger() {
 }
 timelogger zsh start
 
-# zmodload zsh/zprof # This will enable the built in profiling. Recently used to analyse loading times.
+# alert_unused_logs alerts if any log remains unused.
+alert_unused_logs(){
+    for log value in ${(kv)logs}; do
+      if [[ -n $logs[$value] ]]; then echo unused $key log value; fi
+    done
+}
 
 # BUGFIX: Provisional fix for zsh errors
 ZSH_DISABLE_COMPFIX="true" # fixes error prompting "Insecure completion-dependent directories..."
@@ -51,7 +63,7 @@ plugins=(
     golang
     zsh-autosuggestions     # https://github.com/zsh-users/zsh-autosuggestions#oh-my-zsh
     zsh-syntax-highlighting # https://github.com/zsh-users/zsh-syntax-highlighting
-    # alias-tips              # https://github.com/djui/alias-tips
+    # alias-tips            # https://github.com/djui/alias-tips
 )
 source "$ZSH/oh-my-zsh.sh" # LOAD oh-my-zsh. This will load all the plugins.
 
@@ -104,12 +116,6 @@ timelogger integrations start
 # source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/general"
 integrations_ts=$(timelogger integrations end | tr -dc '0-9')
 if [ $integrations_ts -ge 500 ]; then; echo "Runtime of sourcing general integrations was $integrations_ts ms. A bit too high :{"; fi
-
-alert_unused_logs(){
-    for log value in ${(kv)logs}; do
-      if [[ -n $logs[$value] ]]; then echo unused $key log value; fi
-    done
-}
 
 ## ------------- Don't put anything (else) under this line ------------
 alert_unused_logs
