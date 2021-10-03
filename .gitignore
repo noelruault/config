@@ -31,7 +31,7 @@ launch.json
 # Files and directories potentially created by iTerm2
 iTerm2/AppSupport
 
-# ignore everything exept specific directories
+# Ignore everything exept specific directories
 /*
 !/applications
 !/git
@@ -39,6 +39,13 @@ iTerm2/AppSupport
 !/vscode
 !/zshrc-config
 !/fonts
+
+!/setup.sh
+!/update.sh
+
+# Don't add private files / folders
+*private
+*/private/*
 
 # Directories created by 3rd party auth providers
 hub

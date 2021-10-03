@@ -3,8 +3,12 @@
 ### GIT
 # https://github.com/ohmyzsh/ohmyzsh/wiki/Cheatsheet#git
 alias gamod="git ls-files --modified | xargs git add"
-# Remove all your local git branches but keep master and the current branch:
-alias gbreset='git branch | egrep -v "(master|\*)" | xargs git branch -D'
+
+# Remove all your LOCAL git branches but keep master and the current branch:
+alias gbreset='git branch --merged | grep -v \* | xargs git branch -D '
+# - git branch | egrep -v "(master|dev|\*)" | xargs git branch -D
+# - git branch | grep -v "master\|dev" | xargs git branch -D
+
 alias githooksconfig='git config --global core.hooksPath ~/.config/git/hooks/'
 # USEFUL COMMANDS:
 #   - git diff origin/master --name-only -- '*.go' ':(exclude)vendor/*'

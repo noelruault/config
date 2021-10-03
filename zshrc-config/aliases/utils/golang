@@ -36,13 +36,19 @@ function gocover() {
 # go clean -testcache # https://golang.org/pkg/cmd/go/internal/clean/
 
 function gonew() {
-    mkdir -p $GOPATH/src/github.com/noelruault/$1 && cd $_
+    FOLDER_NAME=$1
+    if [[ $# -eq 0 ]]; then
+        # generates random name if not provided
+        FOLDER_NAME=$(openssl rand -hex 4)
+    fi
+
+    mkdir -p $GOPATH/src/github.com/noelruault/$FOLDER_NAME && cd $_
     {
         echo 'package main'
         echo 'import "fmt"'
         echo 'func main() { fmt.Println("hello") }'
-    } > main.go
+    } >main.go
 
-    go mod init github.com/noelruault/$1
+    go mod init github.com/noelruault/$FOLDER_NAME
     code .
 }

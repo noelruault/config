@@ -44,4 +44,3 @@ There are 2 ways to install an iTerm theme (both go to the same configuration lo
 ## oh-my-zsh
 
 	`ln -sF ~/.config/iTerm2/oh-my-zsh ~/.oh-my-zsh` # https://linux.die.net/man/1/ln
-

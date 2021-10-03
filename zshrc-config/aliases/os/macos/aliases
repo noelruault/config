@@ -21,12 +21,13 @@ NO_PARAM_ERROR="""
 [INFO]: You need to run this function with at least one string parameter.
 """
 
-function killapp() {
+function killprocess() {
     if [[ -z "$1" ]]; then
         echo $NO_PARAM_ERROR
         return
     else
-        pids=$(ps aux | grep -Ei "$@" | awk '{print $2}')
+        pids=$(ps aux | grep -v grep | grep --extended-regexp --ignore-case  "$@" | awk '{print $2}')
+        #               ^ exclude self                                              ^ get second column value
 
         if [[ -z "$pids" ]]; then
             echo "Couldn't be found any PID related to the given application."
@@ -39,6 +40,7 @@ function killapp() {
         fi
     fi
 }
+alias gobenchkill='killprocess "test.bench"'
 
 function killport() {
     if [[ -z "$1" ]]; then

@@ -114,20 +114,21 @@ function go_to_dir_on_specific_folder() {
 
 source_integrations_usage="source_integrations [integrations...] -- Sources any integration given a list
 
-3rd party integrations must be added to this script manually. So far we can handle the next
-Options:
-    .          Loads general integrations
-    aws        Prints how to load Amazon Web Service integration
-    flutter    Loads Flutter integration
-    gcloud     Loads Google Cloud integration
-    nvm        Loads NVM integration
-    sql        Loads MySQL integration
+3rd party integrations must be added to this script manually.
+So far the next options can be handled:
+
+    .               Loads general integrations
+    aws             Prints how to load Amazon Web Service integration
+    flutter         Loads Flutter integration
+    gcloud          Loads Google Cloud integration
+    node|npm|nvm    Loads NodeJs integration
+    sql             Loads MySQL integration
 "
 
 function source_integrations() {
     if [[ $# -eq 0 ]]; then
         echo "$source_integrations_usage"
-        exit 1
+        return
     fi
 
     timelogger source_integrations start
@@ -149,15 +150,20 @@ function source_integrations() {
             if [ -f "$GCLOUD_SDK_PATH/completion.zsh.inc" ]; then . "$GCLOUD_SDK_PATH/completion.zsh.inc"; fi
             ;;
 
-        node)
+        node|npm|nvm)
             # https://github.com/nvm-sh/nvm#uninstalling--removal
             # To remove nvm manually, execute the following:
             #   $ rm -rf "$NVM_DIR"
             echo "Loading NVM integration"
             export NVM_DIR="$HOME/.nvm"
 
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
-            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+            # -- Manual installation ---------------
+            # [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+            # [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+            # -- Homebrew installation -------------
+            [ -s "$(brew --prefix)/opt/nvm/nvm.sh" ] && . "$(brew --prefix)/opt/nvm/nvm.sh" # This loads nvm
+            [ -s "$(brew --prefix)/opt/nvm/etc/bash_completion.d/nvm" ] && . "$(brew --prefix)/opt/nvm/etc/bash_completion.d/nvm" # This loads nvm bash_completion
             ;;
 
         aws)
@@ -188,4 +194,20 @@ function source_integrations() {
     done
 
     timelogger source_integrations end
+}
+
+function setvscode() {
+    mkdir -p .vscode/
+    ln -s ~/.config/vscode/private/* ./.vscode/
+
+    if ! grep -qxF 'vscode/*' .gitignore; then
+        echo "vscode folder is not git-ignored."
+        echo "Do you wish to insert a ignore rule for it?"
+        select yn in "Yes" "No"; do
+            case $yn in
+                Yes ) echo "\nvscode/*" >> .gitignore; break;;
+                No ) exit;;
+            esac
+        done
+    fi
 }

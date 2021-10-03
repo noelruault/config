@@ -51,7 +51,7 @@ plugins=(
     golang
     zsh-autosuggestions     # https://github.com/zsh-users/zsh-autosuggestions#oh-my-zsh
     zsh-syntax-highlighting # https://github.com/zsh-users/zsh-syntax-highlighting
-    alias-tips              # https://github.com/djui/alias-tips
+    # alias-tips              # https://github.com/djui/alias-tips
 )
 source "$ZSH/oh-my-zsh.sh" # LOAD oh-my-zsh. This will load all the plugins.
 
@@ -72,7 +72,8 @@ source "$ZSH_CUSTOM_CONFIG_FILES/config/default"
 # To reload .zshrc: 'source .zshrc' or just type 'zsh'
 
 alias zshrc="code $ZSH_CUSTOM_CONFIG_FILES"
-alias .config="code ~/.config/ ~/.ssh/config/ ~/.gitconfig $HOME/.config/git/gitconfig"
+alias .config="code ~/.config/ ~/.gitconfig"
+#  ~/.ssh/config/ $HOME/.config/git/*_global
 
 ## Useful aliases
 for f in "$ZSH_CUSTOM_CONFIG_ALIASES"/utils/*; do source "$f"; done

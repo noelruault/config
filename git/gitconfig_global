@@ -1,11 +1,17 @@
+; ##############
+; CONFIGURATION: Include next lines on ~/.gitconfig
+;   [include]
+;      path = ~/.config/git/gitconfig_global
+; ##############
+
 ; To track what is being load on the global Git settings type:
 ;    $ git config --list --show-origin
 
 [core]
-	excludesfile = /Users/noelruault/.config/git/gitignore_global
+	excludesfile = ~/.config/git/gitignore_global
 
 [include]
-    path = /Users/noelruault/.config/git/private/secrets
+    path = ~/.config/git/private/secrets
 
 [alias]
     aliases = !git config -l | grep alias | cut -c 7-
@@ -13,14 +19,19 @@
     pat = !git add -N . && git add --patch
 
 [pull]
-	rebase = true
+	rebase = false # defaults to merge (the default strategy)
 
 # Enforce SSH
 # [url "alias@gitlab.company.io:"]
 	# insteadOf = https://gitlab.company.io/
+
+[url "git@gitlab.com:"]
+	insteadOf = https://gitlab.com/
+
+#[url "ssh://git@github.com"]
+# 	insteadOf = https://github.com/
+
 [url "ssh://git@github.com/noelruault/"]
 	insteadOf = https://github.com/noelruault/
-[url "ssh://git@github.com/brudi/"]
-	insteadOf = https://github.com/brudi/
 [url "ssh://git@github-hideandseek/hideandseek-store/"]
 	insteadOf = https://github.com/hideandseek-store/

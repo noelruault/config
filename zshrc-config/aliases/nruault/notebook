@@ -1,16 +1,8 @@
 #!/bin/bash
 
 # ========================
-# TODO
-# Function that takes the name of each function and makes it an alias...
-# function hello()
-# for each $(grep 'alias' | awk '{print $2}'){
-#	alias X\?
-# }
-# ========================
-
-# ========================
 # Function to display howto possibilities by typing 'howto?'
+alias notebook\?='howto_possibilities'
 alias howto\?='howto_possibilities'
 function howto_possibilities() {
   grep -E '^alias.*\?' $ZSH_CUSTOM_CONFIG_FILES/aliases/nruault/notebook | awk '{print $2}' | awk -F '\' '{print $1}'
@@ -534,6 +526,21 @@ function permission_doc() {
 """
 }
 
+
+alias pkg\?='pkg_doc'
+function pkg_doc() {
+  echo """
+  pkgutil --pkgs # list all installed packages
+  pkgutil --pkgs | grep -i {keyword}
+  pkgutil --pkg-info package-name.pkg # find the package location
+  pkgutil --files package-name.pkg # list the packages installed files
+
+  locate psql | grep /bin
+
+  [[Source: https://stackoverflow.com/a/27546100/4349318]]
+  """
+}
+
 alias psql\?='postgres_doc'
 alias postgres\?='postgres_doc'
 function postgres_doc() {
@@ -607,14 +614,6 @@ function pkg_doc() {
 
 # ========== Q
 # ========== R
-alias ram\?='ram_doc'
-function ram_doc() {
-  echo """
-  top -o MEM
-  cleanup # https://github.com/fwartner/mac-cleanup
-  """
-}
-
 # ========== S
 alias safari\?='safari_doc'
 function safari_doc() {
@@ -764,6 +763,16 @@ function thread_doc() {
   which then discards it as well since standard output has already been redirected.
 
   [[Source: https://stackoverflow.com/a/10508862/4349318]]
+  """
+}
+
+alias tty\?='tty_doc'
+function tty_doc() {
+  echo """
+  Check active users logged into the server with
+  $ w
+  Get the PID (Process ID) of a connected terminal (tty) with:
+  $ ps -ft <tty00X>
   """
 }
 
