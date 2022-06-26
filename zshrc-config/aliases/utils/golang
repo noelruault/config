@@ -42,13 +42,14 @@ function gonew() {
         FOLDER_NAME=$(openssl rand -hex 4)
     fi
 
-    mkdir -p $GOPATH/src/github.com/noelruault/$FOLDER_NAME && cd $_
+    mkdir -p $(go env GOPATH)/src/github.com/noelruault/$FOLDER_NAME && cd $_
     {
         echo 'package main'
         echo 'import "fmt"'
         echo 'func main() { fmt.Println("hello") }'
     } >main.go
 
+    echo "Starting golang project generated at: $(go env GOPATH)/src/github.com/noelruault/$FOLDER_NAME"
     go mod init github.com/noelruault/$FOLDER_NAME
     code .
 }

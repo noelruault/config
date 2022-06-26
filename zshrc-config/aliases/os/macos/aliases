@@ -132,7 +132,7 @@ alias currentnet="echo $(route get default | grep interface | awk '{print $2}')"
 netbounce(){
     local net=$(route get default | grep interface | awk '{print $2}')
     sudo ifconfig $net down
-    sudo ifconfig $net down
+    sudo ifconfig $net up
 }
 
 # enbounce needs a parameter argument to reset an interface
@@ -146,3 +146,11 @@ enbounce(){
         sudo ifconfig $1 up
     fi
 }
+
+# map exa commands to normal ls commands
+alias ill="exa -l -g --icons"
+alias ils="exa --icons"
+alias ilt="exa --tree --icons -a -I '.git|__pycache__|.mypy_cache|.ipynb_checkpoints'"
+
+# show file previews for fzf using bat
+alias fp="fzf --preview 'bat --style=numbers --color=always --line-range :500 {}'"
