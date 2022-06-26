@@ -14,5 +14,24 @@ alias rm="rm -i"
 
 function search() { find / -name "$@" | echo; }
 
-alias pgstart='pg_ctl -D /usr/local/var/postgres start'
+alias pgstart='pg_ctl -D /usr/local/var/postgres start' # brew services restart postgresql
 alias pgstop='pg_ctl -D /usr/local/var/postgres stop'
+
+function pwgen() {
+    specialChars=('!' '"' '#' '$' '%' '&' '(' ')' '*' '+' ',' '-' '.' '/' ':' ';' '<' '=' '>' '?' '@' '[' '\' ']' '^' '_' '{' '|' '}' '~' \' \")
+
+    echo $(
+        echo $specialChars |
+            tr " " "\n"    |
+            shuf           |
+            tr -d "\n"     |
+            head -c 4
+            ; echo
+    )$(
+        date +%s      |
+            sha256sum |
+            base64    |
+            head -c 8
+            ; echo
+    ) | fold -w1 | shuf | tr -d "\n" ; echo
+}

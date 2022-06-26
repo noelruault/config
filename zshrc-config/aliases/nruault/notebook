@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ========================
-# Function to display howto possibilities by typing 'howto?'
+# Helper functions to display howto possibilities by typing 'howto?'
 alias notebook\?='howto_possibilities'
 alias howto\?='howto_possibilities'
 function howto_possibilities() {
@@ -222,10 +222,12 @@ function git_doc() {
 
 alias go\?='go_doc'
 function go_doc() {
+  # TODO make this smart, searching the tags by regex
   echo """
   go-comments?
   go-encode?
   go-fmt?
+  go-map?
   go-mock?
   go-mod?
   go-naming?
@@ -280,6 +282,25 @@ function go-encode_doc() {
 
   [Reference]: https://play.golang.org/p/S7ff3UgzNlG
   """
+}
+
+alias go-fmt\?='go-fmt_doc'
+function go-fmt_doc() {
+  go doc fmt | head -60
+  echo """
+  CODE RAN: go doc fmt | head -60
+  """
+}
+
+alias go-map\?='go-map_doc'
+function go-map_doc() {
+  echo '''
+  dict := make(map[string]int)
+
+  if val, ok := dict["foo"]; ok {
+    //do something here
+  }
+  '''
 }
 
 alias go-mock\?='go-mock_doc'
@@ -352,14 +373,6 @@ function go-naming_doc() {
   - Don't mix and match long and short formal parameters in the same declaration.
 
   [Reference]: https://dave.cheney.net/practical-go/presentations/qcon-china.html#_identifiers
-  """
-}
-
-alias go-fmt\?='go-fmt_doc'
-function go-fmt_doc() {
-  go doc fmt | head -60
-  echo """
-  CODE RAN: go doc fmt | head -60
   """
 }
 
@@ -446,6 +459,14 @@ function lag_doc() {
   """
 }
 # ========== M
+alias macshortcuts\?='macshortcuts_doc'
+function macshortcuts_doc() {
+  echo """
+  https://support.apple.com/en-il/HT201236
+  """
+}
+
+
 alias mkdir\?='mkdir_doc'
 function mkdir_doc() {
   echo """
@@ -579,6 +600,22 @@ function postgres_doc() {
     - drop schema <schema_name> cascade;
     - create schema <schema_name>;
 
+  [EXAMPLES]
+  Select query examples:
+    $ SELECT current_database(); # Displays name of current DB
+    $ SELECT * FROM portal_user WHERE user_id = 1;
+
+    $ UPDATE portal_user SET password = abc1234... WHERE user_id = 1;
+    $ UPDATE <table> SET <column> = <value> WHERE <column> = <value>;
+
+  [SETUP & DEAMONS info]
+  *** SETUP
+  psql: error: FATAL:  database \"noelruault\" does not exist
+      /usr/local/opt/postgres/bin/createuser -s postgres
+
+  PGUSER=postgres psql
+  [Source: https://stackoverflow.com/a/17646333]
+
   *** DAEMONS
     # To migrate existing data from a previous major version of PostgreSQL run:
     #   brew postgresql-upgrade-database
@@ -588,13 +625,6 @@ function postgres_doc() {
     # Or, if you don't want/need a background service you can just run:
     #   pg_ctl -D /usr/local/var/postgres <start/stop> # -D flags the location of the database storage area
 
-  [EXAMPLES]
-  Select query examples:
-    $ SELECT current_database(); # Displays name of current DB
-    $ SELECT * FROM portal_user WHERE user_id = 1;
-
-    $ UPDATE portal_user SET password = abc1234... WHERE user_id = 1;
-    $ UPDATE <table> SET <column> = <value> WHERE <column> = <value>;
   """
 }
 
@@ -619,6 +649,43 @@ alias safari\?='safari_doc'
 function safari_doc() {
   echo """
   ⌘ + ⇧ + \\ ${spacer1}| Show tab overview
+  """
+}
+
+alias scp\?='scp_doc'
+function scp_doc() {
+  echo """
+  If you want to copy a directory from machine a to b while logged into a:
+    scp -r /path/to/directory user@ipaddress:/path/to/destination
+    rsync -r -v --progress -e ssh user@remote-system:/address/to/remote/file /path/to/destination
+
+  If you want to copy a directory from machine a to b while logged into b:
+    scp -r user@ipaddress:/path/to/directory /path/to/destination
+    rsync -r -v --progress -e ssh /path/to/destination user@remote-system:/address/to/remote/file
+  """
+}
+
+alias screen\?='screen_doc'
+function screen_doc() {
+  echo """
+  Starting named session
+  $ screen -S session_name
+  Detach from Linux Screen Session
+  > Ctrl+a d
+  Reattach to a Linux Screen
+  $ screen -r
+
+  Others:
+  Ctrl+a c ${spacer1}Create a new window (with shell).
+  Ctrl+a \" ${spacer1}List all windows.
+  Ctrl+a 0 ${spacer1}Switch to window 0 (by number).
+  Ctrl+a A ${spacer1}Rename the current window.
+  Ctrl+a S ${spacer1}Split current region horizontally into two regions.
+  Ctrl+a | ${spacer1}Split current region vertically into two regions.
+  Ctrl+a tab ${spacer1}Switch the input focus to the next region.
+  Ctrl+a Ctrl+a Toggle between the current and previous windows
+  Ctrl+a Q ${spacer1}Close all regions but the current one.
+  Ctrl+a X ${spacer1}Close the current region.
   """
 }
 

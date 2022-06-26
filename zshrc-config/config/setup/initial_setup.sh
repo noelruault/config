@@ -27,7 +27,7 @@ git clone https://github.com/zsh-users/zsh-autosuggestions "${ZSH_CUSTOM:-~/.oh-
 brew install coreutils
 
 ## MySQL
-brew install mysql mysql-client
+# brew install mysql mysql-client
 
 ## Upgrading bash used by zsh when using 'bash' command: https://itnext.io/upgrading-bash-on-macos-7138bd1066ba
 brew install bash

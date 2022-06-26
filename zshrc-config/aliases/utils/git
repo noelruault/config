@@ -34,4 +34,4 @@ function grbs() {
 }
 
 gpo() { git push origin $(git branch --show-current) }
-gpos() { git push origin $(git branch --show-current) -o ci.skip } # Gitlab
+# gposkipci() { git push origin $(git branch --show-current) -o ci.skip } # Gitlab

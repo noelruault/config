@@ -11,3 +11,8 @@
 **Remove dotfile:**
 
     mv $HOME/.zshrc-config $HOME/.backup-zshrc-config
+
+**Link rc's:**
+
+    ln -s $HOME/.zshrc-config/config/zshrc $HOME/.zshrc
+    ln -s $HOME/.zshrc-config/config/psqlrc $HOME/.psqlrc

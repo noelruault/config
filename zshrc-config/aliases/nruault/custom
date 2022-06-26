@@ -7,6 +7,18 @@ alias crypto\?="go run $ASSETS_URL/crypto.go"
 alias noel.io\?="bash $ASSETS_URL/noeliodomain.sh"
 { 2>&3 (bash $ASSETS_URL/noeliodomain.sh "bash:request" &) } 3>&2 2>/dev/null
 
+function check-valid-email() {
+    EMAIL_DOMAIN="$1"
+    EMAIL_SERVER=$(nslookup -q=mx $EMAIL_DOMAIN | grep "mail exchanger" | awk 'NR==1{print substr($6, 1, length($6)-1)}')
+    IS_EMAIL_SERVER_REACHABLE="{ echo 'MAIL FROM any@email.com'; sleep 1} | nc $EMAIL_SERVER 25 2>&1 | grep --extended-regex '^250.*OK' --silent"
+
+    ({ echo 'MAIL FROM any@email.com'; sleep 1} | nc $EMAIL_SERVER 25 2>&1 | grep --extended-regex '^250.*OK' --silent  && echo "email $EMAIL_DOMAIN is reachable") || echo "email $EMAIL_DOMAIN is NOT reachable"
+}
+
+function noel-engineer-email() {
+    check-valid-email "noel.engineer"
+}
+
 # alias noel.io\?='check_noelio_domain'
 # function check_noelio_domain() {
 #     # Checks for internet connectivity.
@@ -142,7 +154,7 @@ function source_integrations() {
 
         gcloud)
             echo "Loading GCloud integration"
-            GCLOUD_SDK_PATH="/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk"
+            GCLOUD_SDK_PATH="/usr/local/var/google-cloud-sdk" # installed manually https://cloud.google.com/sdk/docs/install
 
             # The next line updates PATH for the Google Cloud SDK.
             if [ -f "$GCLOUD_SDK_PATH/path.zsh.inc" ]; then . "$GCLOUD_SDK_PATH/path.zsh.inc"; fi

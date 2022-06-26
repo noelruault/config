@@ -4318,7 +4318,6 @@ Restart Session</string>
 	<integer>0</integer>
 	<key>ToolbeltTools</key>
 	<array>
-		<string>Jobs</string>
 		<string>Notes</string>
 	</array>
 	<key>VisualIndicatorForEsc</key>

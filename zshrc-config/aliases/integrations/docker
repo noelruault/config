@@ -1,7 +1,5 @@
 #!/bin/bash
 
-export DOCKER_SCRIPTS_PATH="integrations/docker_scripts"
-
 alias dkclean="sh $ZSH_CUSTOM_CONFIG_ALIASES/$DOCKER_SCRIPTS_PATH/docker_clean_all.sh"
 alias dkpurge="sh $ZSH_CUSTOM_CONFIG_ALIASES/$DOCKER_SCRIPTS_PATH/docker_purge.sh"
 alias dklightclean="docker rmi $(docker images -f "dangling=true" -q) -f"

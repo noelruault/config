@@ -28,10 +28,27 @@ export FZF_DEFAULT_OPTS='-e'
 # References:
 # Prevent the iTerm2 hotkey window from losing focus: https://superuser.com/questions/1100918/how-can-i-prevent-the-iterm2-hotkey-window-from-losing-focus
 # Avoid duplicate entries: https://github.com/junegunn/fzf/issues/600
-
 function rm-zshdup() {
     cp ~/.zsh_history{,-old}
     tmpFile=`mktemp`
     awk -F ";" '!seen[$2]++' ~/.zsh_history > $tmpFile
     mv $tmpFile ~/.zsh_history
 }
+
+# Fix a locale setting warning from Perl
+#     perl: warning: Setting locale failed.
+#     perl: warning: Please check that your locale settings:
+#         LANGUAGE = (unset),
+#         LC_ALL = (unset),
+#         LC_CTYPE = "UTF-8",
+#         LC_TERMINAL = "iTerm2",
+#         LC_TERMINAL_VERSION = "3.4.8",
+#         LANG = "C.UTF-8"
+#         are supported and installed on your system.
+#     perl: warning: Falling back to a fallback locale ("C.UTF-8").
+# LC_ALL="en_EN.UTF-8"
+# LANGUAGE="en_EN.UTF-8"
+
+# Disabling suggestion for large buffers
+
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
