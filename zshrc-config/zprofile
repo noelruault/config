@@ -1,0 +1,6 @@
+# Setting your PATH so that '/opt/homebrew/bin' occurs before '/usr/bin'
+eval $(/opt/homebrew/bin/brew shellenv)
+
+# https://go.dev/doc/gopath_code#GOPATH
+export PATH=$PATH:$(go env GOPATH)/bin # Allows using tools after installing them via 'go install'
+# export GOPATH=$(go env GOPATH) # Useful for scripts but not necessary

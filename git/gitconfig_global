@@ -8,7 +8,7 @@
 ;    $ git config --list --show-origin
 
 [core]
-	excludesfile = ~/.config/git/gitignore_global
+ excludesfile = ~/.config/git/gitignore_global
 
 [include]
     path = ~/.config/git/private/secrets
@@ -21,17 +21,13 @@
 [pull]
 	rebase = false # defaults to merge (the default strategy)
 
-# Enforce SSH
-# [url "alias@gitlab.company.io:"]
-	# insteadOf = https://gitlab.company.io/
-
-[url "git@gitlab.com:"]
-	insteadOf = https://gitlab.com/
-
-#[url "ssh://git@github.com"]
-# 	insteadOf = https://github.com/
 
 [url "ssh://git@github.com/noelruault/"]
 	insteadOf = https://github.com/noelruault/
 [url "ssh://git@github-hideandseek/hideandseek-store/"]
 	insteadOf = https://github.com/hideandseek-store/
+
+[url "ssh://git@gitlab.com/castai"]
+  insteadOf = https://gitlab.com/castai/
+[url "ssh://git@github.com/castai/"]
+	insteadOf = https://github.com/castai/

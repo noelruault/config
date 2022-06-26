@@ -1,4 +1,5 @@
 #!/usr/bin/env zsh
+
 # TODO checklist:
 # [] Handle routing properly. I mean, variables like ZSH_CUSTOM_CONFIG_ALIASES start to be annoying.
 #    I need to do a proper routes system that eventually can be tested when the terminal starts,
@@ -56,14 +57,18 @@ ZSH_THEME="spaceship"; SPACESHIP_BATTERY_SHOW='never'
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-    # docker
-    # kubectl
     fzf                     # https://github.com/junegunn/fzf#using-homebrew-or-linuxbrew
-    git
-    golang
     zsh-autosuggestions     # https://github.com/zsh-users/zsh-autosuggestions#oh-my-zsh
     zsh-syntax-highlighting # https://github.com/zsh-users/zsh-syntax-highlighting
-    # alias-tips            # https://github.com/djui/alias-tips
+
+    git
+    git-extras
+    gnu-utils
+
+    golang
+    docker
+    docker-compose
+    kubectl
 )
 source "$ZSH/oh-my-zsh.sh" # LOAD oh-my-zsh. This will load all the plugins.
 
@@ -96,16 +101,14 @@ if [ -z "$CURRENT_OS" ]; then
     echo "\$CURRENT_OS couldn't be found"
 else
     if [ "$CURRENT_OS" = "Darwin" ]; then
-        source "$ZSH_CUSTOM_CONFIG_ALIASES/os/macos/set_path"
         source "$ZSH_CUSTOM_CONFIG_ALIASES/os/macos/aliases"
     fi
 fi
-# source "$ZSH_CUSTOM_CONFIG_ALIASES/os/linux"
 
 ## Personal aliases
 for f in "$ZSH_CUSTOM_CONFIG_ALIASES"/nruault/*; do source "$f"; done
 
-## Private aliases
+# Private aliases
 PRIVATE_FILES=($(ls "$ZSH_CUSTOM_CONFIG_ALIASES/private" | grep -v '\.')) # Trick to disregard the non-aliases files
 for file in $PRIVATE_FILES; do
     source "$ZSH_CUSTOM_CONFIG_ALIASES/private/$file"
