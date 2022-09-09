@@ -1,5 +1,7 @@
 #!/bin/bash
 
+USE_GKE_GCLOUD_AUTH_PLUGIN=True
+
 alias kdev="kubectl config use-context $KUBE_CONTEXT_DEV"
 alias kprod="kubectl config use-context $KUBE_CONTEXT_PROD"
 alias kctx="kubectl config get-contexts"

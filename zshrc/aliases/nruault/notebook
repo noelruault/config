@@ -217,6 +217,13 @@ function git_doc() {
   Remove existing $(.DS_Store) files from the repository:
   find . -name .DS_Store -print0 | xargs -0 git rm -f --ignore-unmatch
 
+
+  Squash all commits into one:
+    git checkout yourBranch
+    git reset $(git merge-base master $(git branch --show-current))
+    git add -A
+    git commit -m "one commit on yourBranch"
+
   """
 }
 

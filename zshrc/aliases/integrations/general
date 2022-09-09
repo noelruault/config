@@ -6,3 +6,4 @@ source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/docker"
 source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/kubernetes"
 
 source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/javascript"
+source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/gcloud"

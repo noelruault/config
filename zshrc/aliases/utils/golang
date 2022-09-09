@@ -53,3 +53,8 @@ function gonew() {
     go mod init github.com/noelruault/$FOLDER_NAME
     code .
 }
+
+function gomod-recursive() {
+    folders=( $(find $(pwd) -iname 'go.mod' -printf '%h\000' | sort -z -u) )
+    for d in "${folders[@]}" ; do cd "$d" && echo "Match found in $d." && go get ./... && go mod tidy || echo "ERROR in $d"; done
+}

@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>AlternateMouseScroll</key>
+	<true/>
+	<key>BracketedPasteMode</key>
+	<true/>
+	<key>ConvertDosNewlines</key>
+	<true/>
 	<key>Custom Color Presets</key>
 	<dict>
 		<key>Aquaman</key>
@@ -1777,13 +1783,13 @@
 				<key>Alpha Component</key>
 				<real>1</real>
 				<key>Blue Component</key>
-				<real>0.13645660877227783</real>
+				<real>0.52549019607843139</real>
 				<key>Color Space</key>
 				<string>sRGB</string>
 				<key>Green Component</key>
-				<real>0.6633526086807251</real>
+				<real>0.19607843137254902</real>
 				<key>Red Component</key>
-				<real>0.16034421324729919</real>
+				<real>0.47450980392156861</real>
 			</dict>
 			<key>Ansi 10 Color</key>
 			<dict>
@@ -1803,13 +1809,13 @@
 				<key>Alpha Component</key>
 				<real>1</real>
 				<key>Blue Component</key>
-				<real>0.10107920318841934</real>
+				<real>0.33227929845452309</real>
 				<key>Color Space</key>
 				<string>sRGB</string>
 				<key>Green Component</key>
-				<real>0.97455650568008423</real>
+				<real>0.704345703125</real>
 				<key>Red Component</key>
-				<real>0.23473769426345825</real>
+				<real>0.59025502825534204</real>
 			</dict>
 			<key>Ansi 12 Color</key>
 			<dict>
@@ -1881,13 +1887,13 @@
 				<key>Alpha Component</key>
 				<real>1</real>
 				<key>Blue Component</key>
-				<real>0.41386815905570984</real>
+				<real>0.41386815905570989</real>
 				<key>Color Space</key>
 				<string>sRGB</string>
 				<key>Green Component</key>
 				<real>0.89875620603561401</real>
 				<key>Red Component</key>
-				<real>0.44132727384567261</real>
+				<real>0.70714196896460635</real>
 			</dict>
 			<key>Ansi 4 Color</key>
 			<dict>
@@ -1959,13 +1965,13 @@
 				<key>Alpha Component</key>
 				<real>1</real>
 				<key>Blue Component</key>
-				<real>0.21366673707962036</real>
+				<real>0.67843137254901964</real>
 				<key>Color Space</key>
 				<string>sRGB</string>
 				<key>Green Component</key>
-				<real>0.98042243719100952</real>
+				<real>0.43137254901960786</real>
 				<key>Red Component</key>
-				<real>0.60808378458023071</real>
+				<real>0.52156862745098043</real>
 			</dict>
 			<key>BM Growl</key>
 			<true/>
@@ -3108,7 +3114,7 @@
 			<key>Unlimited Scrollback</key>
 			<false/>
 			<key>Use Bold Font</key>
-			<true/>
+			<false/>
 			<key>Use Bright Bold</key>
 			<true/>
 			<key>Use Italic Font</key>
@@ -4551,6 +4557,12 @@
 	</array>
 	<key>OpenBookmark</key>
 	<false/>
+	<key>PasteSpecialRegex</key>
+	<string></string>
+	<key>PasteSpecialSubstitution</key>
+	<string></string>
+	<key>PasteSpecialUseRegexSubstitution</key>
+	<false/>
 	<key>PointerActions</key>
 	<dict>
 		<key>Button,1,1,,</key>
@@ -4585,22 +4597,13 @@
 		</dict>
 	</dict>
 	<key>ShowFullScreenTabBar</key>
-	<false/>
+	<true/>
 	<key>SoundForEsc</key>
 	<false/>
 	<key>StatusBarPosition</key>
 	<integer>1</integer>
 	<key>TabStyleWithAutomaticOption</key>
 	<integer>5</integer>
-<<<<<<< HEAD:iTerm2/com.googlecode.iterm2.plist
-	<key>TabViewType</key>
-	<integer>0</integer>
-	<key>ToolbeltTools</key>
-	<array>
-		<string>Notes</string>
-	</array>
-=======
->>>>>>> 4f15e6ffdf92a5dc6356f0ea653f58d4796474d6:iterm2/com.googlecode.iterm2.plist
 	<key>VisualIndicatorForEsc</key>
 	<false/>
 	<key>findMode_iTerm</key>

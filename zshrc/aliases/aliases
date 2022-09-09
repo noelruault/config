@@ -1,0 +1,23 @@
+#!/bin/bash
+
+## Useful aliases
+for f in "$ZSH_CUSTOM_CONFIG_ALIASES"/utils/*; do source "$f"; done
+
+## Operating System aliases
+CURRENT_OS="$(uname -a | awk '{print $1}')"
+if [ -z "$CURRENT_OS" ]; then
+    echo "\$CURRENT_OS couldn't be found"
+else
+    if [ "$CURRENT_OS" = "Darwin" ]; then
+        source "$ZSH_CUSTOM_CONFIG_ALIASES/os/macos/aliases"
+    fi
+fi
+
+## Personal aliases
+for f in "$ZSH_CUSTOM_CONFIG_ALIASES"/nruault/*; do source "$f"; done
+
+# Private aliases
+PRIVATE_FILES=($(ls "$ZSH_CUSTOM_CONFIG_ALIASES/private" | grep -v '\.')) # Trick to disregard the non-aliases files
+for file in $PRIVATE_FILES; do
+    source "$ZSH_CUSTOM_CONFIG_ALIASES/private/$file"
+done

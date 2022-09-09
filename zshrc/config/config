@@ -1,0 +1,11 @@
+#!/bin/bash
+
+## Some aliases to fix zsh history
+test -e "$ZSH_CUSTOM_CONFIG_FILES/config/fix_zsh" &&
+    source "$ZSH_CUSTOM_CONFIG_FILES/config/fix_zsh"
+test -e "$ZSH_CUSTOM_CONFIG_FILES/config/.iterm2_shell_integration.zsh" &&
+    source "$ZSH_CUSTOM_CONFIG_FILES/config/.iterm2_shell_integration.zsh"
+test -e ~/.fzf.zsh &&
+    source ~/.fzf.zsh
+
+source "$ZSH_CUSTOM_CONFIG_FILES/config/default"
