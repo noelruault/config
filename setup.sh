@@ -1,17 +1,7 @@
 #!/bin/bash
 # Script to execute a first time set-up of zsh config files.
 
-cat setup.sh
-
-PLUGINS=~/.oh-my-zsh/custom
-if [ -d "$PLUGINS" ]
-then
-    echo "Directory '$PLUGINS' already exists." && cd "$PLUGINS";
-else
-    echo "Creating directory '$PLUGINS'" && mkdir "$PLUGINS" && cd "$_"
-fi
-
-cd && git clone https://github.com/noelruault/config.git
+cat dirname "$0"
 
 # A symbolic link, also termed a soft link, is a special kind of file
 # that points to another file, much like a shortcut in Windows or a Macintosh alias.
@@ -31,19 +21,42 @@ ln -sF $HOME/config/code-editors/vim/vimrc $HOME/.vimrc
 # Environment variables should be set in ~/.zprofile
 ln -sF $HOME/config/zshrc-config/zprofile $HOME/.zprofile
 
+if ! command -v brew &> /dev/null; then
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
 
-brew install coreutils # gdate
-brew install fzf # fzf
+brew list fzf &> /dev/null || brew install fzf
+brew list coreutils &> /dev/null || brew install coreutils
+
+if ! [ -d ~/.oh-my-zsh ]; then
+    sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+fi
+
 # Troubleshooting: https://spaceship-prompt.sh/troubleshooting/
-git clone https://github.com/spaceship-prompt/spaceship-prompt.git "$ZSH_CUSTOM/themes/spaceship-prompt" --depth=1 && ln -s "$ZSH_CUSTOM/themes/spaceship-prompt/spaceship.zsh-theme" "$ZSH_CUSTOM/themes/spaceship.zsh-theme" # zsh theme: Spaceship
-git clone https://github.com/zsh-users/zsh-syntax-highlighting ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting # zsh-syntax-highlighting
-git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions  # zsh-autosuggestionszsh-autosuggestions
 
-mkdir ~/.config/zshrc-config/aliases/private/
+# zsh-syntax-highlighting
+SYNTAX_HIGHLIGHTING=${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+if ! [ -d ${SYNTAX_HIGHLIGHTING} ]; then
+   git clone https://github.com/zsh-users/zsh-syntax-highlighting ${SYNTAX_HIGHLIGHTING}
+fi
+
+# zsh-autosuggestions
+SUGGESTIONS=${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+if ! [ -d ${SUGGESTIONS} ]; then
+    git clone https://github.com/zsh-users/zsh-autosuggestions ${SUGGESTIONS}
+fi
+
+# zsh theme: Spaceship
+SPACESHIP=${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/spaceship-prompt
+if ! [ -d ${SPACESHIP} ]; then
+    git clone https://github.com/spaceship-prompt/spaceship-prompt.git $SPACESHIP --depth=1
+    ln -s $SPACESHIP/spaceship.zsh-theme ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/spaceship.zsh-theme
+fi
+
+mkdir -p ~/.config/zshrc-config/aliases/private/
 touch ~/.config/zshrc-config/aliases/private/secrets && chmod +x ~/.config/zshrc-config/aliases/private/secrets
 
 # Clean directories
 cd && rm -rf "~/zsh-autosuggestions ~/zsh-syntax-highlighting"
 
-# TODO install brew
 # TODO install fonts
