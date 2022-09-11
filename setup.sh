@@ -1,7 +1,8 @@
 #!/bin/bash
 # Script to execute a first time set-up of zsh config files.
 
-cat dirname "$0"
+CURRENT_SCRIPT=$(dirname "$0")
+CURRENT_DIR=$(dirname $(readlink -f "${BASH_SOURCE:-$0}"))
 
 # A symbolic link, also termed a soft link, is a special kind of file
 # that points to another file, much like a shortcut in Windows or a Macintosh alias.
@@ -59,4 +60,7 @@ touch ~/.config/zshrc-config/aliases/private/secrets && chmod +x ~/.config/zshrc
 # Clean directories
 cd && rm -rf "~/zsh-autosuggestions ~/zsh-syntax-highlighting"
 
-# TODO install fonts
+# Install fonts 
+if [[ $OSTYPE == 'darwin'* ]]; then
+    cp -r $CURRENT_DIR/fonts/*/* ~/Library/Fonts
+fi
