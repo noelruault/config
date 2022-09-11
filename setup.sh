@@ -9,6 +9,12 @@
 CURRENT_SCRIPT=$(dirname "$0")
 CURRENT_DIR=$(dirname $(readlink -f "${BASH_SOURCE:-$0}"))
 
+if [ -d "$file" ] && ! [ -L "$file" ]; then
+    DEST=$HOME/.backup-config-$(echo date +'%Y%m%d')
+    mv $HOME/.config $DEST
+    echo "current configuration backed up at $DEST"
+fi
+
 rm -f $HOME/.config && ln -sF ~/config $HOME/.config
 
 ## git
@@ -75,4 +81,11 @@ esac
 
 rm -f $HOME/.zshrc && ln -sF $HOME/config/zshrc/zshrc $HOME/.zshrc
 rm -f $HOME/.zprofile && ln -sF $HOME/config/zshrc/zprofile $HOME/.zprofile
-ln -sF $HOME/config/code-editors/vim/vimrc $HOME/.vimrc
+
+if ! [ -d $HOME/config/code-editors/vim/vimrc ]; then
+    ln -sF $HOME/config/code-editors/vim/vimrc $HOME/.vimrc
+fi
+
+if ! [ -d $HOME/config/zshrc/psqlrc ]; then
+    ln -sF $HOME/config/zshrc/config/psqlrc $HOME/.psqlrc
+fi
