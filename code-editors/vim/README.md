@@ -1,4 +1,4 @@
-#
+# vim
 
 mkdir -p ~/.vim && cd $_ && git init
 
