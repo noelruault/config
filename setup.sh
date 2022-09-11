@@ -22,13 +22,29 @@ ln -sF $HOME/config/code-editors/vim/vimrc $HOME/.vimrc
 # Environment variables should be set in ~/.zprofile
 ln -sF $HOME/config/zshrc-config/zprofile $HOME/.zprofile
 
+## git
+brew list git &> /dev/null || brew install git
+
+## bash - Upgrading bash used by zsh when using 'bash' command: https://itnext.io/upgrading-bash-on-macos-7138bd1066ba
+brew list bash &> /dev/null || brew install bash
+BREW_BASH_PATH=$(which -a bash | head -n 1) # get the first line of output from "which -a bash"
+if grep -Fxq "/etc/shells" "$BREW_BASH_PATH"; then
+    echo "latest homebrew bash version already configured"
+else
+    echo "$BREW_BASH_PATH" | sudo tee -a /etc/shells;
+    sudo chsh -s "$BREW_BASH_PATH"
+fi
+
+## brew - https://brew.sh/#install
 if ! command -v brew &> /dev/null; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
-brew list fzf &> /dev/null || brew install fzf
+## fzf - https://github.com/junegunn/fzf#using-homebrew-or-linuxbrew
+brew list fzf &> /dev/null || brew install fzf && "$(brew --prefix)"/opt/fzf/install
 brew list coreutils &> /dev/null || brew install coreutils
 
+## oh-my-zsh - https://ohmyz.sh/#install
 if ! [ -d ~/.oh-my-zsh ]; then
     sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 fi
@@ -47,7 +63,7 @@ if ! [ -d ${SUGGESTIONS} ]; then
     git clone https://github.com/zsh-users/zsh-autosuggestions ${SUGGESTIONS}
 fi
 
-# zsh theme: Spaceship
+# https://spaceship-prompt.sh/getting-started/#installing
 SPACESHIP=${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/spaceship-prompt
 if ! [ -d ${SPACESHIP} ]; then
     git clone https://github.com/spaceship-prompt/spaceship-prompt.git $SPACESHIP --depth=1
