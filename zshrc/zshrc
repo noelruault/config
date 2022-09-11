@@ -14,7 +14,6 @@ declare -A logs=() # -A: Associative (array)
 # #   timelogger heavyprocess start
 # #   timelogger heavyprocess end
 
-alias gdate=$HOMEBREW_PREFIX/bin/gdate
 timelogger() {
   local name=$1
   local action=$2
