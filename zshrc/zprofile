@@ -3,8 +3,6 @@
 
 # Setting your PATH so that homebrew's bin occurs before '/usr/bin'
 if command -v brew &> /dev/null; then
-    alias gdate=$HOMEBREW_PREFIX/bin/gdate
-
     if [[ "$(uname -m)" == "arm64" ]]; then
         eval $(/opt/homebrew/bin/brew shellenv)
     fi
