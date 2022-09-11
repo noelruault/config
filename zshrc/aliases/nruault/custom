@@ -210,7 +210,7 @@ function source_integrations() {
 
 function setvscode() {
     mkdir -p .vscode/
-    ln -s ~/.config/vscode/private/* ./.vscode/
+    ln -s ~/.config/vscode/secrets/* ./.vscode/
 
     if ! grep -qxF 'vscode/*' .gitignore; then
         echo "vscode folder is not git-ignored."

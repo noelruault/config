@@ -40,5 +40,5 @@ launch.json
 .idea
 
 # Private and secret files and folders
-*private*
 *secret*
+

@@ -11,7 +11,7 @@
  excludesfile = ~/.config/git/gitignore_global
 
 [include]
-    path = ~/.config/git/private/secrets
+    path = ~/.config/git/secrets/config
 
 [alias]
     aliases = !git config -l | grep alias | cut -c 7-

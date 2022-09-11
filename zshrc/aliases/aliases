@@ -16,8 +16,14 @@ fi
 ## Personal aliases
 for f in "$ZSH_CUSTOM_CONFIG_ALIASES"/nruault/*; do source "$f"; done
 
-# Private aliases
-PRIVATE_FILES=($(ls "$ZSH_CUSTOM_CONFIG_ALIASES/private" | grep -v '\.')) # Trick to disregard the non-aliases files
-for file in $PRIVATE_FILES; do
-    source "$ZSH_CUSTOM_CONFIG_ALIASES/private/$file"
+# If secrets aliases don't exist, create an empty file
+if ! [ -d $ZSH_CUSTOM_CONFIG_ALIASES/secrets ]; then
+    mkdir -p $ZSH_CUSTOM_CONFIG_ALIASES/secrets
+    touch $ZSH_CUSTOM_CONFIG_ALIASES/secrets/secrets
+fi
+
+# Load secrets aliases
+SECRETS_FILES=($(ls "$ZSH_CUSTOM_CONFIG_ALIASES/secrets" | grep -v '\.')) # Trick to disregard the non-aliases files
+for file in $SECRETS_FILES; do
+    source "$ZSH_CUSTOM_CONFIG_ALIASES/secrets/$file"
 done

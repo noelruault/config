@@ -1,1 +1,12 @@
+# General
 .DS_Store
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.Spotlight-V100
+.Trashes
+
+# Secret files
+*secret*

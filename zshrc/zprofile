@@ -1,9 +1,20 @@
-# Setting your PATH so that '/opt/homebrew/bin' occurs before '/usr/bin'
 # Environment variables should be set in ~/.zprofile
+# Reload? -> `source ~/.zprofile`
 
-eval $(/opt/homebrew/bin/brew shellenv)
-export PATH=$PATH:"$HOMEBREW_PREFIX/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/bin"
+# Setting your PATH so that homebrew's bin occurs before '/usr/bin'
+if [[ "$(uname -m)" == "arm64" ]]; then
+    eval $(/opt/homebrew/bin/brew shellenv)
+fi
+if [[ "$(uname -m)" == "x86_64" ]]; then
+    eval $(/usr/local/bin/brew shellenv)
+fi
+
+if command -v gcloud &> /dev/null; then
+    export PATH=$PATH:"$HOMEBREW_PREFIX/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/bin"
+fi
 
 # https://go.dev/doc/gopath_code#GOPATH
-export PATH=$PATH:$(go env GOPATH)/bin # Allows using tools after installing them via 'go install'
+if command -v go &> /dev/null; then
+    export PATH=$PATH:$(go env GOPATH)/bin # Allows using tools after installing them via 'go install'
+fi
 # export GOPATH=$(go env GOPATH) # Useful for scripts but not necessary
