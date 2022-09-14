@@ -1,6 +1,6 @@
-##############
-# CONFIGURATION: git config --global core.excludesfile ~/.config/git/gitconfig
-##############
+; ##############
+; CONFIGURATION: git config --global core.excludesfile ~/.config/git/gitignore_global
+; ##############
 
 # General
 .DS_Store
@@ -41,4 +41,3 @@ launch.json
 
 # Private and secret files and folders
 *secret*
-

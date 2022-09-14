@@ -1,7 +1,5 @@
 ; ##############
-; CONFIGURATION: Include next lines on ~/.gitconfig
-;   [include]
-;      path = ~/.config/git/gitconfig_global
+; CONFIGURATION: git config --global include.path ~/.config/git/gitconfig_global
 ; ##############
 
 ; To track what is being load on the global Git settings type:
@@ -21,13 +19,12 @@
 [pull]
 	rebase = false # defaults to merge (the default strategy)
 
-
 [url "ssh://git@github.com/noelruault/"]
 	insteadOf = https://github.com/noelruault/
 [url "ssh://git@github-hideandseek/hideandseek-store/"]
 	insteadOf = https://github.com/hideandseek-store/
 
-[url "ssh://git@gitlab.com/castai"]
-  insteadOf = https://gitlab.com/castai/
-[url "ssh://git@github.com/castai/"]
-	insteadOf = https://github.com/castai/
+;[url "ssh://git@gitlab.com/company"]
+;  insteadOf = https://gitlab.com/company/
+;[url "ssh://git@github.com/company/"]
+;	insteadOf = https://github.com/company/

@@ -17,8 +17,10 @@ fi
 
 rm -f $HOME/.config && ln -sF ~/config $HOME/.config
 
-## git
-brew list git &> /dev/null || brew install git
+## brew - https://brew.sh/#install
+if ! command -v brew &> /dev/null; then
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
 
 ## bash - Upgrading bash used by zsh when using 'bash' command: https://itnext.io/upgrading-bash-on-macos-7138bd1066ba
 brew list bash &> /dev/null || brew install bash
@@ -30,10 +32,8 @@ else
     sudo chsh -s "$BREW_BASH_PATH"
 fi
 
-## brew - https://brew.sh/#install
-if ! command -v brew &> /dev/null; then
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-fi
+## git
+brew list git &> /dev/null || brew install git
 
 ## fzf - https://github.com/junegunn/fzf#using-homebrew-or-linuxbrew
 brew list fzf &> /dev/null || brew install fzf && "$(brew --prefix)"/opt/fzf/install
@@ -89,3 +89,17 @@ fi
 if ! [ -d $HOME/config/zshrc/psqlrc ]; then
     ln -sF $HOME/config/zshrc/config/psqlrc $HOME/.psqlrc
 fi
+
+read -p "Do you want to overwrite current git configuration? ([y]/n) " answer </dev/tty
+case $answer in
+    [Yy]* ) source git/git-config.sh ;;
+    [Nn]* ) break ;;
+    * ) echo "Please answer yes or no."; exit 1 ;;
+esac
+
+read -p "Do you want to generate ssh keys? ([y]/n) " answer </dev/tty
+case $answer in
+    [Yy]* ) source git/ssh-gen.sh ;;
+    [Nn]* ) break ;;
+    * ) echo "Please answer yes or no."; exit 1 ;;
+esac
