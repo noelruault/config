@@ -8,7 +8,11 @@ echo "🌅 The ssh key has been generated."
 
 eval "$(ssh-agent -s)"
 ssh-add --apple-use-keychain ~/.ssh/$SSH_FILENAME
-echo "🔐 The ssh key has been added to the apple keychain."
+echo -e """
+Host *
+    PreferredAuthentications publickey
+    IdentityFile ~/.ssh/$SSH_FILENAME.pub""" >> ~/.ssh/config
+echo "🔐 The ssh key has been added to the apple keychain and ssh/config."
 
 pbcopy < ~/.ssh/$SSH_FILENAME.pub
 echo "📃 The ssh key has been copied to clipboard."
