@@ -10,3 +10,6 @@
 
 # Secret files
 *secret*
+
+# Othe auto-generated config folders
+gh/*
