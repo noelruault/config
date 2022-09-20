@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_DIR=$(dirname $0)
-ASSETS_DIR=$SCRIPT_DIR/assets
+ASSETS_DIR=$SCRIPT_DIR/helpers
 
 ## Some aliases to fix zsh history
 source_or_error "$ASSETS_DIR/fix_zsh"
