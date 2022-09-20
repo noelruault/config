@@ -1,0 +1,30 @@
+#!/bin/bash
+
+SCRIPT_DIR=$(dirname $0)
+
+## Useful aliases
+for f in $(lsnoext "$SCRIPT_DIR/utils"); do source_or_error "$f"; done
+
+## Operating System aliases
+CURRENT_OS="$(uname -a | awk '{print $1}')"
+if [ -z "$CURRENT_OS" ]; then
+    echo "\$CURRENT_OS couldn't be found"
+else
+    if [ "$CURRENT_OS" = "Darwin" ]; then
+        source_or_error "$SCRIPT_DIR/os/macos/aliases"
+    fi
+fi
+
+## Personal aliases
+for f in $(lsnoext "$SCRIPT_DIR/nruault"); do source_or_error "$f"; done
+
+# If secrets aliases don't exist, create an empty file
+if ! [ -d $SCRIPT_DIR/secrets ]; then
+    mkdir -p $SCRIPT_DIR/secrets
+    touch $SCRIPT_DIR/secrets/secrets
+fi
+
+# Load secrets aliases
+for f in $(lsnoext "$SCRIPT_DIR/secrets"); do
+    source_or_error $f
+done

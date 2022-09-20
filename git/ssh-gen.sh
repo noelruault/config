@@ -11,7 +11,7 @@ ssh-add --apple-use-keychain ~/.ssh/$SSH_FILENAME
 echo -e """
 Host *
     PreferredAuthentications publickey
-    IdentityFile ~/.ssh/$SSH_FILENAME.pub""" >> ~/.ssh/config
+    IdentityFile ~/.ssh/$SSH_FILENAME""" >> ~/.ssh/config
 echo "🔐 The ssh key has been added to the apple keychain and ssh/config."
 
 pbcopy < ~/.ssh/$SSH_FILENAME.pub

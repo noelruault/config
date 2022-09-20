@@ -36,21 +36,25 @@ function gocover() {
 # go clean -testcache # https://golang.org/pkg/cmd/go/internal/clean/
 
 function gonew() {
+    GITDIR="github.com/$(whoami)"
+    echo "gonew: the git directory has been set to $GITDIR"
+
     FOLDER_NAME=$1
     if [[ $# -eq 0 ]]; then
         # generates random name if not provided
         FOLDER_NAME=$(openssl rand -hex 4)
     fi
 
-    mkdir -p $(go env GOPATH)/src/github.com/noelruault/$FOLDER_NAME && cd $_
+    DSTPATH=$(go env GOPATH)/src/$GITDIR/$FOLDER_NAME
+    mkdir -p  $DSTPATH && cd $_
     {
         echo 'package main'
         echo 'import "fmt"'
         echo 'func main() { fmt.Println("hello") }'
     } >main.go
 
-    echo "Starting golang project generated at: $(go env GOPATH)/src/github.com/noelruault/$FOLDER_NAME"
-    go mod init github.com/noelruault/$FOLDER_NAME
+    echo "gonew: starting golang project generated at: $DSTPATH"
+    go mod init $GITDIR/$FOLDER_NAME
     code .
 }
 

@@ -1,0 +1,45 @@
+#!/usr/bin/env zsh
+
+# lsnoext lists files without any extension
+function lsnoext(){
+    find . -type f ! -name "*.*"
+}
+
+# source_or_error sources the file in $1 or outputs an error
+function source_or_error(){
+    if ! [ -f "$1" ]; then
+        echo "source_or_error: $1 file doesn't exist"
+        return
+    fi
+
+    source $1
+}
+
+declare -A PATHS=()
+PATHS+=(
+    ["ZSH"]="$HOME/.oh-my-zsh"
+    ["ZSH_CUSTOM"]="$HOME/.oh-my-zsh/custom"
+    ["ZSH_CUSTOM_CONFIG_FILES"]="$HOME/.config/zshrc/config"
+    ["ZSH_CUSTOM_CONFIG_ALIASES"]="$HOME/.config/zshrc/aliases"
+)
+
+for key in ${(k)PATHS}; do
+    DIR=${PATHS[${key}]}
+
+    if ! [ -d "$DIR" ]; then
+        echo "routes: $DIR folder doesn't exist"
+        continue
+    fi
+
+    export ${key}=$DIR
+    if [ -f "$DIR/init" ]; then source_or_error $DIR/init ; fi
+    # echo "${key}=${PATHS[${key}]}" # DEBUG
+done
+
+## Docker & k8s integrations are activated by default
+# export DOCKER_SCRIPTS_PATH="integrations/docker_scripts"
+# source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/docker"
+# source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/kubernetes"
+
+# source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/javascript"
+# source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/gcloud"

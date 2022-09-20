@@ -1,9 +1,9 @@
 #!/bin/bash
 
-alias code='/usr/local/bin/code' # Can be configured by using the vscode palette "Shell command: install 'code'..."
-alias goland='/usr/local/bin/goland'
+# alias code='/usr/local/bin/code' # Can be configured by using the vscode palette "Shell command: install 'code'..."
+# alias goland='/usr/local/bin/goland'
 
-alias vscode-settings="$HOME/Library/Application\ Support/Code/User/settings.json"
+# alias vscode-settings="$HOME/Library/Application\ Support/Code/User/settings.json"
 
 ### Vagrant
 alias vagrantclean="vagrant box list | cut -f 1 -d ' ' | xargs -L 1 vagrant box remove -f"

@@ -20,3 +20,9 @@ if command -v go &> /dev/null; then
     export PATH=$PATH:$(go env GOPATH)/bin # Allows using tools after installing them via 'go install'
 fi
 # export GOPATH=$(go env GOPATH) # Useful for scripts but not necessary
+
+# How to bulk set paths in zprofile:
+# path=(
+#   /usr/local/{bin,sbin}
+#   $path[@]
+# )

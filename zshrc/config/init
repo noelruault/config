@@ -1,0 +1,10 @@
+#!/bin/bash
+
+SCRIPT_DIR=$(dirname $0)
+ASSETS_DIR=$SCRIPT_DIR/assets
+
+## Some aliases to fix zsh history
+source_or_error "$ASSETS_DIR/fix_zsh"
+source_or_error "$ASSETS_DIR/.iterm2_shell_integration.zsh"
+source_or_error ~/.fzf.zsh
+source_or_error "$ASSETS_DIR/default"

@@ -1,9 +1,1 @@
 #!/bin/bash
-
-## Docker & k8s integrations are activated by default
-export DOCKER_SCRIPTS_PATH="integrations/docker_scripts"
-source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/docker"
-source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/kubernetes"
-
-source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/javascript"
-source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/gcloud"

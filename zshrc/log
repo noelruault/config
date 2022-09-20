@@ -1,0 +1,31 @@
+#!/usr/bin/env zsh
+
+gdate=$HOMEBREW_PREFIX/bin/gdate
+declare -A logs=() # -A: Associative (array)
+
+# # timelogger can be used to start/end time logs. mainly used to display time intervals when running heavy processes.
+# #
+# # eg:
+# #   timelogger heavyprocess start
+# #   timelogger heavyprocess end
+function timelogger() {
+  local name=$1
+  local action=$2
+  if [ "$action" = "start" ]; then
+    log_start=$(($(gdate +%s%N)/1000000))
+    logs+=( [$name]=$log_start )
+  fi
+  if [ "$action" = "end" ]; then
+    log_end=$(($(gdate +%s%N)/1000000))
+    log_start=$logs[$name]
+    log_runtime=$((log_end - log_start)); echo "Runtime of $name was $log_runtime ms."
+    unset "logs[${(b)name}]"
+  fi
+}
+
+# alert_unused_logs alerts if any log remains unused.
+function alert_unused_logs(){
+    for log value in ${(kv)logs}; do
+      if [[ -n $logs[$value] ]]; then echo unused $key log value; fi
+    done
+}
