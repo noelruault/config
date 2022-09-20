@@ -11,8 +11,11 @@ if [ -z "$CURRENT_OS" ]; then
     echo "\$CURRENT_OS couldn't be found"
 else
     if [ "$CURRENT_OS" = "Darwin" ]; then
-        source_or_error "$SCRIPT_DIR/os/macos/aliases"
+        source_or_error "$SCRIPT_DIR/os/macos"
+    else
+        "There is no specific configuration for the current OS: $CURREN_OS"
     fi
+
 fi
 
 ## Personal aliases

@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	spendTotal    = 975 // approximate expenses on cryptos so far
+	spendTotal    = 000 // approximate expenses on cryptos so far
 	spendCurrency = "EUR"
 )
 

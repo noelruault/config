@@ -47,6 +47,3 @@ if [[ -n $SSH_CONNECTION ]]; then
 else
   export EDITOR='vi'
 fi
-
-# ssh
-# export SSH_KEY_PATH="~/.ssh/rsa_id"

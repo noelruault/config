@@ -5,8 +5,6 @@ SCRIPT_DIR=$(dirname $0)
 source "$HOME/config/zshrc/log"
 timelogger zsh start
 
-# BUGFIX: Provisional fix for zsh errors
-ZSH_DISABLE_COMPFIX="true" # fixes error prompting "Insecure completion-dependent directories..."
 ZSH_THEME="spaceship"; SPACESHIP_BATTERY_SHOW='never'
 # https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 # https://github.com/denysdovhan/spaceship-zsh-theme

@@ -1,6 +1,0 @@
-#!/bin/bash
-
-# Script to block the screen.
-# Potentially used when binding a key.
-#
-osascript -e 'tell application "System Events" to keystroke "q" using {control down, command down}'

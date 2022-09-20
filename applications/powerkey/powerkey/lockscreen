@@ -1,8 +1,0 @@
-#!/bin/bash
-
-# Locking the screen
-osascript -e 'tell application "System Events" to keystroke "q" using {control down, command down}'
-
-## Alternatives without loocking the screen
-# pmset displaysleepnow
-# osascript -e 'tell application "System Events" to sleep'
