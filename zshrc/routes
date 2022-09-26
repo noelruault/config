@@ -2,7 +2,7 @@
 
 # lsnoext lists files without any extension
 function lsnoext(){
-    find . -type f ! -name "*.*"
+    find $1 -type f ! -name "*.*"
 }
 
 # source_or_error sources the file in $1 or outputs an error
