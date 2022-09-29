@@ -7,7 +7,7 @@
 
 [user]
 name = Noël Ruault
-email = noel.ruault@gain.pro
+email = person@company.xyz
 
 [core]
 excludesfile = ~/.config/git/gitignore_global
@@ -21,7 +21,7 @@ path = ~/.config/git/gitconfig_global
 ```
 Host github.com
     HostName github.com
-    User noelruault.engineer@gmail.com
+    User personal-email@gmail.com
     IdentityFile ~/.ssh/id_ed25519.pub
     PreferredAuthentications publickey
     IdentitiesOnly yes

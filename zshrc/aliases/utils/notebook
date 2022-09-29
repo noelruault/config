@@ -633,7 +633,7 @@ function postgres_doc() {
 
   [SETUP & DEAMONS info]
   *** SETUP
-  psql: error: FATAL:  database \"noelruault\" does not exist
+  psql: error: FATAL:  database \"xyz\" does not exist
       /usr/local/opt/postgres/bin/createuser -s postgres
 
   PGUSER=postgres psql
