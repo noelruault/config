@@ -33,7 +33,7 @@ plugins=(
     kubectl
 )
 
-[[ -z "${ZSH}" ]] && echo "ZSH is unset" && exit 1 || source "$ZSH/oh-my-zsh.sh"
+[ ! -d $HOME/.oh-my-zsh ] && echo "oh-my-zsh is not installed" || source "$HOME/.oh-my-zsh/oh-my-zsh.sh"
 
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh

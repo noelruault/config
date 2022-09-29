@@ -13,6 +13,8 @@ fi
 
 if command -v gcloud &> /dev/null; then
     export PATH=$PATH:"$HOMEBREW_PREFIX/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/bin"
+    export GCLOUD_SDK_PATH="$HOMEBREW_PREFIX/Caskroom/google-cloud-sdk"
+    export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 fi
 
 # https://go.dev/doc/gopath_code#GOPATH

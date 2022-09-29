@@ -18,9 +18,6 @@ else
 
 fi
 
-## Personal aliases
-for f in $(lsnoext "$SCRIPT_DIR/nruault"); do source_or_error "$f"; done
-
 # If secrets aliases don't exist, create an empty file
 if ! [ -d $SCRIPT_DIR/secrets ]; then
     mkdir -p $SCRIPT_DIR/secrets

@@ -1,16 +1,24 @@
-# General
+## General
 .DS_Store
 
-# Thumbnails
+## Thumbnails
 ._*
 
-# Files that might appear in the root of a volume
+## Files that might appear in the root of a volume
 .Spotlight-V100
 .Trashes
 
-# Secret files
+## Secret files
 *secret*
 
-# Othe auto-generated config folders
-gh/*
+# Ignores root directories
+/*/
+
+# Ignores iterm2/AppSupport
 iterm2/AppSupport
+
+# Un-ignores some folders
+!code-editors
+!git
+!iterm2
+!zshrc

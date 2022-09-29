@@ -1,0 +1,25 @@
+
+filetype off
+filetype plugin indent off
+set runtimepath+=$GOROOT/misc/vim
+filetype plugin indent on
+syntax on
+
+set termguicolors
+set ignorecase
+set smartcase
+set colorcolumn=100
+set cursorline
+
+" https://www.sobyte.net/post/2022-01/go-vim/
+
+let g:NERDTreeMinimalUI = 1
+let g:NERDTreeChDirMode = 2
+let g:NERDTreeWinSize = 24
+
+nnoremap <c-p> :call fzf#Open()<cr>
+let g:ag_cli = 'rg'
+nnoremap <c-u> :Mru<cr>
+
+runtime vim.lua
+" require'gitsigns'.setup()

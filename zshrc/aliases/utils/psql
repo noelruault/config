@@ -1,8 +1,0 @@
-#!/bin/bash
-
-# psql() {
-#     echo "User not specified, defaulting to user 'postgres'"
-#     PGUSER=postgres command psql "$@" \
-#     ; echo "A history file of the commands use in this session can be found at ~/.psql/_history-<db_name>"
-#     # TODO: check if line exist in psqlrc file before displaying the previous text
-# }

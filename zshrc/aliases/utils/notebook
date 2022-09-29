@@ -5,13 +5,13 @@
 alias notebook\?='howto_possibilities'
 alias howto\?='howto_possibilities'
 function howto_possibilities() {
-  grep -E '^alias.*\?' $ZSH_CUSTOM_CONFIG_FILES/aliases/nruault/notebook | awk '{print $2}' | awk -F '\' '{print $1}'
+  grep -E '^alias.*\?' $ZSH_CUSTOM_CONFIG_ALIASES/utils/notebook | awk '{print $2}' | awk -F '\' '{print $1}'
 }
 
 # ========================
 # Formatting helpers
 spacer3='\t\t\t'
-spacer2='\t\t]'
+spacer2='\t\t'
 spacer1='\t'
 
 # ====HOW-TO Commands=====
@@ -880,7 +880,7 @@ function virtualenv_doc() {
 alias vscode\?='vscode_doc'
 function vscode_doc() {
   echo """
-  ⌘ ⇧ \\ ${spacer3}| Beginning / End of containing function
+  ⌘ ⇧ \\ ${spacer2}| Beginning / End of containing function
   ⌃ Tab / ⌃ ⇧ Tab ${spacer1}| Open previous / next file
   ⌃ \` ${spacer3}| Show integrated terminal
 

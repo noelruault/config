@@ -98,7 +98,7 @@ function memusg() {
         echo "\n Maximum resident set size reports the peak RAM usage."
         ;;
     script)
-        sh $ZSH_CUSTOM_CONFIG_ALIASES/nruault/assets/memusg.sh $@
+        sh $ZSH_CUSTOM_CONFIG_ALIASES/utils/memusg.sh $@
         ;;
     esac
 }

@@ -1,23 +1,383 @@
 #!/bin/bash
 
-# alias code='/usr/local/bin/code' # Can be configured by using the vscode palette "Shell command: install 'code'..."
-# alias goland='/usr/local/bin/goland'
-
-# alias vscode-settings="$HOME/Library/Application\ Support/Code/User/settings.json"
-
 ### Vagrant
 alias vagrantclean="vagrant box list | cut -f 1 -d ' ' | xargs -L 1 vagrant box remove -f"
 
-# alias python='python3'
-# alias ipython='python -m IPython'
-## fix pip
-# alias pip="python -m pip"
-# alias pip3="python3 -m pip"
+### GIT
+# https://github.com/ohmyzsh/ohmyzsh/wiki/Cheatsheet#git
+alias gamod="git ls-files --modified | xargs git add"
 
-# Export pipenv, virtualenv....
-# export PATH=$PATH:$HOME/Library/Python/3.7/bin
+alias gbreset='git branch --merged | grep -v \* | xargs git branch -D '
+# Remove all your LOCAL git branches but keep master and the current branch:
+# - git branch | egrep -v "(master|dev|\*)" | xargs git branch -D
+# - git branch | grep -v "master\|dev" | xargs git branch -D
 
+alias githooksconfig='git config --global core.hooksPath ~/.config/git/hooks/'
+# USEFUL COMMANDS:
+#   - git diff origin/master --name-only -- '*.go' ':(exclude)vendor/*'
+#   - git config --global alias.dirdiff 'diff -p --stat -w --no-index'
+alias gl='git log --graph --decorate --pretty=oneline --abbrev-commit'
+
+grbs_usage="pro_rebase [<number] -- Sources any integration given a list
+
+How grbs works:
+  Put as first param the number of commits you want to cover (1-N).
+  e.g: 'pro_rebase 3' == (git rebase -i HEAD~3)
+  Squash commits or whatever and then push your chages with --force
+"
+function grbs() {
+    # https://stackoverflow.com/a/927386
+    regex='^[0-9]+$'
+    if [[ $@ =~ $regex ]]; then
+        git rebase -i HEAD~"$@"
+        echo "Remember to push with --force flag."
+    else
+        pro_rebase_usage
+    fi
+}
+
+gpo() { git push origin $(git branch --show-current) }
+# gposkipci() { git push origin $(git branch --show-current) -o ci.skip } # Gitlab
+
+### Golang
+
+alias vimgo='vim -u ~/.vimrc.go'
+
+# TODO:
+# https://stackoverflow.com/a/30033822/4349318
+alias gopath='cd $(go env GOPATH)'
+alias gosrc='cd $(go env GOPATH)/src/'
+
+### GOLANG
+function gotest() {
+    # if [[ "$1" == "color" ]]; then
+    go test ./... -p 1 -count 1 -v |
+        sed ''/PASS/s//$(printf "\033[32mPASS\033[0m")/'' |
+        sed ''/FAIL/s//$(printf "\033[31mFAIL\033[0m")/'' # \
+    ## | GREP_COLOR="01;33" egrep --color=always '\s*[a-zA-Z0-9\-_.]+[:][0-9]+[:]|^'
+    # return
+
+    if [[ "$1" == "e2e" ]]; then
+        go test ./test/endtoend -tags=endtoend -count=1 -timeout 120s |
+            sed ''/PASS/s//$(printf "\033[32mPASS\033[0m")/'' |
+            sed ''/FAIL/s//$(printf "\033[31mFAIL\033[0m")/''
+    fi
+}
+
+####
+# USE: gocover -run TestUpdateSomethingExample -count=1
+#
+function gocover() {
+    # go test route/to/test -run TestUpdateSomethingExample -count=1 -coverprofile cover.out; go tool cover -html=cover.out
+    local t=$(mktemp -t cover)
+    go test $COVERFLAGS -coverprofile=$t $@ && go tool cover -func=$t && unlink $t
+}
+
+# for pkg in *; do go test "./$pkg"; done
+# go clean -testcache # https://golang.org/pkg/cmd/go/internal/clean/
+
+function gonew() {
+    GITDIR="github.com/$(whoami)"
+    echo "gonew: the git directory has been set to $GITDIR"
+
+    FOLDER_NAME=$1
+    if [[ $# -eq 0 ]]; then
+        # generates random name if not provided
+        FOLDER_NAME=$(openssl rand -hex 4)
+    fi
+
+    DSTPATH=$(go env GOPATH)/src/$GITDIR/$FOLDER_NAME
+    mkdir -p  $DSTPATH && cd $_
+    {
+        echo 'package main'
+        echo 'import "fmt"'
+        echo 'func main() { fmt.Println("hello") }'
+    } >main.go
+
+    echo "gonew: starting golang project generated at: $DSTPATH"
+    go mod init $GITDIR/$FOLDER_NAME
+    code .
+}
+
+function gomod-recursive() {
+    folders=( $(find $(pwd) -iname 'go.mod' -printf '%h\000' | sort -z -u) )
+    for d in "${folders[@]}" ; do cd "$d" && echo "Match found in $d." && go get ./... && go mod tidy || echo "ERROR in $d"; done
+}
+
+### PostgreSQL
+
+alias pgstart='pg_ctl -D /usr/local/var/postgres start' # brew services restart postgresql
+alias pgstop='pg_ctl -D /usr/local/var/postgres stop'
+
+# psql() {
+#     echo "User not specified, defaulting to user 'postgres'"
+#     PGUSER=postgres command psql "$@" \
+#     ; echo "A history file of the commands use in this session can be found at ~/.psql/_history-<db_name>"
+#     # TODO: check if line exist in psqlrc file before displaying the previous text
+# }
+
+### Others
 function compresspdf() {
     echo 'Usage: compresspdf [input file] [output file] [screen|ebook|printer|prepress]'
     gs -sDEVICE=pdfwrite -dNOPAUSE -dQUIET -dBATCH -dPDFSETTINGS=/${3:-"screen"} -dCompatibilityLevel=1.4 -sOutputFile="$2" "$1"
+}
+
+alias hs='history | grep' # commands history for non-interactive terminals or terminals without fzf
+alias hibernate="sudo systemctl hibernate"
+alias \?='type -a $*'
+
+# Networks
+alias wanip='dig +short myip.opendns.com @resolver1.opendns.com'
+alias localhosts='ifconfig | grep "inet " | grep -v 127.0.0.1' # https://stackoverflow.com/a/4779992
+
+# CP command, do rsync if file is a folder or higher than 50MB  // rsync -ah --progress
+alias cp='rsync -ah --progress'
+alias rm="rm -i"
+
+function search() { find / -name "$@" | echo; }
+
+function pwgen() {
+    specialChars=('!' '"' '#' '$' '%' '&' '(' ')' '*' '+' ',' '-' '.' '/' ':' ';' '<' '=' '>' '?' '@' '[' '\' ']' '^' '_' '{' '|' '}' '~' \' \")
+
+    echo $(
+        echo $specialChars |
+            tr " " "\n"    |
+            shuf           |
+            tr -d "\n"     |
+            head -c 4
+            ; echo
+    )$(
+        date +%s      |
+            sha256sum |
+            base64    |
+            head -c 8
+            ; echo
+    ) | fold -w1 | shuf | tr -d "\n" ; echo
+}
+
+# if [[ $(bash --version | grep "GNU bash") =~ '[1-3].[0-9]+.[0-9]+' ]]; then
+#     echo "zshrc: the minimum version of bash required to export the config routes is 4. Run the setup script to install it."
+#     exit 1
+# fi
+
+##### FIXES
+# Fix slowness of pastes with zsh-syntax-highlighting.zsh
+# https://github.com/vercel/hyper/issues/1276
+# https://github.com/zsh-users/zsh-syntax-highlighting/issues/295
+# https://github.com/magicdude4eva/iterm-oh-my-zsh-powerlevel10k
+
+#     zstyle ':bracketed-paste-magic' active-widgets '.self-*'
+
+# BUGFIX: Provisional fix for zsh errors
+
+#     ZSH_DISABLE_COMPFIX="true" # fixes error prompting "Insecure completion-dependent directories..."
+
+function check-valid-email() {
+    EMAIL_DOMAIN="$1"
+    EMAIL_SERVER=$(nslookup -q=mx $EMAIL_DOMAIN | grep "mail exchanger" | awk 'NR==1{print substr($6, 1, length($6)-1)}')
+    IS_EMAIL_SERVER_REACHABLE="{ echo 'MAIL FROM any@email.com'; sleep 1} | nc $EMAIL_SERVER 25 2>&1 | grep --extended-regex '^250.*OK' --silent"
+
+    ({ echo 'MAIL FROM any@email.com'; sleep 1} | nc $EMAIL_SERVER 25 2>&1 | grep --extended-regex '^250.*OK' --silent  && echo "email $EMAIL_DOMAIN is reachable") || echo "email $EMAIL_DOMAIN is NOT reachable"
+}
+
+# go_to_dir_on_specific_folder will try to find a directory that matches
+# with the given parameters inside of an specific folder.
+#
+# NOTE: WORK_FOLDER variable could be changed to something else, more specific
+# and without evaluations or commands.
+#
+# Used uncommon commands :
+# - https://ss64.com/bash/wc.html
+# - https://ss64.com/bash/awk.html
+# - Colors: https://www.tldp.org/HOWTO/Bash-Prompt-HOWTO/x329.html https://www.shellhacks.com/bash-colors/
+alias goto=go_to_dir_on_specific_folder
+function go_to_dir_on_specific_folder() {
+    if [ -z "$COMPANY_DIRECTORY" ]; then
+        echo "Environment variable COMPANY_DIRECTORY is not defined"
+        return
+    fi
+
+    echo $pwd                                                        # TODO(nruault): Remove-me
+    WORK_FOLDER=$(eval echo $(go env GOPATH)/src/$COMPANY_DIRECTORY) # eval will store the desired payments path.
+
+    # If there is no arguments, just go to $COMPANY_DIRECTORY
+    if [[ $# -eq 0 ]]; then
+        cd $WORK_FOLDER
+        return
+    fi
+
+    counter=$(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | wc -l) # wc is used for counting the lines
+    if (($counter == 0)); then
+        # An inverted counter will try to find matches inverting the order of the params.
+        inverted_counter=$(find $WORK_FOLDER -type d -name "*$2*$1*" -print -maxdepth 1 | wc -l)
+        if (($inverted_counter > 0)); then
+            # If something matches, will display the results in addition to a tip.
+            echo "Better try \e[0;33m$2 $1\e[0m"
+            echo "Found:\n\e[0;34m$(find $WORK_FOLDER -type d -name "*$2*$1*" -print -maxdepth 1 | awk -F/ '{print $NF}')\e[0m"
+            return
+        fi
+
+        echo "No matches."
+        return
+
+    elif (($counter > 1)); then
+        # AWK is used in the next command to get the name of the folder without the path
+        # The parenthesis at the begining will make this an array.
+        search=($(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}'))
+
+        # This loop will check if the input matches exactly with the name of the folder,
+        # if there is an exact match, will cd and end the function.
+        for i in "${search[@]}"; do
+            if [ $i = $1 ]; then
+                cd $WORK_FOLDER$1
+                return
+            fi
+        done
+
+        # If more than one folder were found and there is not a clear candidate, print the results.
+        # The loop is used to print them in different lines.
+        for i in "${search[@]}"; do echo $i; done
+        return
+    else
+        # If only one folder was found, change to the found directory
+        # cd $WORK_FOLDER$(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}')
+
+        ## TODO(nruault): REMOVE ME -----------------------
+        FOLDER=$(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}')
+        WORK_FOLDER=$(eval echo $(go env GOPATH)/src/$COMPANY_DIRECTORY)
+        COM=$(find $WORK_FOLDER -type d -name "$FOLDER" -print -maxdepth 1 | awk -F/ '{print $NF}')
+        if [ -z "$COM" ]; then
+            cd $WORK_FOLDER$FOLDER
+        fi
+        cd $WORK_FOLDER$(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}')
+        ## REMOVE ME -----------------------
+    fi
+}
+
+source_integrations_usage="source_integrations [integrations...] -- Sources any integration given a list
+
+3rd party integrations must be added to this script manually.
+So far the next options can be handled:
+
+    .               Loads general integrations
+    aws             Prints how to load Amazon Web Service integration
+    flutter         Loads Flutter integration
+    gcloud          Loads Google Cloud integration
+    node|npm|nvm    Loads NodeJs integration
+    sql             Loads MySQL integration
+"
+
+function source_integrations() {
+    if [[ $# -eq 0 ]]; then
+        echo "$source_integrations_usage"
+        return
+    fi
+
+    timelogger source_integrations start
+
+    while [ $# -gt 0 ]; do
+        case "$1" in
+        .)
+            echo "Loading general integrations"
+            source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/general"
+            ;;
+
+        gcloud)
+            echo "Loading GCloud integration"
+            # GCLOUD_SDK_PATH was set on ~/.zprofile
+
+            # The next line updates PATH for the Google Cloud SDK.
+            if [ -f "$GCLOUD_SDK_PATH/path.zsh.inc" ]; then . "$GCLOUD_SDK_PATH/path.zsh.inc"; fi
+            # The next line enables shell command completion for gcloud.
+            if [ -f "$GCLOUD_SDK_PATH/completion.zsh.inc" ]; then . "$GCLOUD_SDK_PATH/completion.zsh.inc"; fi
+            ;;
+
+        node|npm|nvm)
+            # https://github.com/nvm-sh/nvm#uninstalling--removal
+            # To remove nvm manually, execute the following:
+            #   $ rm -rf "$NVM_DIR"
+            echo "Loading NVM integration"
+            export NVM_DIR="$HOME/.nvm"
+
+            # -- Manual installation ---------------
+            # [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+            # [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+            # -- Homebrew installation -------------
+            [ -s "$(brew --prefix)/opt/nvm/nvm.sh" ] && . "$(brew --prefix)/opt/nvm/nvm.sh" # This loads nvm
+            [ -s "$(brew --prefix)/opt/nvm/etc/bash_completion.d/nvm" ] && . "$(brew --prefix)/opt/nvm/etc/bash_completion.d/nvm" # This loads nvm bash_completion
+            ;;
+
+        aws)
+            echo "Load AWS profiles by running 'export AWS_PROFILE=<development/production/personal>'"
+            echo "All the profiles are sourced from '~/.aws/credentials'"
+            ;;
+
+        flutter)
+            echo "Loading Flutter integration"
+            [ -s "$HOME/flutter/bin/flutter" ] && export PATH="$PATH:$HOME/flutter/bin"
+            ;;
+
+        sql)
+            echo "Loading MySQL integration"
+            # brew install mysql mysql-client # It is important to include both, server and client
+            if [ -f "/usr/local/opt/mysql-client/bin" ]; then export PATH="/usr/local/opt/mysql-client/bin:$PATH"; fi
+            ;;
+
+        *)
+            echo "$0: error: unrecognized option $1"
+            echo "$0: $source_integrations_usage"
+            exit 0
+            ;;
+
+        esac
+        shift
+
+    done
+
+    timelogger source_integrations end
+}
+
+function domain_expiration(){
+    if nc -zw1 google.com 443 &>/dev/null; then echo; else exit 1; fi # Checks for internet connectivity. Silent exit if no connection
+
+    domain_status=$(whois $1 | grep -m1 "Domain Status")
+    domain_expiry_date=$(whois $1 | grep "Registry Expiry Date" | grep -oE '(\d{4})-(\d\d)-(\d\d)' | sed 's/[\._-]//g')
+
+    gdate=$HOMEBREW_PREFIX/bin/gdate
+    current_epoch_time=$(gdate +%s)
+    domain_expity_date_epoch=$(gdate --date=$domain_expiry_date +%s)
+    days_until_expiration=$(((domain_expity_date_epoch - current_epoch_time) / 86400))
+
+    if [[ "$2" == "bash:request" ]]; then
+        if ((days_until_expiration < 30)); then
+            echo "DOMAIN ABOUT TO EXPIRE, $days_until_expiration days left."
+            echo "$domain_status"
+        fi
+    else
+        echo "Domain expiration is $days_until_expiration days ahead."
+    fi
+}
+
+alias noel.io\?=check-noel.io-domain-expiration
+function check-noel.io-domain-expiration () {
+    domain_expiration noel.io
+}
+
+{ 2>&3 (domain_expiration "noel.io" "bash:request" &) } 3>&2 2>/dev/null # Request that will be made always, but only return if the domain is expiring in less than X days
+
+function setvscode() {
+    mkdir -p .vscode/
+    ln -s ~/.config/vscode/secrets/* ./.vscode/
+
+    if ! grep -qxF 'vscode/*' .gitignore; then
+        echo "vscode folder is not git-ignored."
+        echo "Do you wish to insert a ignore rule for it?"
+        select yn in "Yes" "No"; do
+            case $yn in
+                Yes ) echo "\nvscode/*" >> .gitignore; break;;
+                No ) exit;;
+            esac
+        done
+    fi
 }
