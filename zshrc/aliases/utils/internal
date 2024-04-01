@@ -1,0 +1,90 @@
+#!/bin/bash
+
+alias \?='type -a $*'
+alias cp='rsync -ah --progress'
+alias rm="rm -i"
+
+alias hs='history | grep' # commands history for non-interactive terminals or terminals without fzf
+alias hibernate="sudo systemctl hibernate"
+
+iunmount() {
+    if [ $# -eq 0 ]; then
+        echo "Usage: iunmount <device>"
+        return 1
+    fi
+    device=$1
+    if ! $(diskutil info $device | grep -q "\s\+Removable Media:\s\+Removable"); then
+        echo "Device at $device is not marked as removable."
+        return 1
+    fi
+    echo "Do you want to remove all Mac related hidden files and folders and eject disk?"
+    echo "Do you want to remove all Mac related hidden files and folders and eject disk?"
+    echo -n "Unmount $device? [y/N] "
+    read -r REPLY
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        dot_clean -m $device
+        rm -rf "$device/.Trashes"
+        rm -rf "$device/.Spotlight-V100"
+        rm -rf "$device/.fseventsd"
+        diskutil eject $device
+        # "/Users/noelruault/config/zshrc/aliases/utils/clean_and_unmount.sh" -m $device
+    fi
+}
+
+function search() { find / -name "$@" | echo; }
+
+function pwgen() {
+    specialChars=('!' '#' '$' '%' '&' '(' ')' '*' '+' ',' '-' '.' '/' ':' ';' '<' '=' '>' '?' '@' '[' '\' ']' '^' '_' '{' '|' '}' '~')
+
+    echo $(
+        echo $specialChars |
+            tr " " "\n"    |
+            shuf           |
+            tr -d "\n"     |
+            head -c 4
+            ; echo
+    )$(
+        date +%s      |
+            sha256sum |
+            base64    |
+            head -c 8
+            ; echo
+    ) | fold -w1 | shuf | tr -d "\n" ; echo
+}
+
+function fileformat(){
+    arch=$(uname -m)
+    os=$(uname -s)
+
+    case "$os" in
+    Linux)
+        file_format="elf64"
+        ;;
+    Darwin)
+        case "$arch" in
+        x86_64)
+            file_format="macho64"
+            ;;
+        aarch64)
+            file_format="macho64"
+            ;;
+        esac
+        ;;
+    Windows)
+        case "$arch" in
+        x86)
+            file_format="win32"
+            ;;
+        x86_64)
+            file_format="win64"
+            ;;
+        esac
+        ;;
+    *)
+        echo "No se ha podido determinar el formato de archivo de salida para tu ordenador."
+        exit 1
+        ;;
+    esac
+    echo $file_format
+}

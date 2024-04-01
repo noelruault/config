@@ -1,28 +1,8 @@
 #!/bin/bash
 
-alias \?='type -a $*'
-alias cp='rsync -ah --progress'
-alias rm="rm -i"
-
-function search() { find / -name "$@" | echo; }
-
-function pwgen() {
-    specialChars=('!' '"' '#' '$' '%' '&' '(' ')' '*' '+' ',' '-' '.' '/' ':' ';' '<' '=' '>' '?' '@' '[' '\' ']' '^' '_' '{' '|' '}' '~' \' \")
-
-    echo $(
-        echo $specialChars |
-            tr " " "\n"    |
-            shuf           |
-            tr -d "\n"     |
-            head -c 4
-            ; echo
-    )$(
-        date +%s      |
-            sha256sum |
-            base64    |
-            head -c 8
-            ; echo
-    ) | fold -w1 | shuf | tr -d "\n" ; echo
+function current_git_ssh_key(){
+    SSH_VERSION=$(ssh -v git@github.com 2>&1); \
+    echo $SSH_VERSION | grep "Server accepts key:" | grep -oEi '\S+.ssh\S+'
 }
 
 ### GIT
@@ -140,12 +120,27 @@ alias pgstop='pg_ctl -D /usr/local/var/postgres stop'
 ### Others
 function compresspdf() {
     # brew install ghostscript
-    echo 'Usage: compresspdf [input file] [output file] [screen|ebook|printer|prepress]'
-    gs -sDEVICE=pdfwrite -dNOPAUSE -dQUIET -dBATCH -dPDFSETTINGS=/${3:-"screen"} -dCompatibilityLevel=1.4 -sOutputFile="$2" "$1"
+    echo '''
+    Usage: compresspdf [input file] [output file] [screen|ebook|printer|prepress]
+        [screen] selects low-resolution output similar to the Acrobat Distiller "Screen Optimized" setting.
+        [ebook] selects medium-resolution output similar to the Acrobat Distiller "eBook" setting.
+        [printer] selects output similar to the Acrobat Distiller "Print Optimized" setting.
+        [prepress] selects output similar to Acrobat Distiller "Prepress Optimized" setting.
+        [default] selects output intended to be useful across a wide variety of uses, possibly at the expense of a larger output file.
+    '''
+    gs -sDEVICE=pdfwrite \
+    -dNOPAUSE -dQUIET -dBATCH \
+    -dPDFSETTINGS=/${3:-"screen"} \
+    -dCompatibilityLevel=1.4 \
+    -sOutputFile="$1".compressed.pdf "$1";
+    # -sOutputFile="$2" "$1"
+
+    # compresspdf "Massive.pdf" "Small.pdf" ebook
 }
 
-alias hs='history | grep' # commands history for non-interactive terminals or terminals without fzf
-alias hibernate="sudo systemctl hibernate"
+function pdfcompress() {
+   gs -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/screen -dEmbedAllFonts=true -dSubsetFonts=true -dColorImageDownsampleType=/Bicubic -dColorImageResolution=144 -dGrayImageDownsampleType=/Bicubic -dGrayImageResolution=144 -dMonoImageDownsampleType=/Bicubic -dMonoImageResolution=144 -sOutputFile=$1.compressed.pdf $1;
+}
 
 ### Networks
 alias wanip='dig +short myip.opendns.com @resolver1.opendns.com'
@@ -317,6 +312,10 @@ function source_integrations() {
             if [ -f "/usr/local/opt/mysql-client/bin" ]; then export PATH="/usr/local/opt/mysql-client/bin:$PATH"; fi
             ;;
 
+        idf)
+            echo "Loading idf.py integration"
+            . $HOME/esp/esp-idf/export.sh
+            ;;
         *)
             echo "$0: error: unrecognized option $1"
             echo "$0: $source_integrations_usage"
@@ -344,11 +343,11 @@ function domain_expiration(){
 
     if [[ "$2" == "bash:request" ]]; then
         if ((days_until_expiration < 30)); then
-            echo "DOMAIN ABOUT TO EXPIRE, $days_until_expiration days left."
+            echo "DOMAIN $1 ABOUT TO EXPIRE, $days_until_expiration days left."
             echo "$domain_status"
         fi
     else
-        echo "Domain expiration is $days_until_expiration days ahead."
+        echo "Domain $1 expiration is $days_until_expiration days ahead."
     fi
 }
 
@@ -370,3 +369,45 @@ function setvscode() {
 
 ### Vagrant
 alias vagrantclean="vagrant box list | cut -f 1 -d ' ' | xargs -L 1 vagrant box remove -f"
+
+# Add rubygems to the path
+export PATH=/usr/local/lib/ruby/gems/2.7.0/bin:$PATH
+
+# ping to specific port
+# nc -vz -u seaparty.crabdance.com 2194
+# -z Zero-I/O mode [used for scanning]
+# -v Verbose
+# -u UDP mode
+
+
+### Javascript
+function jsnew() {
+    local template_dir="$ZSH_CUSTOM_CONFIG_ALIASES/utils/templates/_javascript/"
+
+    if [[ ! -d "$template_dir" ]]; then
+        echo "Template directory not found: $template_dir"
+        return 1
+    fi
+
+    local gitdir="github.com/$(whoami)"
+    echo "jsnew: the git directory has been set to $gitdir"
+
+    local folder_name=$1
+    if [[ $# -eq 0 ]]; then
+        # Generate a random name if not provided
+        folder_name=$(openssl rand -hex 4)
+    fi
+
+    local dstpath="$(go env GOPATH)/src/$gitdir/$folder_name"
+    mkdir -p "$dstpath" && cd "$_"
+    rsync --recursive "$template_dir" .
+
+    echo "jsnew: starting JavaScript project generated at: $dstpath"
+    if [[ -f "Makefile" ]]; then
+        make setup
+    else
+        echo "Makefile not found. You may need to set up your project manually."
+    fi
+
+    code .
+}

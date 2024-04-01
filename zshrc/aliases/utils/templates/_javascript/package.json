@@ -1,0 +1,17 @@
+{
+  "name": "prueba",
+  "version": "0.0.1",
+  "license": "UNLICENSED",
+  "private": true,
+
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "node": true
+    }
+  },
+  "devDependencies": {
+    "@stylistic/eslint-plugin-js": "latest",
+    "eslint": "latest"
+  }
+}

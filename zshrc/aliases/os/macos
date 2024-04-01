@@ -56,6 +56,7 @@ function killport() {
             echo $SPIDER
             echo "Related PIDS found:\n$pids"
             kill -9 $(netstat -vanp tcp | grep "$@" | awk '{print $9}')
+            # lsof -i tcp:5000 | awk '{print $2}' | tail -n +2
             return
         fi
     fi
@@ -111,22 +112,22 @@ function memusg() {
 # NETWORK ALIASES
 
 function myip() {
-    echo ">> public ip / curl <remote_url>"
+    echo ">> external / public ip"
     curl http://ipecho.net/plain
     echo
 
-    echo ">> private ip / ipconfig"
+    echo ">> private ip (internal to my router)"
     ## MACOS
     ipconfig getifaddr en0 # ifconfig | grep "inet "
 
-    echo ">> default gateway (usually router) / netstat"
+    echo ">> router (default gateway)"
     netstat -nr | grep -E "default.*en0" --color=never
 }
 
 # wifibounce restarts Wi-Fi network interface
 alias wifibounce='sudo networksetup -setv4off Wi-Fi;sudo  networksetup -setdhcp Wi-Fi'
 # currentnet prints the active network interface
-alias currentnet="echo $(route get default | grep interface | awk '{print $2}')"
+alias currentnet="route get default | grep interface | awk '{print $2}'"
 
 # netbounce will get the interface that is set to reach hosts from this machine and reset it
 netbounce(){
@@ -134,6 +135,8 @@ netbounce(){
     sudo ifconfig $net down
     sudo ifconfig $net up
 }
+
+alias flushdns="sudo killall -HUP mDNSResponder"
 
 # enbounce needs a parameter argument to reset an interface
 # You can list interfaces by typing: << networksetup -listnetworkserviceorder >>
@@ -154,3 +157,9 @@ alias ilt="exa --tree --icons -a -I '.git|__pycache__|.mypy_cache|.ipynb_checkpo
 
 # show file previews for fzf using bat
 alias fp="fzf --preview 'bat --style=numbers --color=always --line-range :500 {}'"
+
+# If gcc is installed, override MacOS gcc (clang/LLVM compiler)
+GCCs=($(ls /usr/local/bin/gcc-*))
+if (( ${#GCCs[@]} != 0 )); then
+    alias gcc="$(basename $GCCs[1])"
+fi

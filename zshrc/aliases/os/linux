@@ -3,8 +3,12 @@
 alias killport='sudo netstat -plten | grep'
 
 function myip(){
+    # dns lookup
+    # dig +short seaparty.crabdance.com
+    # dig +short <domain.ext>
+
     echo ">> public ip / curl <remote_url>"
-    curl http://ipecho.net/plain;echo
+    curl -4 ifconfig.me;echo
 
     echo ">> private ip / ipconfig"
     ## LINUX  https://stackoverflow.com/a/24634284/4349318

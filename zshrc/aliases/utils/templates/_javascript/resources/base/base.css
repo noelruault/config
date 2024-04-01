@@ -1,0 +1,18 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --essential: "true";
+}
+
+#status-css-base-tag {
+    display: none;
+}
+
+#status-css-base:after {
+    color: green;
+    content: ': online';
+}

@@ -1,9 +1,9 @@
 #!/bin/bash
 
-SCRIPT_DIR=$(dirname $0)
+SCRIPT_DIR=$(dirname ${(%):-%x})
 
 ## Useful aliases
-for f in $(lsnoext "$SCRIPT_DIR/utils"); do source_or_error "$f"; done
+for f in $(lsnoext "$SCRIPT_DIR/utils" | grep -v "/_"); do source_or_error "$f"; done
 
 ## Operating System aliases
 CURRENT_OS="$(uname -a | awk '{print $1}')"

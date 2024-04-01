@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-SCRIPT_DIR=$(dirname $0)
+SCRIPT_DIR=$(dirname ${(%):-%x})
 
 source "$HOME/config/zshrc/log"
 timelogger zsh start
@@ -28,9 +28,9 @@ plugins=(
     gnu-utils
 
     golang
-    docker
-    docker-compose
-    kubectl
+    # docker
+    # docker-compose
+    # kubectl
 )
 
 [ ! -d $HOME/.oh-my-zsh ] && echo "oh-my-zsh is not installed" || source "$HOME/.oh-my-zsh/oh-my-zsh.sh"
@@ -41,7 +41,6 @@ plugins=(
 # For a full list of active aliases, run `alias`.
 # To reload .zshrc: 'source .zshrc' or just type 'zsh'
 source "$HOME/.config/zshrc/routes"
-
 
 ## 3rd party integration aliases
 timelogger integrations start

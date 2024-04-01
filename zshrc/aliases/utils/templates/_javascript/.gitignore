@@ -1,0 +1,15 @@
+### macOS ###
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+__*
+
+## Javascript ##
+node_modules
+
+## VSCode ##
+!.vscode/extensions.json

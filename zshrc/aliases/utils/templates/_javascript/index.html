@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+    <title>Title's page</title>
+
+    <link rel="stylesheet" href="./resources/base/base.css">
+    <script defer src="./resources/base/base.js"></script>
+
+    <!-- Defer non-critical CSS: https://web.dev/articles/defer-non-critical-css-->
+    <link rel="preload" href="./resources/base/unessential.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <!-- Fallback for non-JS users -->
+    <noscript>
+        <link rel="stylesheet" href="./resources/base/unessential.css">
+    </noscript>
+</head>
+
+<h1>¡Hola Mundo!</h1>
+
+<div id="debug-stats">
+    <caption>Debug stats</caption>
+    <ul>
+        <li>Javascript <span id="status-js">offline></span></li>
+        <li id="status-css-base">CSS base <span id="status-css-base-tag">offline></span></li>
+        <li id="status-css-unessential">CSS unessential <span id="status-css-unessential-tag">offline></span></li>
+    </ul>
+</div>
+
+<body>
+    <!-- Your content goes here -->
+</body>
+
+</html>
