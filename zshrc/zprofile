@@ -28,3 +28,15 @@ fi
 #   /usr/local/{bin,sbin}
 #   $path[@]
 # )
+
+# bun
+# The followint script checks if the ~/.bun/bin/bun executable file exists and is executable (-x flag).
+# If it does, it adds the bun completions to the shell and adds ~/.bun/bin to the PATH.
+#
+if [ -x "$HOME/.bun/bin/bun" ]; then
+    # bun completions
+    [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+    # bun on path
+    export BUN_INSTALL="$HOME/.bun"
+    export PATH="$BUN_INSTALL/bin:$PATH"
+fi

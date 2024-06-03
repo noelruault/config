@@ -4,7 +4,6 @@
   "license": "UNLICENSED",
   "private": true,
   "type": "module",
-
   "eslintConfig": {
     "env": {
       "browser": true,
@@ -14,5 +13,6 @@
   "devDependencies": {
     "@stylistic/eslint-plugin-js": "latest",
     "eslint": "latest"
-  }
+  },
+  "dependencies": { "htmx.org": "latest", "wrangler": "latest" }
 }

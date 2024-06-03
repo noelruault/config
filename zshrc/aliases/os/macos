@@ -112,22 +112,26 @@ function memusg() {
 # NETWORK ALIASES
 
 function myip() {
+    CURRENT_INTERFACE=$(route get default | awk '/interface/ {print $2}')
+
     echo ">> external / public ip"
     curl http://ipecho.net/plain
+    # Can use dig to query a DNS server for your public IP address too.
+    # dig +short myip.opendns.com @resolver1.opendns.com
     echo
 
     echo ">> private ip (internal to my router)"
     ## MACOS
-    ipconfig getifaddr en0 # ifconfig | grep "inet "
+    ipconfig getifaddr $CURRENT_INTERFACE # ifconfig | grep "inet "
 
     echo ">> router (default gateway)"
-    netstat -nr | grep -E "default.*en0" --color=never
+    netstat -nr | grep -E "default.*$CURRENT_INTERFACE" --color=never
 }
 
 # wifibounce restarts Wi-Fi network interface
 alias wifibounce='sudo networksetup -setv4off Wi-Fi;sudo  networksetup -setdhcp Wi-Fi'
 # currentnet prints the active network interface
-alias currentnet="route get default | grep interface | awk '{print $2}'"
+alias interface\?="route get default | grep 'interface'"
 
 # netbounce will get the interface that is set to reach hosts from this machine and reset it
 netbounce(){

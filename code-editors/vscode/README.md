@@ -9,3 +9,7 @@ Useful paths:
     ~/.vscode/extensions
 
 [Reference](https://stackoverflow.com/a/49706409)
+
+## Useful resources
+
+[25 VS Code Productivity Tips and Speed Hacks](https://www.youtube.com/watch?v=ifTF3ags0XI&list=TLPQMjkwOTIwMjIKHhbMqJHE4A&index=2)
