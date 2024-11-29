@@ -889,6 +889,12 @@ function vscode_doc() {
 }
 
 # ========== W
+alias wifi\?='wifi_doc'
+function wifi() {
+  echo "Running Wi-Fi (Wireless Fidelity IEEE 802.11x) Diagnostics"
+  echo "wdutil -s"
+  wdutil -s
+}
 # ========== X
 # ========== Y
 # ========== Z

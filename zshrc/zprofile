@@ -40,3 +40,7 @@ if [ -x "$HOME/.bun/bin/bun" ]; then
     export BUN_INSTALL="$HOME/.bun"
     export PATH="$BUN_INSTALL/bin:$PATH"
 fi
+
+if command -v fzf &> /dev/null; then
+    [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+fi

@@ -2,11 +2,11 @@
 ; CONFIGURATION: git config --global include.path ~/.config/git/gitconfig_global
 ; ##############
 
-; To track what is being load on the global Git settings type:
+; To track what is being loaded in global Git settings:
 ;    $ git config --list --show-origin
 
 [core]
- excludesfile = ~/.config/git/gitignore_global
+    excludesfile = ~/.config/git/gitignore_global
 
 [include]
     path = ~/.config/git/secrets/config
@@ -17,14 +17,14 @@
     pat = !git add -N . && git add --patch
 
 [pull]
-	rebase = false # defaults to merge (the default strategy)
+    rebase = false  # defaults to merge (the default strategy)
 
-[url "ssh://git@github.com/noelruault/"]
-	insteadOf = https://github.com/noelruault/
-[url "ssh://git@github-hideandseek/hideandseek-store/"]
-	insteadOf = https://github.com/hideandseek-store/
+;[url "ssh://git@github.com/username/"]
+;   insteadOf = https://github.com/username/
+;[url "ssh://git@gitlab.com/username/"]
+;   insteadOf = https://gitlab.com/username/
 
 ;[url "ssh://git@gitlab.com/company"]
-;  insteadOf = https://gitlab.com/company/
+;   insteadOf = https://gitlab.com/company/
 ;[url "ssh://git@github.com/company/"]
-;	insteadOf = https://github.com/company/
+;   insteadOf = https://github.com/company/

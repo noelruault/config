@@ -28,9 +28,6 @@ plugins=(
     gnu-utils
 
     golang
-    # docker
-    # docker-compose
-    # kubectl
 )
 
 [ ! -d $HOME/.oh-my-zsh ] && echo "oh-my-zsh is not installed" || source "$HOME/.oh-my-zsh/oh-my-zsh.sh"

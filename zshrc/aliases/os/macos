@@ -1,16 +1,25 @@
 #!/bin/bash
 
-# alias killport='netstat -vanp tcp | grep'
+# ------------------------------
+# GENERAL ALIASES AND FUNCTIONS
+# ------------------------------
+
+# Launch Jupyter notebook
 alias notebook='/anaconda3/bin/jupyter_mac.command ; exit;'
 
-# dot_clean -> Remove dot-underscore files. Merges ._* files with corresponding native files. # https://ss64.com/osx/dot_clean.html
+# Remove .DS_Store files
 alias ds_clean="find . -name '.DS_Store' -type f -delete"
 
+# Display user, groups, and ID info
 function whoamipro() {
     echo '*** $whoami ***' && whoami
     echo '*** $groups $(whoami) ***' && groups $(whoami) | cut -d' ' -f1
     echo '*** $id ***' && id
 }
+
+# ------------------------------
+# PROCESS AND SERVICE MANAGEMENT
+# ------------------------------
 
 SPIDER="""
     _
@@ -21,149 +30,142 @@ NO_PARAM_ERROR="""
 [INFO]: You need to run this function with at least one string parameter.
 """
 
+# Kill processes by name
 function killprocess() {
     if [[ -z "$1" ]]; then
-        echo $NO_PARAM_ERROR
+        echo "$NO_PARAM_ERROR"
         return
     else
-        pids=$(ps aux | grep -v grep | grep --extended-regexp --ignore-case  "$@" | awk '{print $2}')
-        #               ^ exclude self                                              ^ get second column value
-
+        pids=$(ps aux | grep -v grep | grep -Ei "$@" | awk '{print $2}')
         if [[ -z "$pids" ]]; then
-            echo "Couldn't be found any PID related to the given application."
-            return
+            echo "Couldn't find any PID related to the given application."
         else
-            echo $SPIDER
-            echo "Related PIDS found:\n$pids"
-            kill -9 $(ps aux | grep -Ei "$@" | awk '{print $2}')
-            return
+            echo "$SPIDER"
+            echo "Related PIDs found:\n$pids"
+            kill -9 $pids
         fi
     fi
 }
+
+# Alias for killing a specific process
 alias gobenchkill='killprocess "test.bench"'
 
+# Kill processes by port number
 function killport() {
     if [[ -z "$1" ]]; then
-        echo $NO_PARAM_ERROR
+        echo "$NO_PARAM_ERROR"
         return
     else
-        pids=$(netstat -vanp tcp | grep "$@" | awk '{print $9}')
-
+        pids=$(netstat -vanp tcp | grep "$1" | awk '{print $9}')
         if [[ -z "$pids" ]]; then
-            echo "Couldn't be found any PID related to the given port."
-            return
+            echo "Couldn't find any PID related to the given port."
         else
-            echo $SPIDER
-            echo "Related PIDS found:\n$pids"
-            kill -9 $(netstat -vanp tcp | grep "$@" | awk '{print $9}')
-            # lsof -i tcp:5000 | awk '{print $2}' | tail -n +2
-            return
+            echo "$SPIDER"
+            echo "Related PIDs found:\n$pids"
+            kill -9 $pids
         fi
     fi
 }
 
+# Find running apps by name
 function findapp() {
     if [[ -z "$1" ]]; then
-        echo $NO_PARAM_ERROR
+        echo "$NO_PARAM_ERROR"
         return
     else
-        apps=$(ps axc | grep --ignore-case "$@")
-
+        apps=$(ps axc | grep -i "$@")
         if [[ -z "$apps" ]]; then
-            echo "Couldn't be found any PID related to the given app name."
-            return
+            echo "Couldn't find any app related to the given name."
         else
             echo "Related apps found:\n$apps"
-            return
         fi
     fi
 }
 
-# getUDID finds the UDID of a connected Apple device
-function getUDID() {
-    # xctrace list lists capabilities of the current running environment, such as devices or templates
-    xcrun xctrace list devices
+# ------------------------------
+# SYSTEM INFORMATION AND MEMORY
+# ------------------------------
 
-    # system_profiler reports system hardware and software configuration
-    # system_profiler SPUSBDataType | sed -n -e '/iPad/,/Serial/p' -e '/iPhone/,/Serial/p' | grep "Serial Number:" | awk -F ": " '{print $2}'
+# Get the UDID of a connected Apple device
+function getUDID() {
+    xcrun xctrace list devices
 }
 
+# Report memory usage
 function memusg() {
-    echo "Which type of mem usage reporter do you want to use? < time / script >:"
+    echo "Which type of memory usage reporter do you want to use? < time / script >:"
     read memusg_source
 
     case $memusg_source in
     time)
-        echo "alias for /usr/bin/time -l $@"
-        /usr/bin/time -l $@
+        /usr/bin/time -l "$@"
         echo "\n Maximum resident set size reports the peak RAM usage."
         ;;
     script)
-        sh $ZSH_CUSTOM_CONFIG_ALIASES/utils/memusg.sh $@
+        sh $ZSH_CUSTOM_CONFIG_ALIASES/utils/memusg.sh "$@"
         ;;
     esac
 }
 
-# $ZSH_CUSTOM/plugins/zsh-syntax-highlighting/highlighters/brackets/brackets-highlighter.zsh
+# ------------------------------
+# NETWORK MANAGEMENT
+# ------------------------------
 
-### How to use Terminal to send keystrokes?
-## osascript -e 'tell application "System Events" to keystroke "q" using {control down, command down}'
-
-# NETWORK ALIASES
-
+# Show public and private IP addresses and default gateway
 function myip() {
     CURRENT_INTERFACE=$(route get default | awk '/interface/ {print $2}')
 
-    echo ">> external / public ip"
+    echo ">> External (public) IP:"
     curl http://ipecho.net/plain
-    # Can use dig to query a DNS server for your public IP address too.
-    # dig +short myip.opendns.com @resolver1.opendns.com
     echo
 
-    echo ">> private ip (internal to my router)"
-    ## MACOS
-    ipconfig getifaddr $CURRENT_INTERFACE # ifconfig | grep "inet "
+    echo ">> Private IP (internal to router):"
+    ipconfig getifaddr "$CURRENT_INTERFACE"
 
-    echo ">> router (default gateway)"
+    echo ">> Router (default gateway):"
     netstat -nr | grep -E "default.*$CURRENT_INTERFACE" --color=never
 }
 
-# wifibounce restarts Wi-Fi network interface
-alias wifibounce='sudo networksetup -setv4off Wi-Fi;sudo  networksetup -setdhcp Wi-Fi'
-# currentnet prints the active network interface
+# Restart Wi-Fi network interface
+alias wifibounce='sudo networksetup -setv4off Wi-Fi;sudo networksetup -setdhcp Wi-Fi'
+
+# Show active network interface
 alias interface\?="route get default | grep 'interface'"
 
-# netbounce will get the interface that is set to reach hosts from this machine and reset it
-netbounce(){
+# Restart the default network interface
+function netbounce() {
     local net=$(route get default | grep interface | awk '{print $2}')
-    sudo ifconfig $net down
-    sudo ifconfig $net up
+    sudo ifconfig "$net" down
+    sudo ifconfig "$net" up
 }
 
+# Flush DNS cache
 alias flushdns="sudo killall -HUP mDNSResponder"
 
-# enbounce needs a parameter argument to reset an interface
-# You can list interfaces by typing: << networksetup -listnetworkserviceorder >>
-# Other handful network commands are: << ifconfig ; scutil --dns ; networksetup -listnetworkserviceorder >>
-enbounce(){
-    if [ -z "$1" ]; then
+# Restart a specific network interface
+function enbounce() {
+    if [[ -z "$1" ]]; then
         echo "You should provide a network interface."
     else
-        sudo ifconfig $1 down
-        sudo ifconfig $1 up
+        sudo ifconfig "$1" down
+        sudo ifconfig "$1" up
     fi
 }
 
-# map exa commands to normal ls commands
-alias ill="exa -l -g --icons"
-alias ils="exa --icons"
-alias ilt="exa --tree --icons -a -I '.git|__pycache__|.mypy_cache|.ipynb_checkpoints'"
+# ------------------------------
+# COMMAND LINE ENHANCEMENTS
+# ------------------------------
 
-# show file previews for fzf using bat
+# Show file previews for fzf using bat
 alias fp="fzf --preview 'bat --style=numbers --color=always --line-range :500 {}'"
 
-# If gcc is installed, override MacOS gcc (clang/LLVM compiler)
-GCCs=($(ls /usr/local/bin/gcc-*))
-if (( ${#GCCs[@]} != 0 )); then
-    alias gcc="$(basename $GCCs[1])"
-fi
+# ------------------------------
+# COMPILER ALIAS
+# ------------------------------
+
+# If GNU GCC is installed in /usr/local/bin, override the default macOS gcc (which is clang/LLVM).
+# Check for installed GCC versions (matching /usr/local/bin/gcc-*) and set an alias for 'gcc' to point to the first available version.
+# GCCs=($(ls /usr/local/bin/gcc-* 2>/dev/null)) # suppress errors if no match is found
+# if (( ${#GCCs[@]} != 0 )); then
+#     alias gcc="$(basename ${GCCs[0]})"
+# fi
