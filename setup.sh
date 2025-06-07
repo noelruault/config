@@ -20,6 +20,9 @@ install_homebrew() {
     if ! command -v brew &> /dev/null; then
         echo "Installing Homebrew..."
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        echo >> /Users/"$(whoami)"/.zprofile
+        echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/"$(whoami)"/.zprofile
+        eval "$(/opt/homebrew/bin/brew shellenv)"
     else
         echo "Homebrew is already installed."
     fi
@@ -47,7 +50,7 @@ setup_bash() {
 install_oh_my_zsh() {
     if [ ! -d ~/.oh-my-zsh ]; then
         echo "Installing Oh-My-Zsh..."
-        sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
     else
         echo "Oh-My-Zsh is already installed."
     fi
@@ -150,3 +153,6 @@ if prompt_user "Do you want to generate SSH keys?"; then
         echo "$ssh_gen_script not found, skipping."
     fi
 fi
+
+# TODO:
+# https://iterm2colorschemes.com

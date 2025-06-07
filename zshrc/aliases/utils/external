@@ -411,3 +411,10 @@ function jsnew() {
 
     code .
 }
+
+# Add deno completions to search path
+if [[ ":$FPATH:" != *":/Users/noelruault/completions:"* ]]; then export FPATH="/Users/noelruault/completions:$FPATH"; fi
+
+# bun completions
+[ -s "/Users/noelruault/.bun/_bun" ] && source "/Users/noelruault/.bun/_bun"
+. "/Users/noelruault/.deno/env"

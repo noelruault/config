@@ -6,5 +6,5 @@ ASSETS_DIR=$SCRIPT_DIR/helpers
 ## Some aliases to fix zsh history
 source_or_error "$ASSETS_DIR/fix_zsh"
 source_or_error "$ASSETS_DIR/.iterm2_shell_integration.zsh"
-source_or_error ~/.fzf.zsh
 source_or_error "$ASSETS_DIR/default"
+# source_or_error ~/.fzf.zsh

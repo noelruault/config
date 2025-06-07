@@ -2,24 +2,15 @@
 # Reload? -> `source ~/.zprofile`
 
 # Setting your PATH so that homebrew's bin occurs before '/usr/bin'
-if command -v brew &> /dev/null; then
-    if [[ "$(uname -m)" == "arm64" ]]; then
-        eval $(/opt/homebrew/bin/brew shellenv)
-    fi
-    if [[ "$(uname -m)" == "x86_64" ]]; then
-        eval $(/usr/local/bin/brew shellenv)
-    fi
-fi
-
-if command -v gcloud &> /dev/null; then
-    export PATH=$PATH:"$HOMEBREW_PREFIX/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/bin"
-    export GCLOUD_SDK_PATH="$HOMEBREW_PREFIX/Caskroom/google-cloud-sdk"
-    export USE_GKE_GCLOUD_AUTH_PLUGIN=True
+if [[ -x "/opt/homebrew/bin/brew" ]]; then
+    eval $(/opt/homebrew/bin/brew shellenv)
+elif [[ -x "/usr/local/bin/brew" ]]; then
+    eval $(/usr/local/bin/brew shellenv)
 fi
 
 # https://go.dev/doc/gopath_code#GOPATH
-if command -v go &> /dev/null; then
-    export PATH=$PATH:$(go env GOPATH)/bin # Allows using tools after installing them via 'go install'
+if [[ -x "/usr/local/go/bin/go" ]]; then
+    export PATH=$PATH:$(/usr/local/go/bin/go env GOPATH)/bin # Allows using tools after installing them via 'go install'
 fi
 # export GOPATH=$(go env GOPATH) # Useful for scripts but not necessary
 
@@ -41,6 +32,6 @@ if [ -x "$HOME/.bun/bin/bun" ]; then
     export PATH="$BUN_INSTALL/bin:$PATH"
 fi
 
-if command -v fzf &> /dev/null; then
-    [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-fi
+# if command -v fzf &> /dev/null; then
+#     [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# fi
