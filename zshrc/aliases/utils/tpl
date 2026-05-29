@@ -1,0 +1,72 @@
+#!/bin/bash
+# Project template launcher.
+#
+# Templates live under templates/_<name>/ at the repo root. The leading
+# underscore is kept for consistency with prior layout and to keep templates
+# visually grouped; the loader no longer needs to skip them since they sit
+# outside aliases/utils/.
+#
+# Optional convention: each template may contain an executable .init.sh
+# that runs in the destination directory after the copy.
+#
+# Commands:
+#   tpl ls                - list available templates
+#   tpl info <name>       - print README.md if present, else ls the dir
+#   tpl new <name> <dest> - cp -R the template to <dest>, run .init.sh
+#                           if executable, then `code <dest>` if VS Code
+#                           is on PATH.
+#
+# Note: `gonew` (in aliases/utils/external) is intentionally NOT replaced
+# by a `tpl new go` wrapper. gonew has bespoke behavior (random-hex name,
+# GOPATH-derived destination, boilerplate main.go, go mod init, code .)
+# that does not fit the generic copy + .init.sh pattern.
+
+_tpl_dir() { echo "$ZSH_CUSTOM_CONFIG_TEMPLATES"; }
+
+tpl() {
+    local dir; dir=$(_tpl_dir)
+    case ${1:-ls} in
+        ls)
+            (cd "$dir" && ls -d _*/ 2>/dev/null | sed 's|^_||;s|/$||' | sort)
+            ;;
+        info)
+            local name=$2
+            [[ -z $name ]] && { echo "usage: tpl info <name>"; return 1; }
+            local src="$dir/_$name"
+            if [[ ! -d $src ]]; then
+                echo "tpl: template '$name' not found" >&2
+                return 1
+            fi
+            if [[ -f "$src/README.md" ]]; then
+                cat "$src/README.md"
+            else
+                ls -la "$src"
+            fi
+            ;;
+        new)
+            local name=$2 dest=$3
+            if [[ -z $name || -z $dest ]]; then
+                echo "usage: tpl new <name> <dest>"
+                return 1
+            fi
+            local src="$dir/_$name"
+            if [[ ! -d $src ]]; then
+                echo "tpl: template '$name' not found" >&2
+                return 1
+            fi
+            if [[ -e $dest ]]; then
+                echo "tpl: destination '$dest' already exists" >&2
+                return 1
+            fi
+            cp -R "$src" "$dest" || return 1
+            if [[ -x "$dest/.init.sh" ]]; then
+                (cd "$dest" && ./.init.sh) || echo "tpl: .init.sh exited non-zero" >&2
+            fi
+            command -v code >/dev/null 2>&1 && code "$dest"
+            ;;
+        *)
+            echo "usage: tpl ls | tpl info <name> | tpl new <name> <dest>"
+            return 1
+            ;;
+    esac
+}

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+## Remove all yarn global dependencies
+alias yarnclean="yarn global remove $(yarn global list | grep info | sed 's/^info "\(.*\)@.*".*$/\1/')"

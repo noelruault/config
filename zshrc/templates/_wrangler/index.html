@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAP8VAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAABEREQABEAAAAAAAAAARAAAAAAAAAAEQAAAAAAAAABEAAAAAAAAAARAAAAAAAAARAAAAAAAAARAAAAAAAAARAAAAAAAAARAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA">
+
+    <title>Title's page</title>
+
+    <!-- # Javascript # -->
+    <script defer type="module" src="./src/web/base/base.js"></script>
+
+    <!-- # CSS # -->
+    <!-- ## Base (essential) CSS ## -->
+    <link rel="stylesheet" href="./src/web/base/base.css">
+    <!-- ## Defer non-critical CSS: https://web.dev/articles/defer-non-critical-css ## -->
+    <link rel="preload" href="./src/web/base/unessential.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <!-- ## Fallback for non-JS users ## -->
+    <noscript>
+        <link rel="stylesheet" href="./src/web/base/unessential.css">
+    </noscript>
+
+</head>
+
+<body>
+
+    <h1>¡Hola Mundo!</h1>
+
+    <div id="debug-stats">
+        <caption>Debug stats</caption>
+        <ul>
+            <li>Javascript <span id="status-js">offline</span></li>
+            <li id="status-css-base">CSS base <span id="status-css-base-tag">offline></span></li>
+            <li id="status-css-unessential">CSS unessential <span id="status-css-unessential-tag">offline></span></li>
+        </ul>
+    </div>
+
+    <button hx-post="/clicked" hx-swap="outerHTML">
+        Click Me
+    </button>
+
+</body>
+
+</html>

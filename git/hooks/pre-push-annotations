@@ -1,0 +1,18 @@
+#!/bin/bash
+# Don't push if any 'TAG' is in the source for HEAD
+
+DONT_PUSH_FLAGS="TODO(nruault) NOTE(nruault)"
+
+for flag in $DONT_PUSH_FLAGS; do
+    flag_found=`git grep --color "$flag" HEAD`
+    if [ -n "$flag_found" ]
+    then
+        # Display which commit the first occurence of the flag was found and exit failure
+        commit=`git log --pretty=format:'%Cred%h%Creset' -S "$flag" | tail -n1`
+        echo "Found $flag, first occurence was in $commit, not pushing"
+
+        # Display which files contain the annotations, have in mind that they could not be included to commit
+        files=`git grep --color --files-with-matches "$flag"`
+        echo -e "Files afected are \n$files\nHave in mind that the files displayed could not be commited yet, it's just an added information."
+    fi
+done

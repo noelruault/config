@@ -1,0 +1,104 @@
+#!/usr/bin/env zsh
+
+SCRIPT_DIR=$(dirname ${(%):-%x})
+
+[[ -n $ZSH_PROFILE ]] && zmodload zsh/zprof
+
+source "$HOME/config/zshrc/log"
+timelogger zsh start
+
+# Prompt selector. Default starship (faster, single binary, no OMZ theme
+# fallbacks). Set ZSH_PROMPT=spaceship to swap back.
+: ${ZSH_PROMPT:=starship}
+if [[ $ZSH_PROMPT == starship ]] && command -v starship >/dev/null 2>&1; then
+    ZSH_THEME=""
+else
+    ZSH_THEME="spaceship"
+fi
+SPACESHIP_BATTERY_SHOW='never'
+# https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
+# https://github.com/denysdovhan/spaceship-zsh-theme
+# https://github.com/mbadolato/iTerm2-Color-Schemes#installation-instructions
+
+alias zshrc="code $HOME/config/zshrc"
+alias .config="code ~/config"
+
+# Plugin list (single source of truth, shared between OMZ and zinit branches).
+plugins=(
+    fzf                     # https://github.com/junegunn/fzf#using-homebrew-or-linuxbrew
+    zsh-autosuggestions     # https://github.com/zsh-users/zsh-autosuggestions#oh-my-zsh
+    zsh-syntax-highlighting # https://github.com/zsh-users/zsh-syntax-highlighting
+
+    git
+    git-extras
+    gnu-utils
+
+    golang
+)
+
+# Pin OMZ's compinit cache file to a stable, per-host path so it is reused
+# across sessions. Set explicitly so the zinit branch can share intent.
+export ZSH_COMPDUMP="$HOME/.zcompdump-${SHORT_HOST:-$HOST}-${ZSH_VERSION}"
+# Skip OMZ's compaudit on macOS (warnings about group-writable dirs in /usr/local).
+export ZSH_DISABLE_COMPFIX=true
+
+# Loader selector. Default omz. Set ZSH_LOADER=zinit for the turbo branch.
+# Install zinit first: `mkdir -p ~/.local/share/zinit && git clone https://github.com/zdharma-continuum/zinit.git ~/.local/share/zinit/zinit.git`
+: ${ZSH_LOADER:=omz}
+case $ZSH_LOADER in
+    zinit)
+        if [[ -s "$HOME/.local/share/zinit/zinit.git/zinit.zsh" ]]; then
+            source "$HOME/.local/share/zinit/zinit.git/zinit.zsh"
+            zinit snippet OMZL::completion.zsh
+            zinit snippet OMZL::history.zsh
+            zinit snippet OMZL::key-bindings.zsh
+            zinit wait lucid for \
+                OMZP::git \
+                OMZP::git-extras \
+                OMZP::gnu-utils \
+                OMZP::golang \
+                atinit"zicompinit; zicdreplay" \
+                    zdharma-continuum/fast-syntax-highlighting \
+                atload"_zsh_autosuggest_start" \
+                    zsh-users/zsh-autosuggestions \
+                junegunn/fzf
+        else
+            echo "ZSH_LOADER=zinit but zinit not installed. Falling back to omz."
+            echo "Install: mkdir -p ~/.local/share/zinit && git clone https://github.com/zdharma-continuum/zinit.git ~/.local/share/zinit/zinit.git"
+            [ ! -d $HOME/.oh-my-zsh ] && echo "oh-my-zsh is not installed" || source "$HOME/.oh-my-zsh/oh-my-zsh.sh"
+        fi
+        ;;
+    *)
+        [ ! -d $HOME/.oh-my-zsh ] && echo "oh-my-zsh is not installed" || source "$HOME/.oh-my-zsh/oh-my-zsh.sh"
+        ;;
+esac
+
+# Starship init runs after OMZ so its prompt wins. Gated by ZSH_PROMPT.
+if [[ $ZSH_PROMPT == starship ]] && command -v starship >/dev/null 2>&1; then
+    eval "$(starship init zsh)"
+fi
+
+# Set personal aliases, overriding those provided by oh-my-zsh libs,
+# plugins, and themes. Aliases can be placed here, though oh-my-zsh
+# users are encouraged to define aliases within the ZSH_CUSTOM folder.
+# For a full list of active aliases, run `alias`.
+# To reload .zshrc: 'source .zshrc' or just type 'zsh'
+source "$HOME/.config/zshrc/routes"
+
+## 3rd party integration aliases
+timelogger integrations start
+timelogger integrations end
+if [ $LAST_TIMELOG_MS -ge 500 ]; then echo "Runtime of sourcing general integrations was $LAST_TIMELOG_MS ms. A bit too high :{"; fi
+
+## --------------------- External tool init block ---------------------
+# General user-local bin (not a tool-specific path, kept eager).
+export PATH="$HOME/.local/bin:$PATH"
+
+# Antigravity, opencode, lms: lazy-loaded via aliases/lazy/* (wired in routes).
+# bun: completions + PATH live in zprofile.
+
+## ------------- Don't put anything (else) under this line ------------
+alert_unused_logs
+timelogger zsh end
+[[ -n $ZSH_PROFILE ]] && zprof
+## ------------------------- THE END OF ZSHRC -------------------------

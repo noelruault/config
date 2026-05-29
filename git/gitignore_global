@@ -1,0 +1,45 @@
+; ##############
+; CONFIGURATION: git config --global core.excludesfile ~/.config/git/gitignore_global
+; ##############
+
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
+
+# Thumbnails
+._*
+__*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Editor related files
+.idea
+.vscode/*
+!.vscode/settings.json
+.zed/*
+
+# AI
+.github/instructions
+.github/*instructions*
+.github/*.md
+
+# Private and secret files and folders
+*secret*

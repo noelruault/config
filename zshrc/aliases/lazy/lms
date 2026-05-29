@@ -1,0 +1,3 @@
+#!/usr/bin/env zsh
+# Lazy init for lms (LM Studio CLI): append bin dir to PATH on first invocation.
+export PATH="$PATH:$HOME/.lmstudio/bin"

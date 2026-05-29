@@ -1,0 +1,30 @@
+; ##############
+; CONFIGURATION: git config --global include.path ~/.config/git/gitconfig_global
+; ##############
+
+; To track what is being loaded in global Git settings:
+;    $ git config --list --show-origin
+
+[core]
+    excludesfile = ~/.config/git/gitignore_global
+
+[include]
+    path = ~/.config/git/secrets/config
+
+[alias]
+    aliases = !git config -l | grep alias | cut -c 7-
+    dirdiff = diff -p --stat -w --no-index
+    pat = !git add -N . && git add --patch
+
+[pull]
+    rebase = false  # defaults to merge (the default strategy)
+
+[url "ssh://git@github.com/noelruault/"]
+   insteadOf = https://github.com/noelruault/
+;[url "ssh://git@gitlab.com/username/"]
+;   insteadOf = https://gitlab.com/username/
+
+[url "ssh://git@github.com/WebBeds/"]
+   insteadOf = https://github.com/WebBeds/
+;[url "ssh://git@github.com/company/"]
+;   insteadOf = https://github.com/company/

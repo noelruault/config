@@ -1,0 +1,28 @@
+## General
+.DS_Store
+
+## Thumbnails
+._*
+
+## Files that might appear in the root of a volume
+.Spotlight-V100
+.Trashes
+
+## Secret files
+*secret*
+
+# Ignores root directories
+/*/
+
+# Ignores iterm2/AppSupport
+iterm2/AppSupport
+
+# Un-ignores some folders
+!code-editors
+!git
+!iterm2
+!zshrc
+!nvim
+
+# Fonts live in a private repo, cloned here on demand by setup.sh
+.fonts-private/

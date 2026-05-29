@@ -1,0 +1,3 @@
+
+  cp ~/.<file-name>{,-<extension>}
+  

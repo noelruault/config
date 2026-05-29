@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# [INFO]
+# [WARNING]: Not working with large amount of files found
+# pre-commit-rubocop hook for git.
+# Hook that uses rubocop gem to check if files changed in actual commit are
+# good enough in order to commit them to the branch.
+
+
+echo "[RUBOCOP] --> Init (wait a second)"
+
+MODIFIED_FILES=$(git status --porcelain | xargs ls -1 2>/dev/null | grep '\.rb$' | xargs rubocop)
+
+if [ -z "$MODIFIED_FILES" ]; then
+    echo -e "[RUBOCOP] --> 🌝 Nothing to be scanned."
+    exit 0
+fi
+
+FAILS=$(rubocop --color $MODIFIED_FILES)
+
+if [[ "$FAILS" = *"no offenses"* ]]; then
+    echo -e "[RUBOCOP] --> 👍 Approved."
+    exit 0
+else
+    echo -e "$FAILS"
+    echo "[RUBOCOP] --> ✋ You've offenses!!!"
+    exit 1
+fi

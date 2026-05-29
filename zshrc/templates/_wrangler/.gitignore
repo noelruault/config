@@ -1,0 +1,29 @@
+### macOS ###
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+## Config ##
+.env
+.env.*
+!.env.example
+build/
+
+# Thumbnails
+._*
+__*
+
+## Node.js ##
+node_modules
+
+## VSCode ##
+!.vscode/extensions.json
+
+# Wrangler files
+.wrangler
+.dev.vars
+
+## Others ##
+dist
+bun.lockb

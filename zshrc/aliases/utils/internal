@@ -1,0 +1,195 @@
+#!/bin/bash
+
+alias \?='type -a $*'
+alias cp='rsync -ah --progress'
+alias rm="rm -i"
+
+
+alias hs='history | grep' # commands history for non-interactive terminals or terminals without fzf
+alias hibernate="sudo systemctl hibernate"
+
+iunmount() {
+    if [ $# -eq 0 ]; then
+        echo "Usage: iunmount <device>"
+        return 1
+    fi
+    device=$1
+    if ! $(diskutil info $device | grep -q "\s\+Removable Media:\s\+Removable"); then
+        echo "Device at $device is not marked as removable."
+        return 1
+    fi
+    echo "Do you want to remove all Mac related hidden files and folders and eject disk?"
+    echo -n "Unmount $device? [y/N] "
+    read -r REPLY
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        dot_clean -m $device
+        rm -rf "$device/.Trashes"
+        rm -rf "$device/.Spotlight-V100"
+        rm -rf "$device/.fseventsd"
+        diskutil eject $device
+        # "$ZSH_CUSTOM_CONFIG_SCRIPTS/clean_and_unmount.sh" -m $device
+    fi
+}
+
+function search() { find / -name "$@" | echo; }
+
+function i.pwgen() {
+    local pw_length=16
+    local num_each=1
+
+    # Parse positional arguments
+    if [ -n "$1" ]; then
+        pw_length=$1
+    fi
+    if [ -n "$2" ]; then
+        num_each=$2
+    fi
+
+    # Validate that we can fit the minimum characters
+    local min_length=$((num_each * 4))
+    if [ $min_length -gt $pw_length ]; then
+        echo "Error: (num_each * 4) = $min_length must be <= pw_length = $pw_length"
+        echo "Usage: pwgen [ pw_length ] [ num_each ]"
+        return 1
+    fi
+
+    # Character groups
+    local uppercase="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    local lowercase="abcdefghijklmnopqrstuvwxyz"
+    local numbers="0123456789"
+    local symbols='!#$%&()*+,-./:;<=>?@[]^_{|}~'
+
+    # Build password with required minimum characters
+    local password=""
+
+    # Add required uppercase letters
+    for ((i=0; i<num_each; i++)); do
+        local idx=$((RANDOM % ${#uppercase}))
+        password+="${uppercase:$idx:1}"
+    done
+
+    # Add required lowercase letters
+    for ((i=0; i<num_each; i++)); do
+        local idx=$((RANDOM % ${#lowercase}))
+        password+="${lowercase:$idx:1}"
+    done
+
+    # Add required numbers
+    for ((i=0; i<num_each; i++)); do
+        local idx=$((RANDOM % ${#numbers}))
+        password+="${numbers:$idx:1}"
+    done
+
+    # Add required symbols
+    for ((i=0; i<num_each; i++)); do
+        local idx=$((RANDOM % ${#symbols}))
+        password+="${symbols:$idx:1}"
+    done
+
+    # Fill the rest with random characters from all groups
+    local all_chars="$uppercase$lowercase$numbers$symbols"
+    local current_length=${#password}
+    local remaining=$((pw_length - current_length))
+
+    for ((i=0; i<remaining; i++)); do
+        local idx=$((RANDOM % ${#all_chars}))
+        password+="${all_chars:$idx:1}"
+    done
+
+    # Shuffle the password
+    echo "$password" | fold -w1 | shuf | tr -d "\n"
+    echo
+}
+
+function fileformat(){
+    arch=$(uname -m)
+    os=$(uname -s)
+
+    case "$os" in
+    Linux)
+        file_format="elf64"
+        ;;
+    Darwin)
+        case "$arch" in
+        x86_64)
+            file_format="macho64"
+            ;;
+        aarch64)
+            file_format="macho64"
+            ;;
+        esac
+        ;;
+    Windows)
+        case "$arch" in
+        x86)
+            file_format="win32"
+            ;;
+        x86_64)
+            file_format="win64"
+            ;;
+        esac
+        ;;
+    *)
+        echo "No se ha podido determinar el formato de archivo de salida para tu ordenador."
+        exit 1
+        ;;
+    esac
+    echo $file_format
+}
+
+# gitloc: summarize Git line churn grouped by file extension.
+#
+# Output columns:
+#   <extension> +<added> -<deleted> =<total_changed>
+#
+# Examples:
+#   gitloc
+#     - Unstaged changes only.
+#   gitloc --cached
+#     - Staged changes only (what will be committed).
+#   gitloc HEAD
+#     - All local changes vs HEAD (staged + unstaged).
+#   gitloc --cached -- . ':(exclude)**/*.md'
+#     - Staged only, excluding markdown files.
+#
+# Notes:
+#   - This uses `git diff --numstat`, so binary files ("-") are ignored.
+#   - Grouping is based on the basename extension (e.g. ".go", ".ts", ".md").
+#   - Files without an extension are grouped under "(noext)".
+#   - `"$@"` forwards any normal `git diff` args/pathspecs.
+gitloc () {
+  local diff_args=()
+  local user_args=()
+  local ignore_space=0
+  local arg
+
+  for arg in "$@"; do
+    if [ "$arg" = "--ignore-space" ]; then
+      ignore_space=1
+      continue
+    fi
+    user_args+=("$arg")
+  done
+
+  if [ "$ignore_space" -eq 1 ]; then
+    diff_args+=("-w")
+  fi
+
+  git diff --numstat "${diff_args[@]}" "${user_args[@]}" | awk -F '\t' '
+    $1 ~ /^[0-9]+$/ && $2 ~ /^[0-9]+$/ {
+      file=$3
+      n=split(file,p,"/"); base=p[n]
+      ext="(noext)"
+      if (match(base, /\.[^.]+$/)) ext=substr(base, RSTART)
+      add[ext]+=$1; del[ext]+=$2
+    }
+    END {
+      totalA=0; totalD=0
+      for (e in add) {
+        printf "%-10s +%d -%d =%d\n", e, add[e], del[e], add[e]+del[e]
+        totalA+=add[e]; totalD+=del[e]
+      }
+      printf "%-10s +%d -%d =%d\n", "TOTAL", totalA, totalD, totalA+totalD
+    }' | sort
+}

@@ -1,0 +1,21 @@
+#!/usr/bin/env zsh
+# lazy_cmd <name> <init-script-path>
+#   First invocation of <name>:
+#     - unfunction the stub
+#     - source <init-script-path> (which puts the real command on PATH)
+#     - re-dispatch the call to the real command
+#   Subsequent invocations hit the real command on PATH directly.
+#
+# Used by routes to defer PATH-only init for interactive-only tools.
+# Tradeoff: shell completions for the tool do not exist until first call.
+
+lazy_cmd() {
+  local name=$1 init=$2
+  eval "
+    $name() {
+      unfunction $name 2>/dev/null
+      source '$init'
+      $name \"\$@\"
+    }
+  "
+}

@@ -1,0 +1,45 @@
+#!/usr/bin/env zsh
+
+# zsh builtin: $EPOCHREALTIME is float "seconds.microseconds since epoch".
+# Zero-fork replacement for `$(gdate +%s%N)`. Required once per shell.
+zmodload zsh/datetime 2>/dev/null
+
+declare -A logs=() # -A: Associative (array)
+
+# timelogger: cheap interval timer. Pure zsh, no fork.
+#
+# Usage:
+#   timelogger heavyprocess start
+#   timelogger heavyprocess end
+#
+# The "end" branch always computes the interval and (for the zsh interval)
+# persists it to ~/.cache/zsh-startup-ms so `shellinfo` can read it later.
+# It only ECHOES "Runtime of NAME was N ms." when $ZSH_TIMING is set, to
+# keep default shell startup output quiet.
+function timelogger() {
+  local name=$1
+  local action=$2
+
+  if [ "$action" = "start" ]; then
+    logs+=( [$name]=$EPOCHREALTIME )
+  fi
+  if [ "$action" = "end" ]; then
+    local log_start=$logs[$name]
+    local diff_ms=$(( (EPOCHREALTIME - log_start) * 1000 ))
+    local log_runtime=${diff_ms%.*}
+    LAST_TIMELOG_MS=$log_runtime
+    [[ -n $ZSH_TIMING ]] && echo "Runtime of $name was $log_runtime ms."
+    if [ "$name" = "zsh" ]; then
+      mkdir -p "$HOME/.cache" 2>/dev/null
+      echo "$log_runtime" > "$HOME/.cache/zsh-startup-ms" 2>/dev/null
+    fi
+    unset "logs[${(b)name}]"
+  fi
+}
+
+# alert_unused_logs alerts if any log remains unused.
+function alert_unused_logs(){
+    for log value in ${(kv)logs}; do
+      if [[ -n $logs[$value] ]]; then echo unused $key log value; fi
+    done
+}

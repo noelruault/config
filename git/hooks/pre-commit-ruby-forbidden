@@ -1,0 +1,47 @@
+#!/bin/zsh
+#!/usr/local/opt/grep/libexec/gnubin/grep
+
+# Git pre-commit hook to check all staged Ruby (*.rb/haml/coffee) files
+# for forbidden references, (grep 3 | zsh) is mandatory. On MacOs install
+# last version of gnu-grep with command `brew install grep`
+#
+# Installation:
+#   On MacOs install last version of gnu-grep with command `brew install grep`
+# ----
+#   ln -s /path/to/pre-commit.sh /path/to/project/.git/hooks/pre-commit
+#
+# Based on
+#
+#   http://codeinthehole.com/writing/tips-for-using-a-git-pre-commit-hook/
+#   http://mark-story.com/posts/view/using-git-commit-hooks-to-prevent-stupid-mistakes
+#   https://gist.github.com/3266940
+#   https://gist.github.com/alexbevi/3436040#file-pre-commit-sh
+#   https://unix.stackexchange.com/a/37316
+#
+
+FILES_PATTERN='\.(rb|haml|coffee)(\..+)?$'
+declare -a FORBIDDEN=( binding.pry byebug debugger)
+
+forbidden_composition=''
+for element in ${FORBIDDEN[@]}; do
+    forbidden_element="grep --color --with-filename -n '$element' \$@;"
+    forbidden_composition+=" ${forbidden_element}"
+done
+
+command=$(
+    git ls-files --others --exclude-standard --modified \
+    | grep --invert-match Gemfile \
+    | grep --extended-regexp ${FILES_PATTERN} \
+    | GREP_COLOR='4;5;37;41' xargs bash -c $forbidden_composition bash
+)
+
+if [ -z "$command" ]; then
+    echo -e "[FORBIDDEN_WORDS] --> 🌝 Nothing relevant found."
+    #exit 0
+else
+    echo "[FORBIDDEN_WORDS] --> ✋ You have forbidden words!!!"
+
+    command=(\\n❗️${command//$'\n'/ '\n'❗️}\\n)
+    echo $command
+    #exit 1
+fi

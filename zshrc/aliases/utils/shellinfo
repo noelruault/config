@@ -1,0 +1,106 @@
+#!/bin/bash
+# Inventory commands: print what is loaded in this shell.
+#
+#   shellist - brew-list style: section headers, one item per line, sorted.
+#   shellinfo - brew-info style: one-line summary plus key metrics.
+#
+# Source of truth lives inside this shell (functions + env vars set by
+# routes / zshrc / aliases). Associative arrays are NOT exported across
+# subshells in zsh; these commands are functions, so they run in the
+# same shell that sourced routes. Safe.
+
+_si_sorted_words() {
+    print -l -- ${(@)*} | sort
+}
+
+shellist() {
+    local loader=${ZSH_LOADER:-omz}
+    local prompt=${ZSH_PROMPT:-spaceship}
+    local profile=${ZSH_PROFILE:+on}; profile=${profile:-off}
+
+    echo "==> Loader / prompt"
+    echo "loader=$loader   prompt=$prompt   profile=$profile"
+
+    echo "==> Plugins"
+    if [[ -n ${plugins+x} ]]; then
+        echo "${(@)plugins}" | tr ' ' '\n' | sort | paste -sd '  ' -
+    else
+        echo "(none)"
+    fi
+
+    echo "==> Integrations (eager)"
+    local eager=()
+    [[ -e "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/docker" ]] && eager+=(docker)
+    echo "${eager[@]}"
+
+    echo "==> Integrations (lazy)"
+    local lazy=()
+    for f in "$ZSH_CUSTOM_CONFIG_ALIASES"/lazy/*(N); do
+        local b=${f:t}
+        [[ $b == _* ]] && continue
+        lazy+=("$b")
+    done
+    # nvm is also lazy but lives in external, not lazy/.
+    typeset -f nvm >/dev/null 2>&1 && lazy+=(nvm)
+    print -l -- "${lazy[@]}" | sort | paste -sd '  ' -
+
+    echo "==> Utils"
+    for f in "$ZSH_CUSTOM_CONFIG_ALIASES"/utils/*(N); do
+        local b=${f:t}
+        [[ $b == _* || $b == *.sh || -d $f ]] && continue
+        echo "$b"
+    done | sort | paste -sd '  ' -
+
+    echo "==> OS-specific"
+    case $(uname) in
+        Darwin) echo "macos" ;;
+        Linux)  echo "linux" ;;
+        *)      echo "(unknown)" ;;
+    esac
+
+    echo "==> Notebook topics"
+    if [[ -d "$ZSH_CUSTOM_CONFIG_NOTEBOOK" ]]; then
+        ls "$ZSH_CUSTOM_CONFIG_NOTEBOOK"/*.md 2>/dev/null \
+            | xargs -n1 basename 2>/dev/null \
+            | sed 's/\.md$//' | sort | paste -sd '  ' -
+    fi
+
+    echo "==> Templates"
+    if [[ -d "$ZSH_CUSTOM_CONFIG_TEMPLATES" ]]; then
+        (cd "$ZSH_CUSTOM_CONFIG_TEMPLATES" && \
+            ls -d _*/ 2>/dev/null | sed 's|^_||;s|/$||' | sort | paste -sd '  ' -)
+    fi
+}
+
+shellinfo() {
+    local loader=${ZSH_LOADER:-omz}
+    local prompt=${ZSH_PROMPT:-spaceship}
+    local profile=${ZSH_PROFILE:+on}; profile=${profile:-off}
+    local startup="(no snapshot)"
+    [[ -s "$HOME/.cache/zsh-startup-ms" ]] && startup="$(<$HOME/.cache/zsh-startup-ms) ms"
+
+    local plugin_count=0
+    [[ -n ${plugins+x} ]] && plugin_count=${#plugins[@]}
+
+    local eager_count=0
+    [[ -e "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/docker" ]] && eager_count=1
+
+    local lazy_count=0
+    for f in "$ZSH_CUSTOM_CONFIG_ALIASES"/lazy/*(N); do
+        [[ ${f:t} == _* ]] && continue
+        ((lazy_count++))
+    done
+    typeset -f nvm >/dev/null 2>&1 && ((lazy_count++))
+
+    local nb_count=0
+    if [[ -d "$ZSH_CUSTOM_CONFIG_NOTEBOOK" ]]; then
+        nb_count=$(ls "$ZSH_CUSTOM_CONFIG_NOTEBOOK"/*.md 2>/dev/null | wc -l | tr -d ' ')
+    fi
+
+    printf 'Loader:   %-15s(env ZSH_LOADER, set to "zinit" for turbo)\n' "$loader"
+    printf 'Prompt:   %-15s(env ZSH_PROMPT, set to "starship" to swap)\n' "$prompt"
+    printf 'Profile:  %-15s(env ZSH_PROFILE=1 to enable zprof)\n' "$profile"
+    printf 'Startup:  %-15s(last timelogger snapshot)\n' "$startup"
+    printf '%d plugins, %d eager integration, %d lazy integrations, %d notebook topics\n' \
+        "$plugin_count" "$eager_count" "$lazy_count" "$nb_count"
+}

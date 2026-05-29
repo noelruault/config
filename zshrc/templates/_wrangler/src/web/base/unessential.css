@@ -1,0 +1,12 @@
+:root {
+    --essential: "false";
+}
+
+#status-css-unessential-tag {
+    display: none;
+}
+
+#status-css-unessential:after{
+    color: green;
+    content: ': online';
+}

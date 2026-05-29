@@ -1,0 +1,274 @@
+#!/bin/bash
+# Notebook launcher. Each topic lives in notebook.d/<topic>.md.
+#
+# Commands:
+#   howto                    - fzf-pick a topic (preview via bat), then render it
+#   howto <topic>            - render notebook.d/<topic>.md (bat, fallback cat)
+#   howto?                   - list all topic names, sorted
+#   howto add <topic>        - open notebook.d/<topic>.md in $EDITOR
+#   howto ask <filter> "<q>" - filter docs first, then pipe to an AI helper.
+#                              <filter> is either an exact topic name, or
+#                              a ripgrep keyword (matches files containing it).
+#                              Never cats all topics; context limits.
+#
+# NOTEBOOK_AI selects the helper for `howto ask`:
+#   claude (default) - prefers the `claudio` shell function (defined in
+#                      aliases/utils/external) if available, else the `claude`
+#                      binary on PATH.
+#   opencode         - pipes to `opencode` (lazy-loaded; will source on first use)
+#   lms              - pipes to `lms` (lazy-loaded; will source on first use)
+#   ollama           - pipes to `ollama run "$OLLAMA_MODEL" "$query"`. Default
+#                      model gemma4:e2b-mlx (MLX variant for Apple Silicon).
+#                      Install: brew install ollama;
+#                      pull: ollama pull gemma4:e2b-mlx (or :e4b, :26b, :31b).
+#                      Override per host via $OLLAMA_MODEL.
+#                      Output streams live; markdown is rewritten inline via perl:
+#                        **bold** -> bold, *italic* -> italic, `code` -> dim,
+#                        Thinking...<text>...done thinking. -> gray.
+#                      Headers / fenced blocks not boxed (would need full-buffer render).
+#                      Thinking output shown by default; OLLAMA_HIDE_THINKING=1 or
+#                      `howto ask --no-think` to hide.
+
+_notebook_dir() { echo "$ZSH_CUSTOM_CONFIG_NOTEBOOK"; }
+
+# One-time hint: if NOTEBOOK_AI is unset, suggest configuring a local AI.
+# Shows once per user; silenced by the marker file or by setting NOTEBOOK_AI.
+_notebook_hint_ai() {
+    [[ -n $NOTEBOOK_AI ]] && return
+    local marker=${XDG_CACHE_HOME:-$HOME/.cache}/notebook-ai-hint
+    [[ -f $marker ]] && return
+    mkdir -p "${marker:h}" 2>/dev/null
+    print -u2 -- "notebook: tip — configure a local AI to enable 'howto ask'."
+    print -u2 -- "  Recommended: ollama + gemma4. Run: howto setup"
+    print -u2 -- "  (Shown once. To silence: touch $marker)"
+    touch "$marker" 2>/dev/null
+}
+
+_notebook_render() {
+    local f=$1
+    if command -v bat >/dev/null 2>&1; then
+        bat --style=plain --paging=never -l md "$f"
+    else
+        cat "$f"
+    fi
+}
+
+_notebook_ai_pipe() {
+    local query=$1
+    local provider=${NOTEBOOK_AI:-claude}
+    case $provider in
+        claude)
+            if typeset -f claudio >/dev/null 2>&1; then
+                claudio -p "$query"
+            elif command -v claude >/dev/null 2>&1; then
+                claude -p "$query"
+            else
+                echo "howto ask: no claude/claudio available" >&2
+                return 1
+            fi
+            ;;
+        opencode)
+            command -v opencode >/dev/null 2>&1 || typeset -f opencode >/dev/null 2>&1 || { echo "howto ask: opencode not available" >&2; return 1; }
+            opencode "$query"
+            ;;
+        lms)
+            command -v lms >/dev/null 2>&1 || typeset -f lms >/dev/null 2>&1 || { echo "howto ask: lms not available" >&2; return 1; }
+            lms "$query"
+            ;;
+        ollama)
+            command -v ollama >/dev/null 2>&1 || { echo "howto ask: ollama not installed (brew install ollama)" >&2; return 1; }
+            command -v curl >/dev/null 2>&1 || { echo "howto ask: curl required" >&2; return 1; }
+            command -v jq   >/dev/null 2>&1 || { echo "howto ask: jq required (brew install jq)" >&2; return 1; }
+
+            local model=${OLLAMA_MODEL:-gemma4:e2b-mlx}
+            local hide_thinking=${OLLAMA_HIDE_THINKING:-0}
+            local think_val=true
+            [[ $hide_thinking == 1 ]] && think_val=false
+            local host=${OLLAMA_HOST:-http://localhost:11434}
+            local cols=${COLUMNS:-100}
+
+            # Build JSON body: prompt = context (stdin) + query.
+            local context; context=$(cat)
+            local body
+            body=$(jq -Rn \
+                --arg m "$model" \
+                --arg p "${context}
+
+${query}" \
+                --argjson t $think_val \
+                '{model:$m, prompt:$p, stream:true, think:$t}')
+
+            # Stream NDJSON from /api/generate. jq emits one tagged line per
+            # token: "T<json>" = thinking, "A<json>" = answer. Perl decodes
+            # and routes each section to its own glow-stream subprocess: the
+            # thinking pipe gets -gray (everything tinted dim gray); the
+            # answer pipe runs in full color. glow-stream is an append-only
+            # line-buffered markdown -> ANSI rewriter (bold/italic/code/
+            # headers/bullets). No cursor magic, no flicker, no repaint.
+            # Build: (cd scripts/glow-stream && go build .).
+            curl -sN -X POST "$host/api/generate" -H 'Content-Type: application/json' -d "$body" \
+                | jq -rj --unbuffered '
+                    if .thinking and (.thinking|length>0) then "T" + (.thinking|@json) + "\n"
+                    elif .response and (.response|length>0) then "A" + (.response|@json) + "\n"
+                    else empty end' \
+                | GLOW_STREAM_BIN="${ZSH_CUSTOM_CONFIG_SCRIPTS}/glow-stream/glow-stream" \
+                  perl -e '
+                    use strict; use utf8; use JSON::PP; $|=1;
+                    binmode STDOUT, ":utf8";
+                    my $bin = $ENV{GLOW_STREAM_BIN} || "";
+                    my $have_streamer = (-x $bin);
+
+                    my ($GS_T, $GS_A);
+                    sub open_pipe {
+                        my @args = @_;
+                        open(my $fh, "|-", $bin, @args) or return undef;
+                        binmode $fh, ":utf8";
+                        $fh->autoflush(1);
+                        return $fh;
+                    }
+
+                    while (my $line = <STDIN>) {
+                        chomp $line;
+                        next if length($line) < 2;
+                        my $tag = substr($line, 0, 1);
+                        my $tok = eval { decode_json(substr($line, 1)) };
+                        next unless defined $tok;
+
+                        if ($tag eq "T") {
+                            if ($have_streamer) {
+                                $GS_T //= open_pipe("-gray") // do { $have_streamer = 0; undef };
+                                print $GS_T $tok if $GS_T;
+                            } else {
+                                print "\e[90m$tok\e[0m";
+                            }
+                        } elsif ($tag eq "A") {
+                            if ($GS_T) { close $GS_T; $GS_T = undef; print "\n"; }
+                            if ($have_streamer) {
+                                $GS_A //= open_pipe() // do { $have_streamer = 0; undef };
+                                print $GS_A $tok if $GS_A;
+                            } else {
+                                print $tok;
+                            }
+                        }
+                    }
+                    close $GS_T if $GS_T;
+                    close $GS_A if $GS_A;
+                '
+            ;;
+        *)
+            echo "howto ask: unknown NOTEBOOK_AI=$provider" >&2
+            return 1
+            ;;
+    esac
+}
+
+howto() {
+    local dir; dir=$(_notebook_dir)
+    _notebook_hint_ai
+    if [[ $# -eq 0 ]]; then
+        if command -v fzf >/dev/null 2>&1; then
+            local pick
+            if command -v bat >/dev/null 2>&1; then
+                pick=$(ls "$dir"/*.md | xargs -n1 basename | sed 's/\.md$//' | sort | fzf --preview "bat --style=plain --color=always -l md $dir/{}.md")
+            else
+                pick=$(ls "$dir"/*.md | xargs -n1 basename | sed 's/\.md$//' | sort | fzf --preview "cat $dir/{}.md")
+            fi
+            [[ -n $pick ]] && _notebook_render "$dir/$pick.md"
+        else
+            ls "$dir"/*.md | xargs -n1 basename | sed 's/\.md$//' | sort
+        fi
+        return
+    fi
+
+    case $1 in
+        -h|--help|help)
+            cat <<'EOF'
+howto - offline notebook + optional AI Q&A over your own notes.
+
+Usage:
+  howto                          fzf-pick a topic (bat preview), then render it
+  howto <topic>                  render notebook.d/<topic>.md
+  howto?                         list all topic names
+  howto add <topic>              open notebook.d/<topic>.md in $EDITOR
+  howto ask <filter> "<query>"   filter docs, pipe to AI, print answer
+                                 <filter> = exact topic OR ripgrep keyword
+                                 flags: --think | --no-think (ollama only)
+  howto setup                    show local-AI setup guide (Ollama + Gemma 4)
+  howto -h | --help              this message
+
+Environment:
+  NOTEBOOK_AI            claude (default) | opencode | lms | ollama
+  OLLAMA_MODEL           used when NOTEBOOK_AI=ollama (default gemma4:e2b-mlx)
+  OLLAMA_HIDE_THINKING   set =1 to hide chain-of-thought by default
+
+Full reference: howto setup
+EOF
+            return 0
+            ;;
+        setup)
+            _notebook_render "$dir/notebook-ai.md"
+            ;;
+        ask)
+            shift
+            local override_hide=""
+            local args=()
+            while [[ $# -gt 0 ]]; do
+                case $1 in
+                    --no-think) override_hide=1; shift ;;
+                    --think)    override_hide=0; shift ;;
+                    *)          args+=("$1"); shift ;;
+                esac
+            done
+            set -- "${args[@]}"
+            local filter=$1; shift
+            local query="$*"
+            local matches=()
+            if [[ -f "$dir/$filter.md" ]]; then
+                matches=("$dir/$filter.md")
+            elif command -v rg >/dev/null 2>&1; then
+                while IFS= read -r f; do matches+=("$f"); done < <(rg -l "$filter" "$dir" 2>/dev/null)
+            else
+                while IFS= read -r f; do matches+=("$f"); done < <(grep -l "$filter" "$dir"/*.md 2>/dev/null)
+            fi
+            if [[ ${#matches[@]} -eq 0 ]]; then
+                echo "howto ask: no notebook topics match '$filter'" >&2
+                return 1
+            fi
+            if [[ -n $override_hide ]]; then
+                cat "${matches[@]}" | OLLAMA_HIDE_THINKING=$override_hide _notebook_ai_pipe "$query"
+            else
+                cat "${matches[@]}" | _notebook_ai_pipe "$query"
+            fi
+            ;;
+        add)
+            local topic=$2
+            [[ -z $topic ]] && { echo "usage: howto add <topic>"; return 1; }
+            ${EDITOR:-vi} "$dir/$topic.md"
+            ;;
+        *)
+            local topic=$1
+            if [[ -f "$dir/$topic.md" ]]; then
+                _notebook_render "$dir/$topic.md"
+            else
+                echo "howto: unknown topic '$topic'. Try 'howto?'" >&2
+                return 1
+            fi
+            ;;
+    esac
+}
+
+# `howto?` and `notebook?` list all topics
+alias notebook\?='howto'
+alias howto\?='howto'
+
+# Backward-compat aliases for legacy `<topic>?` invocations.
+# Sunset after one week; remove this block then.
+for _topic in awk bash bash-exit bashrc copy dd diskutil django-migrations \
+              docker docker-compose git go go-comments go-encode go-fmt \
+              go-map go-mock go-mod go-naming go-versions gpg grep iterm \
+              lag macshortcuts mkdir mouse mysql npm permission pkg postgres \
+              safari scp screen shebang ssh statuscodes subl tar thread tty \
+              virtualenv vscode; do
+    alias "${_topic}?=howto ${_topic}"
+done
+unset _topic

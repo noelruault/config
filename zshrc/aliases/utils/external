@@ -1,0 +1,690 @@
+#!/bin/bash
+
+function current_git_ssh_key(){
+    SSH_VERSION=$(ssh -v git@github.com 2>&1); \
+    echo $SSH_VERSION | grep "Server accepts key:" | grep -oEi '\S+.ssh\S+'
+}
+
+### GIT
+# https://github.com/ohmyzsh/ohmyzsh/wiki/Cheatsheet#git
+alias gamod="git ls-files --modified | xargs git add"
+
+alias gbreset='git branch --merged | grep -v \* | xargs git branch -D '
+# Remove all your LOCAL git branches but keep master and the current branch:
+# - git branch | egrep -v "(master|dev|\*)" | xargs git branch -D
+# - git branch | grep -v "master\|dev" | xargs git branch -D
+
+alias githooksconfig='git config --global core.hooksPath ~/.config/git/hooks/'
+# USEFUL COMMANDS:
+#   - git diff origin/master --name-only -- '*.go' ':(exclude)vendor/*'
+#   - git config --global alias.dirdiff 'diff -p --stat -w --no-index'
+alias gl='git log --graph --decorate --pretty=oneline --abbrev-commit'
+
+grbs_usage="pro_rebase [<number] -- Sources any integration given a list
+How grbs works:
+  Put as first param the number of commits you want to cover (1-N).
+  e.g: 'pro_rebase 3' == (git rebase -i HEAD~3)
+  Squash commits or whatever and then push your chages with --force
+"
+function grbs() {
+    # https://stackoverflow.com/a/927386
+    regex='^[0-9]+$'
+    if [[ $@ =~ $regex ]]; then
+        git rebase -i HEAD~"$@"
+        echo "Remember to push with --force flag."
+    else
+        pro_rebase_usage
+    fi
+}
+
+gpo() { git push origin $(git branch --show-current) }
+# gposkipci() { git push origin $(git branch --show-current) -o ci.skip } # Gitlab
+
+### Golang
+
+alias vimgo='vim -u ~/.vimrc.go'
+
+# TODO:
+# https://stackoverflow.com/a/30033822/4349318
+alias gopath='cd $(go env GOPATH)'
+alias gosrc='cd $(go env GOPATH)/src/'
+
+### GOLANG
+function gotest() {
+    # if [[ "$1" == "color" ]]; then
+    go test ./... -p 1 -count 1 -v |
+        sed ''/PASS/s//$(printf "\033[32mPASS\033[0m")/'' |
+        sed ''/FAIL/s//$(printf "\033[31mFAIL\033[0m")/'' # \
+    ## | GREP_COLOR="01;33" egrep --color=always '\s*[a-zA-Z0-9\-_.]+[:][0-9]+[:]|^'
+    # return
+
+    if [[ "$1" == "e2e" ]]; then
+        go test ./test/endtoend -tags=endtoend -count=1 -timeout 120s |
+            sed ''/PASS/s//$(printf "\033[32mPASS\033[0m")/'' |
+            sed ''/FAIL/s//$(printf "\033[31mFAIL\033[0m")/''
+    fi
+}
+
+####
+# USE: gocover -run TestUpdateSomethingExample -count=1
+#
+function gocover() {
+    # go test route/to/test -run TestUpdateSomethingExample -count=1 -coverprofile cover.out; go tool cover -html=cover.out
+    local t=$(mktemp -t cover)
+    go test $COVERFLAGS -coverprofile=$t $@ && go tool cover -func=$t && unlink $t
+}
+
+# for pkg in *; do go test "./$pkg"; done
+# go clean -testcache # https://golang.org/pkg/cmd/go/internal/clean/
+
+function gonew() {
+    GITDIR="github.com/$(whoami)"
+    echo "gonew: the git directory has been set to $GITDIR"
+
+    FOLDER_NAME=$1
+    if [[ $# -eq 0 ]]; then
+        # generates random name if not provided
+        FOLDER_NAME=$(openssl rand -hex 4)
+    fi
+
+    DSTPATH=$(go env GOPATH)/src/$GITDIR/$FOLDER_NAME
+    mkdir -p  $DSTPATH && cd $_
+    {
+        echo 'package main'
+        echo 'import "fmt"'
+        echo 'func main() { fmt.Println("hello") }'
+    } >main.go
+
+    echo "gonew: starting golang project generated at: $DSTPATH"
+    go mod init $GITDIR/$FOLDER_NAME
+    code .
+}
+
+function gomod-recursive() {
+    folders=( $(find $(pwd) -iname 'go.mod' -printf '%h\000' | sort -z -u) )
+    for d in "${folders[@]}" ; do cd "$d" && echo "Match found in $d." && go get ./... && go mod tidy || echo "ERROR in $d"; done
+}
+
+### PostgreSQL
+
+alias pgstart='pg_ctl -D /usr/local/var/postgres start' # brew services restart postgresql
+alias pgstop='pg_ctl -D /usr/local/var/postgres stop'
+
+# psql() {
+#     echo "User not specified, defaulting to user 'postgres'"
+#     PGUSER=postgres command psql "$@" \
+#     ; echo "A history file of the commands use in this session can be found at ~/.psql/_history-<db_name>"
+#     # TODO: check if line exist in psqlrc file before displaying the previous text
+# }
+
+### Others
+function compresspdf() {
+    # brew install ghostscript
+    echo '''
+    Usage: compresspdf [input file] [output file] [screen|ebook|printer|prepress]
+        [screen] selects low-resolution output similar to the Acrobat Distiller "Screen Optimized" setting.
+        [ebook] selects medium-resolution output similar to the Acrobat Distiller "eBook" setting.
+        [printer] selects output similar to the Acrobat Distiller "Print Optimized" setting.
+        [prepress] selects output similar to Acrobat Distiller "Prepress Optimized" setting.
+        [default] selects output intended to be useful across a wide variety of uses, possibly at the expense of a larger output file.
+    '''
+    gs -sDEVICE=pdfwrite \
+    -dNOPAUSE -dQUIET -dBATCH \
+    -dPDFSETTINGS=/${3:-"screen"} \
+    -dCompatibilityLevel=1.4 \
+    -sOutputFile="$1".compressed.pdf "$1";
+    # -sOutputFile="$2" "$1"
+
+    # compresspdf "Massive.pdf" "Small.pdf" ebook
+}
+
+function pdfcompress() {
+   gs -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/screen -dEmbedAllFonts=true -dSubsetFonts=true -dColorImageDownsampleType=/Bicubic -dColorImageResolution=144 -dGrayImageDownsampleType=/Bicubic -dGrayImageResolution=144 -dMonoImageDownsampleType=/Bicubic -dMonoImageResolution=144 -sOutputFile=$1.compressed.pdf $1;
+}
+
+### Networks
+alias wanip='dig +short myip.opendns.com @resolver1.opendns.com'
+alias localhosts='ifconfig | grep "inet " | grep -v 127.0.0.1' # https://stackoverflow.com/a/4779992
+
+# CP command, do rsync if file is a folder or higher than 50MB  // rsync -ah --progress
+
+##### FIXES
+# Fix slowness of pastes with zsh-syntax-highlighting.zsh
+# https://github.com/vercel/hyper/issues/1276
+# https://github.com/zsh-users/zsh-syntax-highlighting/issues/295
+# https://github.com/magicdude4eva/iterm-oh-my-zsh-powerlevel10k
+
+#     zstyle ':bracketed-paste-magic' active-widgets '.self-*'
+
+# BUGFIX: Provisional fix for zsh errors
+
+#     ZSH_DISABLE_COMPFIX="true" # fixes error prompting "Insecure completion-dependent directories..."
+
+function check-valid-email() {
+    EMAIL_DOMAIN="$1"
+    EMAIL_SERVER=$(nslookup -q=mx $EMAIL_DOMAIN | grep "mail exchanger" | awk 'NR==1{print substr($6, 1, length($6)-1)}')
+    IS_EMAIL_SERVER_REACHABLE="{ echo 'MAIL FROM any@email.com'; sleep 1} | nc $EMAIL_SERVER 25 2>&1 | grep --extended-regex '^250.*OK' --silent"
+
+    ({ echo 'MAIL FROM any@email.com'; sleep 1} | nc $EMAIL_SERVER 25 2>&1 | grep --extended-regex '^250.*OK' --silent  && echo "email $EMAIL_DOMAIN is reachable") || echo "email $EMAIL_DOMAIN is NOT reachable"
+}
+
+# go_to_dir_on_specific_folder will try to find a directory that matches
+# with the given parameters inside of an specific folder.
+#
+# NOTE: WORK_FOLDER variable could be changed to something else, more specific
+# and without evaluations or commands.
+#
+# Used uncommon commands :
+# - https://ss64.com/bash/wc.html
+# - https://ss64.com/bash/awk.html
+# - Colors: https://www.tldp.org/HOWTO/Bash-Prompt-HOWTO/x329.html https://www.shellhacks.com/bash-colors/
+alias goto=go_to_dir_on_specific_folder
+function go_to_dir_on_specific_folder() {
+    if [ -z "$COMPANY_DIRECTORY" ]; then
+        echo "Environment variable COMPANY_DIRECTORY is not defined"
+        return
+    fi
+
+    echo $pwd                                                        # TODO(nruault): Remove-me
+    WORK_FOLDER=$(eval echo $(go env GOPATH)/src/$COMPANY_DIRECTORY) # eval will store the desired payments path.
+
+    # If there is no arguments, just go to $COMPANY_DIRECTORY
+    if [[ $# -eq 0 ]]; then
+        cd $WORK_FOLDER
+        return
+    fi
+
+    counter=$(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | wc -l) # wc is used for counting the lines
+    if (($counter == 0)); then
+        # An inverted counter will try to find matches inverting the order of the params.
+        inverted_counter=$(find $WORK_FOLDER -type d -name "*$2*$1*" -print -maxdepth 1 | wc -l)
+        if (($inverted_counter > 0)); then
+            # If something matches, will display the results in addition to a tip.
+            echo "Better try \e[0;33m$2 $1\e[0m"
+            echo "Found:\n\e[0;34m$(find $WORK_FOLDER -type d -name "*$2*$1*" -print -maxdepth 1 | awk -F/ '{print $NF}')\e[0m"
+            return
+        fi
+
+        echo "No matches."
+        return
+
+    elif (($counter > 1)); then
+        # AWK is used in the next command to get the name of the folder without the path
+        # The parenthesis at the begining will make this an array.
+        search=($(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}'))
+
+        # This loop will check if the input matches exactly with the name of the folder,
+        # if there is an exact match, will cd and end the function.
+        for i in "${search[@]}"; do
+            if [ $i = $1 ]; then
+                cd $WORK_FOLDER$1
+                return
+            fi
+        done
+
+        # If more than one folder were found and there is not a clear candidate, print the results.
+        # The loop is used to print them in different lines.
+        for i in "${search[@]}"; do echo $i; done
+        return
+    else
+        # If only one folder was found, change to the found directory
+        # cd $WORK_FOLDER$(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}')
+
+        ## TODO(nruault): REMOVE ME -----------------------
+        FOLDER=$(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}')
+        WORK_FOLDER=$(eval echo $(go env GOPATH)/src/$COMPANY_DIRECTORY)
+        COM=$(find $WORK_FOLDER -type d -name "$FOLDER" -print -maxdepth 1 | awk -F/ '{print $NF}')
+        if [ -z "$COM" ]; then
+            cd $WORK_FOLDER$FOLDER
+        fi
+        cd $WORK_FOLDER$(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}')
+        ## REMOVE ME -----------------------
+    fi
+}
+
+source_integrations_usage="source_integrations [integrations...] -- Sources any integration given a list
+
+3rd party integrations must be added to this script manually.
+So far the next options can be handled:
+
+    .               Loads general integrations
+    aws             Prints how to load Amazon Web Service integration
+    flutter         Loads Flutter integration
+    gcloud          Loads Google Cloud integration
+    node|npm|nvm    Loads NodeJs integration
+    sql             Loads MySQL integration
+"
+
+function source_integrations() {
+    if [[ $# -eq 0 ]]; then
+        echo "$source_integrations_usage"
+        return
+    fi
+
+    timelogger source_integrations start
+
+    while [ $# -gt 0 ]; do
+        case "$1" in
+        .)
+            echo "Loading general integrations"
+            source "$ZSH_CUSTOM_CONFIG_ALIASES/integrations/general"
+            ;;
+
+        gcloud)
+            echo "Loading GCloud integration"
+            # GCLOUD_SDK_PATH was set on ~/.zprofile
+
+            # The next line updates PATH for the Google Cloud SDK.
+            if [ -f "$GCLOUD_SDK_PATH/path.zsh.inc" ]; then . "$GCLOUD_SDK_PATH/path.zsh.inc"; fi
+            # The next line enables shell command completion for gcloud.
+            if [ -f "$GCLOUD_SDK_PATH/completion.zsh.inc" ]; then . "$GCLOUD_SDK_PATH/completion.zsh.inc"; fi
+            ;;
+
+        node|npm|nvm)
+            # https://github.com/nvm-sh/nvm#uninstalling--removal
+            # To remove nvm manually, execute the following:
+            #   $ rm -rf "$NVM_DIR"
+            echo "Loading NVM integration"
+            export NVM_DIR="$HOME/.nvm"
+
+            # -- Manual installation ---------------
+            # [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+            # [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+            # -- Homebrew installation -------------
+            [ -s "$(brew --prefix)/opt/nvm/nvm.sh" ] && . "$(brew --prefix)/opt/nvm/nvm.sh" # This loads nvm
+            [ -s "$(brew --prefix)/opt/nvm/etc/bash_completion.d/nvm" ] && . "$(brew --prefix)/opt/nvm/etc/bash_completion.d/nvm" # This loads nvm bash_completion
+            ;;
+
+        aws)
+            echo "Load AWS profiles by running 'export AWS_PROFILE=<development/production/personal>'"
+            echo "All the profiles are sourced from '~/.aws/credentials'"
+            ;;
+
+        flutter)
+            echo "Loading Flutter integration"
+            [ -s "$HOME/flutter/bin/flutter" ] && export PATH="$PATH:$HOME/flutter/bin"
+            ;;
+
+        sql)
+            echo "Loading MySQL integration"
+            # brew install mysql mysql-client # It is important to include both, server and client
+            if [ -f "/usr/local/opt/mysql-client/bin" ]; then export PATH="/usr/local/opt/mysql-client/bin:$PATH"; fi
+            ;;
+
+        idf)
+            echo "Loading idf.py integration"
+            . $HOME/esp/esp-idf/export.sh
+            ;;
+        *)
+            echo "$0: error: unrecognized option $1"
+            echo "$0: $source_integrations_usage"
+            exit 0
+            ;;
+
+        esac
+        shift
+
+    done
+
+    timelogger source_integrations end
+}
+
+# USE: domain_expiration domain.com [bash:request]
+function domain_expiration(){
+    if nc -zw1 google.com 443 &>/dev/null; then echo; else exit 1; fi # Checks for internet connectivity. Silent exit if no connection
+
+    domain_status=$(whois $1 | grep -m1 "Domain Status")
+    domain_expiry_date=$(whois $1 | grep "Registry Expiry Date" | grep -oE '(\d{4})-(\d\d)-(\d\d)' | sed 's/[\._-]//g')
+
+    gdate=$HOMEBREW_PREFIX/bin/gdate
+    current_epoch_time=$(gdate +%s)
+    domain_expity_date_epoch=$(gdate --date=$domain_expiry_date +%s)
+    days_until_expiration=$(((domain_expity_date_epoch - current_epoch_time) / 86400))
+
+    if [[ "$2" == "bash:request" ]]; then
+        if ((days_until_expiration < 30)); then
+            echo "DOMAIN $1 ABOUT TO EXPIRE, $days_until_expiration days left."
+            echo "$domain_status"
+        fi
+    else
+        echo "Domain $1 expiration is $days_until_expiration days ahead."
+    fi
+}
+
+function setvscode() {
+    mkdir -p .vscode/
+    ln -s ~/.config/vscode/secrets/* ./.vscode/
+
+    if ! grep -qxF 'vscode/*' .gitignore; then
+        echo "vscode folder is not git-ignored."
+        echo "Do you wish to insert a ignore rule for it?"
+        select yn in "Yes" "No"; do
+            case $yn in
+                Yes ) echo "\nvscode/*" >> .gitignore; break;;
+                No ) exit;;
+            esac
+        done
+    fi
+}
+
+### Vagrant
+alias vagrantclean="vagrant box list | cut -f 1 -d ' ' | xargs -L 1 vagrant box remove -f"
+
+# Add rubygems to the path
+export PATH=/usr/local/lib/ruby/gems/2.7.0/bin:$PATH
+
+# ping to specific port
+# nc -vz -u seaparty.crabdance.com 2194
+# -z Zero-I/O mode [used for scanning]
+# -v Verbose
+# -u UDP mode
+
+
+### Javascript
+function jsnew() {
+    local template_dir="$ZSH_CUSTOM_CONFIG_TEMPLATES/_javascript/"
+
+    if [[ ! -d "$template_dir" ]]; then
+        echo "Template directory not found: $template_dir"
+        return 1
+    fi
+
+    local gitdir="github.com/$(whoami)"
+    echo "jsnew: the git directory has been set to $gitdir"
+
+    local folder_name=$1
+    if [[ $# -eq 0 ]]; then
+        # Generate a random name if not provided
+        folder_name=$(openssl rand -hex 4)
+    fi
+
+    local dstpath="$(go env GOPATH)/src/$gitdir/$folder_name"
+    mkdir -p "$dstpath" && cd "$_"
+    rsync --recursive "$template_dir" .
+
+    echo "jsnew: starting JavaScript project generated at: $dstpath"
+    if [[ -f "Makefile" ]]; then
+        make setup
+    else
+        echo "Makefile not found. You may need to set up your project manually."
+    fi
+
+    code .
+}
+
+# Add deno completions to search path
+# if [[ ":$FPATH:" != *":/Users/$(whoami)/completions:"* ]]; then export FPATH="/Users/$(whoami)/completions:$FPATH"; fi
+
+# bun completions: sourced exactly once in zprofile. Do not re-source here.
+# . "/Users/$(whoami)/.deno/env"
+
+# nvm (node version manager): lazy. First call to nvm/node/npm/npx sources
+# nvm.sh, then re-dispatches. Subsequent calls hit the real command directly.
+export NVM_DIR="$HOME/.nvm"
+nvm() {
+  unfunction nvm node npm npx 2>/dev/null
+  [[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
+  [[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"
+  nvm "$@"
+}
+node() { nvm use default >/dev/null 2>&1; node "$@"; }
+npm()  { nvm use default >/dev/null 2>&1; npm  "$@"; }
+npx()  { nvm use default >/dev/null 2>&1; npx  "$@"; }
+
+alias jira-list='jiralist'
+function jiralist {
+  for p in NEBU BAWS PE; do
+    echo "=== $p ==="
+    jira issue list -p $p -a$(jira me) --plain
+  done
+}
+
+alias jira\?="jiradescription"
+function jiradescription() {
+  echo """
+jira issue view <issue-key>
+    """
+}
+
+export CLAUDE_HOME_PERSONAL="$HOME/.claude-personal-home"
+export CLAUDE_HOME_WORK="$HOME/.claude-work-home"
+
+_claudio_init_home() {
+  local target_home="$1"
+  [[ -d "$target_home/.claude" ]] || mkdir -p "$target_home/.claude"
+
+  # Share config dirs across personal/work homes by symlinking to the canonical
+  # ~/.claude/<dir> (the real user $HOME, not the alternate claudio home). Only
+  # dirs safe to share globally live here; a dir absent from canonical is skipped
+  # (guard below), so listing not-yet-created ones like prompts is harmless.
+  # Per-profile state (projects, history, sessions, settings.json, plugins,
+  # tasks) stays separate and is NOT listed here.
+  local real_home="${target_home%/*}"
+  local shared_dir
+  for shared_dir in skills agents hooks prompts commands; do
+    local canonical_dir="$real_home/.claude/$shared_dir"
+    local linked_dir="$target_home/.claude/$shared_dir"
+    if [[ -d "$canonical_dir" && ! -e "$linked_dir" && ! -L "$linked_dir" ]]; then
+      ln -s "$canonical_dir" "$linked_dir"
+    fi
+  done
+
+  # macOS Security framework reads $HOME/Library/Keychains. With HOME pointed
+  # at the alt home, anything touching the keychain (git credential helper,
+  # gh, ssh-add, claude OAuth lookup) triggers a "Keychain Not Found" prompt.
+  # Symlink the real user's Keychains dir so lookups resolve transparently.
+  [[ -d "$target_home/Library" ]] || mkdir -p "$target_home/Library"
+  local canonical_keychains="$real_home/Library/Keychains"
+  local linked_keychains="$target_home/Library/Keychains"
+  if [[ -d "$canonical_keychains" && ! -e "$linked_keychains" && ! -L "$linked_keychains" ]]; then
+    ln -s "$canonical_keychains" "$linked_keychains"
+  fi
+
+  # If anything writes $target_home/Library/Preferences/com.apple.security.plist
+  # with an empty DefaultKeychain (seen after a failed keychain lookup), the
+  # Security framework triggers a "Keychain Not Found — A keychain cannot be
+  # found to store '$USER'" prompt on every subsequent call. The real HOME has
+  # no such file; the alt HOME shouldn't either. Nuke it on init so Security
+  # falls back to its built-in defaults and resolves via the symlink above.
+  rm -f "$target_home/Library/Preferences/com.apple.security.plist" 2>/dev/null
+}
+
+# Per-account keychain isolation. macOS Keychain stores OAuth creds under
+# a single (service, account) pair, shared across both claudio HOMEs via the
+# Library/Keychains symlink above. Without this swap, logging into one account
+# silently overwrites the other. We snapshot the blob into each home and swap
+# it in before claude runs.
+_CLAUDIO_KC_SERVICE="Claude Code-credentials"
+
+_claudio_kc_account() { printf '%s' "${USER:-$(id -un)}"; }
+
+_claudio_owner_file() { printf '%s' "$HOME/.claude/claudio-keychain-owner"; }
+
+_claudio_creds_file() {
+  case "$1" in
+    personal) printf '%s' "$CLAUDE_HOME_PERSONAL/.claude/.claudio-credentials.json" ;;
+    work)     printf '%s' "$CLAUDE_HOME_WORK/.claude/.claudio-credentials.json" ;;
+  esac
+}
+
+_claudio_keychain_read() {
+  security find-generic-password \
+    -s "$_CLAUDIO_KC_SERVICE" -a "$(_claudio_kc_account)" -w 2>/dev/null
+}
+
+_claudio_keychain_write() {
+  security add-generic-password -U \
+    -s "$_CLAUDIO_KC_SERVICE" -a "$(_claudio_kc_account)" -w "$1" >/dev/null 2>&1
+}
+
+_claudio_save_creds() {
+  local account="$1" file blob
+  file=$(_claudio_creds_file "$account")
+  [[ -z "$file" ]] && return 1
+  blob=$(_claudio_keychain_read)
+  [[ -z "$blob" ]] && return 0
+  mkdir -p "${file%/*}"
+  ( umask 077 && printf '%s' "$blob" > "$file" )
+  chmod 600 "$file" 2>/dev/null
+  printf '%s' "$account" > "$(_claudio_owner_file)"
+}
+
+_claudio_load_creds() {
+  local account="$1" file blob
+  file=$(_claudio_creds_file "$account")
+  [[ -z "$file" || ! -f "$file" ]] && return 1
+  blob=$(<"$file")
+  [[ -z "$blob" ]] && return 1
+  _claudio_keychain_write "$blob"
+}
+
+_claudio_swap_in() {
+  local target="$1" owner_file owner
+  owner_file=$(_claudio_owner_file)
+  mkdir -p "${owner_file%/*}"
+  [[ -f "$owner_file" ]] && owner=$(<"$owner_file")
+
+  if [[ -z "$owner" ]]; then
+    # First time: claim current keychain blob for the target account.
+    printf '%s' "$target" > "$owner_file"
+    _claudio_save_creds "$target"
+    return 0
+  fi
+
+  [[ "$owner" == "$target" ]] && return 0
+
+  _claudio_save_creds "$owner"
+  _claudio_load_creds "$target"   # ok if no saved file yet; login will snapshot
+  printf '%s' "$target" > "$owner_file"
+}
+
+_claudio_run() {
+  local account="$1"
+  shift
+
+  local real_home="$HOME"
+  local home_dir
+
+  case "$account" in
+    personal) home_dir="$CLAUDE_HOME_PERSONAL" ;;
+    work)     home_dir="$CLAUDE_HOME_WORK" ;;
+    *)
+      echo "_claudio_run: unknown account '$account'" >&2
+      return 2
+      ;;
+  esac
+
+  _claudio_init_home "$home_dir"
+  _claudio_swap_in "$account"
+
+  HOME="$home_dir" \
+  AWS_CONFIG_FILE="$real_home/.aws/config" \
+  AWS_SHARED_CREDENTIALS_FILE="$real_home/.aws/credentials" \
+    command claude "$@"
+  local rc=$?
+  _claudio_save_creds "$account"
+  return $rc
+}
+
+# Extract a --resume / -r session id from an arg list. Echoes the id on stdout
+# if found, empty string otherwise. Recognises: `--resume <id>`, `--resume=<id>`,
+# `-r <id>`, `-r=<id>`.
+_claudio_extract_resume_id() {
+  local prev=""
+  local a
+  for a in "$@"; do
+    case "$prev" in
+      --resume|-r) echo "$a"; return 0 ;;
+    esac
+    case "$a" in
+      --resume=*) echo "${a#--resume=}"; return 0 ;;
+      -r=*)       echo "${a#-r=}";       return 0 ;;
+    esac
+    prev="$a"
+  done
+  return 1
+}
+
+# Given a session id, echo "personal" or "work" if exactly one home contains
+# the matching <id>.jsonl. Echoes "ambiguous" and returns 2 if both contain it.
+# Returns 1 if neither does.
+_claudio_account_for_session() {
+  local id="$1"
+  local personal_hit work_hit
+  personal_hit=$(find "$CLAUDE_HOME_PERSONAL/.claude/projects" -name "${id}.jsonl" -print -quit 2>/dev/null)
+  work_hit=$(find "$CLAUDE_HOME_WORK/.claude/projects" -name "${id}.jsonl" -print -quit 2>/dev/null)
+  if [[ -n "$personal_hit" && -z "$work_hit" ]]; then echo personal; return 0; fi
+  if [[ -z "$personal_hit" && -n "$work_hit" ]]; then echo work;     return 0; fi
+  if [[ -n "$personal_hit" && -n "$work_hit" ]]; then echo ambiguous; return 2; fi
+  return 1
+}
+
+claudio() {
+  for arg in "$@"; do
+    if [[ "$arg" == "update" ]]; then
+      echo "claudio: 'update' operates on the shared binary; run 'claude update' directly" >&2
+      return 1
+    fi
+  done
+
+  case "${1:-}" in
+    --1)
+      shift
+      _claudio_run personal "$@"
+      ;;
+
+    --2)
+      shift
+      _claudio_run work "$@"
+      ;;
+
+    -h|--help)
+      cat <<'EOF'
+Usage:
+  claudio                       Choose account interactively
+  claudio --1                   Use personal account
+  claudio --2                   Use work account
+  claudio --1 ...args           Pass remaining args to claude
+  claudio --2 ...args           Pass remaining args to claude
+  claudio ...args               Choose account interactively, then pass args to claude
+  claudio --resume <id> ...     Auto-detect which home holds <id> and dispatch
+EOF
+      ;;
+
+    *)
+      # Auto-detect home when --resume <id> is passed without --1/--2.
+      local resume_id
+      if resume_id=$(_claudio_extract_resume_id "$@") && [[ -n "$resume_id" ]]; then
+        local auto_account rc
+        auto_account=$(_claudio_account_for_session "$resume_id"); rc=$?
+        case "$rc" in
+          0)
+            echo "claudio: session $resume_id found in $auto_account home"
+            _claudio_run "$auto_account" "$@"
+            return $?
+            ;;
+          2)
+            echo "claudio: session $resume_id exists in BOTH homes, pick --1 or --2 explicitly" >&2
+            return 2
+            ;;
+          *)
+            echo "claudio: session $resume_id not found in either home, choosing interactively" >&2
+            ;;
+        esac
+      fi
+
+      local choice
+      if command -v gum >/dev/null 2>&1; then
+        choice=$(gum choose --header "Choose Claude account" "personal" "work") || return 1
+      else
+        echo "Choose Claude account:"
+        select choice in personal work; do
+          [[ -n "$choice" ]] && break
+        done
+      fi
+
+      _claudio_run "$choice" "$@"
+      ;;
+  esac
+}

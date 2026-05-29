@@ -1,0 +1,3 @@
+#!/usr/bin/env zsh
+# Lazy init for antigravity: prepend bin dir to PATH on first invocation.
+export PATH="$HOME/.antigravity/antigravity/bin:$PATH"

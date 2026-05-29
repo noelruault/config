@@ -1,0 +1,6 @@
+{
+    "recommendations": [
+        "dbaeumer.vscode-eslint",
+        "ms-vscode.live-server" // Not useful if you are using node's live-server (see Makefile)
+    ]
+}

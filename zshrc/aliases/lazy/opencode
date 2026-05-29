@@ -1,0 +1,3 @@
+#!/usr/bin/env zsh
+# Lazy init for opencode: prepend bin dir to PATH on first invocation.
+export PATH="$HOME/.opencode/bin:$PATH"
