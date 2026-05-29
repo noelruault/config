@@ -18,7 +18,8 @@
 iterm2/AppSupport
 
 # Un-ignores some folders
-!code-editors
+!apps
+!rcs
 !git
 !iterm2
 !zshrc
