@@ -1,0 +1,11 @@
+#!/bin/bash
+# aispeak loader.
+#
+# The assistant itself lives in its own repo (private until made public):
+#   github.com/noelruault/aispeak
+# setup.sh clones it to ~/go/src/github.com/noelruault/aispeak. Source it when
+# present; silently no-op for anyone without access (repo not cloned → file
+# absent). Keeps the dotfiles public-safe while the tool stays private.
+_as_repo="$HOME/go/src/github.com/noelruault/aispeak/aispeak.zsh"
+[[ -r $_as_repo ]] && source "$_as_repo"
+unset _as_repo

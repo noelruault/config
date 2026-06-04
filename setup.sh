@@ -69,12 +69,12 @@ install_zsh_plugins() {
 
 # Install fonts (macOS only).
 # Fonts are commercially licensed, so they live in a private repo instead of
-# being committed here. Cloned on demand into .fonts-private/ (gitignored).
+# being committed here. Cloned on demand into .fonts/ (gitignored).
 # Requires git auth (SSH key) to the private repo; skips cleanly without it.
 FONTS_REPO="git@github.com:noelruault/fonts.git"
 install_fonts() {
     if [[ $OSTYPE == 'darwin'* ]]; then
-        local fonts_dir="$CURRENT_DIR/.fonts-private"
+        local fonts_dir="$CURRENT_DIR/.fonts"
         echo "Installing fonts..."
         if [ ! -d "$fonts_dir/.git" ]; then
             git clone --depth=1 "$FONTS_REPO" "$fonts_dir" 2>/dev/null || {
@@ -89,6 +89,34 @@ install_fonts() {
             \( -iname '*.ttf' -o -iname '*.otf' -o -iname '*.ttc' -o -iname '*.dfont' \) \
             -exec cp {} ~/Library/Fonts/ \; \
             || echo "Failed to copy fonts from $fonts_dir"
+    fi
+}
+
+# Install aispeak, the offline voice assistant (private repo until public).
+# Cloned on demand into the Go src tree; skips cleanly without git access, so
+# anyone running this setup without rights to the repo just gets nothing.
+# The shell loader (zshrc/aliases/utils/aispeak) sources it only if present.
+AISPEAK_REPO="git@github.com:noelruault/aispeak.git"
+AISPEAK_DIR="$HOME/go/src/github.com/noelruault/aispeak"
+install_aispeak() {
+    if [ -d "$AISPEAK_DIR/.git" ]; then
+        git -C "$AISPEAK_DIR" pull --ff-only 2>/dev/null || true
+    else
+        mkdir -p "$(dirname "$AISPEAK_DIR")"
+        git clone "$AISPEAK_REPO" "$AISPEAK_DIR" 2>/dev/null || {
+            # No access (private repo / no key) — silently skip.
+            return
+        }
+    fi
+    # Pre-build the speech binary if we can; otherwise it builds on first run.
+    if command -v swiftc >/dev/null 2>&1 && [ -x "$AISPEAK_DIR/speech-stt/build.sh" ]; then
+        "$AISPEAK_DIR/speech-stt/build.sh" >/dev/null 2>&1 || true
+    fi
+    # Populate doc corpora once (English manual download + local Spanish import),
+    # so `aispeak --topic vim-en|vim-es` works out of the box. Best-effort.
+    local docs_root="${XDG_DATA_HOME:-$HOME/.local/share}/aispeak/docs"
+    if [ ! -d "$docs_root/vim-en" ] && [ -x "$AISPEAK_DIR/scripts/fetch-docs.sh" ]; then
+        "$AISPEAK_DIR/scripts/fetch-docs.sh" all >/dev/null 2>&1 || true
     fi
 }
 
@@ -193,6 +221,10 @@ fi
 # Fonts last: the private fonts repo is cloned over SSH, so this must run after
 # SSH key generation / signing above, otherwise a fresh machine has no auth yet.
 install_fonts
+
+# aispeak: also a private SSH clone, so likewise after SSH setup. No-op without
+# repo access; loaded by zshrc/aliases/utils/aispeak only when the clone exists.
+install_aispeak
 
 # TODO:
 # https://iterm2colorschemes.com
