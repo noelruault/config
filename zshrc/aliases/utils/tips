@@ -1,0 +1,24 @@
+#!/bin/bash
+# Once-a-day startup tip. Surfaces `zshhelp` (so you don't forget your custom
+# commands exist) plus a rotating secondary tip. Shown at most once per calendar
+# day; the check is a single stamp-file read, so it never slows startup.
+# Silence entirely: touch ~/.cache/zsh-tip-off
+() {
+    local cache=${XDG_CACHE_HOME:-$HOME/.cache}
+    [[ -f $cache/zsh-tip-off ]] && return
+    local stamp=$cache/zsh-tip-day today
+    zmodload zsh/datetime 2>/dev/null
+    today=$(strftime '%Y%m%d' $EPOCHSECONDS 2>/dev/null) || today=$(date +%Y%m%d)
+    [[ -r $stamp && "$(cat $stamp 2>/dev/null)" == $today ]] && return
+    mkdir -p "$cache" 2>/dev/null
+    print -r -- "$today" > "$stamp"
+
+    local -a extra=(
+        "zshperf doctor — check shell startup health"
+        "howto? — your offline notebook topics (howto ask <t> for AI)"
+        "zshperf — where startup time goes"
+        "aispeak --lang es — talk to a local LLM by voice"
+    )
+    local idx=$(( ${today: -1} % $#extra + 1 ))
+    print -P -u2 "%F{8}tip:%f run %F{cyan}zshhelp%f to list all your custom commands  ·  also: ${extra[idx]}"
+}
