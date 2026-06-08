@@ -1,0 +1,70 @@
+#!/bin/bash
+# zshhelp — catalog your custom commands so you don't forget they exist.
+#
+# Scans the tracked alias/function files (aliases/utils, aliases/os, integrations)
+# and lists every function and alias with the description from the comment right
+# above its definition (or the inline comment after an alias).
+#
+#   zshhelp            list everything, grouped by file
+#   zshhelp <keyword>  only entries whose name/description match <keyword>
+#   zshhelp -h         this help
+#
+# To give a command a description, put a `# one-line summary` on the line
+# directly above its `name() {` (or after `alias name=... # summary`).
+
+_zshhelp_scan() {  # $1=file → "name<TAB>description" per command
+    perl -ne '
+        if (/^\s*#(.*)/) {
+            my $c = $1; $c =~ s/^\s+//; $c =~ s/\s+$//;
+            # Keep only prose-y descriptions; drop shebangs, ## dividers, bare
+            # URLs, and code-ish comment-outs — a non-description comment right
+            # above a def means that def simply has no description (blank).
+            if ($c eq "" || $c =~ /^[!#-]/ || $c =~ m{://} || $c =~ /[=#]/
+                || $c !~ /[a-z].*[a-z]/) { $last=""; } else { $last=$c; }
+            next;
+        }
+        next if /^\s*$/;
+        if (/^\s*(?:function\s+)?([A-Za-z0-9_?+.\-]+)\s*\(\)\s*\{/) {
+            print "$1\t" . ($last // "") . "\n"; $last=""; next;
+        }
+        if (/^\s*alias\s+([A-Za-z0-9_?+.\-]+)=(.*)/) {
+            my ($n,$rest)=($1,$2); my $d=$last // "";
+            if ($rest =~ /#\s*(.*?)\s*$/) {
+                my $ic=$1;
+                $d=$ic unless ($ic =~ /^[!#-]/ || $ic =~ m{://} || $ic =~ /[=#]/ || $ic !~ /[a-z].*[a-z]/);
+            }
+            print "$n\t$d\n"; $last=""; next;
+        }
+        $last="";   # any other code line drops the pending comment
+    ' "$1"
+}
+
+zshhelp() {
+    setopt local_options extended_glob 2>/dev/null
+    [[ $1 == -h || $1 == --help ]] && { sed -n '2,16p' "${(%):-%x}" | sed 's/^# \{0,1\}//'; return 0; }
+    local filter=$1
+    local base="${ZSH_CUSTOM_CONFIG_ALIASES:-$HOME/config/zshrc/aliases}"
+
+    # Files to scan (skip secrets and _-prefixed/internal helpers).
+    local -a files
+    files=( "$base"/utils/^_*(.N) "$base"/os/*(.N) "$base"/integrations/**/*(.N) )
+
+    local f name desc line shown_header total=0
+    print -P "%F{cyan}Your custom zsh commands%f  (zshhelp <keyword> to filter)"
+    for f in $files; do
+        [[ $f == *secret* ]] && continue
+        shown_header=""
+        while IFS=$'\t' read -r name desc; do
+            [[ -z $name || $name == _* ]] && continue   # skip internal helpers
+            if [[ -n $filter && $name != *$filter* && $desc != *$filter* ]]; then continue; fi
+            if [[ -z $shown_header ]]; then
+                print -P "\n%F{yellow}${f:t}%f"
+                shown_header=1
+            fi
+            printf "  %-20s %s\n" "$name" "$desc"
+            (( total++ ))
+        done < <(_zshhelp_scan "$f")
+    done
+    [[ $total == 0 ]] && print "  (no matches)"
+    print -P "\n%F{8}howto?  = notebook topics · zshperf doctor = startup health%f"
+}
