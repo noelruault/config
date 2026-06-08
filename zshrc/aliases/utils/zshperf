@@ -1,0 +1,77 @@
+#!/bin/bash
+# zshperf — profile & sanity-check zsh startup speed.
+#
+#   zshperf [waterfall]   where startup time goes, per subsystem (default)
+#   zshperf time [N]      time N fresh login shells (default 5)
+#   zshperf doctor        check the usual slow-startup culprits, report PASS/WARN
+#   zshperf -h            this help
+#
+# Tip: zshperf runs a shell, which can invalidate the completion cache, so the
+# FIRST `zshperf time` shell may show a one-off rebuild. Read the rest.
+
+zshperf() {
+    local sc="${ZSH_CUSTOM_CONFIG_SCRIPTS:-$HOME/config/zshrc/scripts}/startup-waterfall.sh"
+    zmodload zsh/datetime 2>/dev/null
+
+    case ${1:-waterfall} in
+        waterfall|wf|"")
+            [[ -f $sc ]] || { echo "zshperf: missing $sc" >&2; return 1; }
+            zsh "$sc"
+            ;;
+        time)
+            local n=${2:-5} i t0
+            echo "timing $n fresh login shells (zsh -ilc exit)…" >&2
+            for i in $(seq 1 "$n"); do
+                t0=$EPOCHREALTIME
+                zsh -ilc exit >/dev/null 2>&1
+                printf 'shell %2d: %5.0f ms\n' "$i" "$(( (EPOCHREALTIME - t0) * 1000 ))"
+            done
+            ;;
+        doctor)
+            local pass="✅" warn="⚠️ "
+            echo "zsh startup doctor"
+            echo "──────────────────"
+            # 1. compdump keyed stably (NOT on the flapping hostname)
+            if [[ $ZSH_COMPDUMP == *'-'$HOST'-'* || $ZSH_COMPDUMP == *"$(scutil --get LocalHostName 2>/dev/null)"* ]]; then
+                echo "$warn compdump keyed on hostname ($ZSH_COMPDUMP)"
+                echo "      → rebuilds when the hostname changes. Key on \$ZSH_VERSION only."
+            else
+                echo "$pass compdump path is host-independent ($ZSH_COMPDUMP:t)"
+            fi
+            # 2. fpath deduped + sorted (so the dump is reused across shell types)
+            local total=$#fpath uniq sorted
+            uniq=$(print -l -- $fpath | sort -u | wc -l | tr -d ' ')
+            if [[ $total != $uniq ]]; then
+                echo "$warn fpath has duplicates ($total entries, $uniq unique) → add: typeset -U fpath"
+            else
+                echo "$pass fpath deduped ($total entries)"
+            fi
+            # The real invariant: do login and non-login shells produce the SAME
+            # fpath? If not, OMZ deletes the dump on every shell-type switch.
+            local lh nh
+            lh=$(zsh -lic 'print -r -- "$fpath"' 2>/dev/null | tail -1 | md5)
+            nh=$(zsh -ic  'print -r -- "$fpath"' 2>/dev/null | tail -1 | md5)
+            if [[ $lh == $nh ]]; then
+                echo "$pass fpath identical for login & non-login (dump reused across shell types)"
+            else
+                echo "$warn fpath differs login vs non-login → dump invalidated on shell-type"
+                echo "      switches. Stabilize before the loader: typeset -U fpath; fpath=(\"\${(@o)fpath}\")"
+            fi
+            # 3. compdump present (so compinit uses -C, not a full rebuild)
+            if [[ -f $ZSH_COMPDUMP ]]; then
+                echo "$pass completion dump present (warm path available)"
+            else
+                echo "$warn no completion dump yet → next shell does a one-time full rebuild"
+            fi
+            echo ""
+            echo "Deeper breakdown:  zshperf waterfall"
+            ;;
+        -h|--help)
+            sed -n '2,12p' "${(%):-%x}" | sed 's/^# \{0,1\}//'
+            ;;
+        *)
+            echo "zshperf: unknown '$1' (try: waterfall | time | doctor | -h)" >&2
+            return 1
+            ;;
+    esac
+}
