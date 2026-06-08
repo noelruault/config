@@ -1,7 +1,6 @@
 #!/bin/bash
-# Once-a-day startup tip. Surfaces `zshhelp` (so you don't forget your custom
-# commands exist) plus a rotating secondary tip. Shown at most once per calendar
-# day; the check is a single stamp-file read, so it never slows startup.
+# Once-a-day startup reminder of the homegrown tools, so they stay discoverable.
+# Shown at most once per calendar day; a single stamp-file read, no startup cost.
 # Silence entirely: touch ~/.cache/zsh-tip-off
 () {
     local cache=${XDG_CACHE_HOME:-$HOME/.cache}
@@ -13,12 +12,12 @@
     mkdir -p "$cache" 2>/dev/null
     print -r -- "$today" > "$stamp"
 
-    local -a extra=(
-        "zshperf doctor — check shell startup health"
-        "howto? — your offline notebook topics (howto ask <t> for AI)"
-        "zshperf — where startup time goes"
-        "aispeak --lang es — talk to a local LLM by voice"
-    )
-    local idx=$(( ${today: -1} % $#extra + 1 ))
-    print -P -u2 "%F{8}tip:%f run %F{cyan}zshhelp%f to list all your custom commands  ·  also: ${extra[idx]}"
+    {
+        print -P "%F{8}── your tools ─────────────────────────────────────────%f"
+        print -P "  %F{cyan}zshhelp%f   list all your custom commands (+ keyword filter)"
+        print -P "  %F{cyan}zshperf%f   shell startup speed: waterfall · time · doctor"
+        print -P "  %F{cyan}aispeak%f   talk to a local LLM by voice (--lang, --topic)"
+        print -P "  %F{cyan}howto?%f    offline notebook topics (howto ask <t> for AI)"
+        print -P "%F{8}──────────────────── once a day · touch ~/.cache/zsh-tip-off to mute%f"
+    } >&2
 }
