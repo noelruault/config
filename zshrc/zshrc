@@ -46,6 +46,15 @@ export ZSH_COMPDUMP="$HOME/.zcompdump-${ZSH_VERSION}"
 # Skip OMZ's compaudit on macOS (warnings about group-writable dirs in /usr/local).
 export ZSH_DISABLE_COMPFIX=true
 
+# Stabilize fpath so the completion dump is reusable across shell types. OMZ
+# deletes its dump whenever the stored "#omz fpath: $fpath" differs from the
+# current one. Login vs non-login shells assemble the SAME completion dirs in a
+# different ORDER (and with duplicates), so every login<->non-login switch
+# invalidated the dump and forced a ~3s compinit rebuild. Dedupe + sort here →
+# identical fpath for every shell type → one dump, reused everywhere.
+typeset -U fpath
+fpath=("${(@o)fpath}")
+
 # Loader selector. Default omz. Set ZSH_LOADER=zinit for the turbo branch.
 # Install zinit first: `mkdir -p ~/.local/share/zinit && git clone https://github.com/zdharma-continuum/zinit.git ~/.local/share/zinit/zinit.git`
 : ${ZSH_LOADER:=omz}
