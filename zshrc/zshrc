@@ -36,9 +36,13 @@ plugins=(
     golang
 )
 
-# Pin OMZ's compinit cache file to a stable, per-host path so it is reused
-# across sessions. Set explicitly so the zinit branch can share intent.
-export ZSH_COMPDUMP="$HOME/.zcompdump-${SHORT_HOST:-$HOST}-${ZSH_VERSION}"
+# Pin OMZ's compinit cache file to a STABLE, host-independent path so it is
+# reused across sessions. Do NOT key on hostname: this machine's name flaps
+# (corporate mDNS/VPN renames it: noelruault <-> WTG-76584), which kept changing
+# the cache filename → cache miss → a full ~2.5s compinit rebuild on nearly
+# every shell. The dump isn't host-specific for a single user; key on the zsh
+# version only (changes only on a zsh upgrade).
+export ZSH_COMPDUMP="$HOME/.zcompdump-${ZSH_VERSION}"
 # Skip OMZ's compaudit on macOS (warnings about group-writable dirs in /usr/local).
 export ZSH_DISABLE_COMPFIX=true
 
