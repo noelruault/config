@@ -151,15 +151,27 @@ overwrite_config "$HOME/config" "$HOME/.config"
 
 install_homebrew
 setup_bash
-install_brew_package git
-install_brew_package fzf
-install_brew_package coreutils
-install_brew_package shfmt
-install_brew_package shellcheck
-# neovim runs the config at nvim/ (active via the ~/.config -> ~/config symlink).
-# Plugins (lazy.nvim) bootstrap themselves on first `nvim` launch.
-install_brew_package neovim
+# Core CLI tools, in one list so a fresh machine gets everything in a single pass.
+# bash is handled by setup_bash above (it also configures the login shell).
+# neovim config lives in nvim/ (active via ~/.config -> ~/config); lazy.nvim
+# bootstraps its plugins on first `nvim` launch.
+BREW_PACKAGES=(
+    git        # version control + private-repo clones
+    gh         # GitHub CLI: auth, private clones, PR/workflow ops
+    jq         # JSON processor: required by the .claude guards (claude-*-ro-guard)
+    python     # python3: bin/resolve-secrets in the .claude dotfiles repo
+    awscli     # aws CLI: the AWS read-only guard + day-to-day AWS
+    coreutils  # GNU coreutils (readlink -f used by this script, etc.)
+    fzf
+    shfmt
+    shellcheck
+    neovim
+)
+for pkg in "${BREW_PACKAGES[@]}"; do
+    install_brew_package "$pkg"
+done
 
+# Optional / heavier tooling (uncomment as needed):
 # install_brew_package docker
 # install_brew_package colima
 # install_brew_package docker-compose
