@@ -24,6 +24,7 @@ iterm2/AppSupport
 !iterm2
 !zshrc
 !nvim
+!tests
 
 # Fonts live in a private repo, cloned here on demand by setup.sh
 .fonts/

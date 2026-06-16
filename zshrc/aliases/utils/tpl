@@ -62,7 +62,8 @@ tpl() {
             if [[ -x "$dest/.init.sh" ]]; then
                 (cd "$dest" && ./.init.sh) || echo "tpl: .init.sh exited non-zero" >&2
             fi
-            command -v code >/dev/null 2>&1 && code "$dest"
+            # plain && would make `tpl new` return 1 whenever VS Code is absent
+            if command -v code >/dev/null 2>&1; then code "$dest"; fi
             ;;
         *)
             echo "usage: tpl ls | tpl info <name> | tpl new <name> <dest>"

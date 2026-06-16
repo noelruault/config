@@ -42,6 +42,7 @@ So only `code-editors/`, `git/`, `iterm2/`, `zshrc/`, `fonts/` (plus root files)
 - `code-editors/` — `vscode/`, `vim/`, `psql/` settings.
 - `iterm2/` — profiles (`iterm-profiles.json`), keymap, color schemes, plist. `AppSupport` is re-ignored.
 - `fonts/` — `Mono/` + `Other/` font files, copied to `~/Library/Fonts` by `setup.sh`. ~34 MB, 400+ files committed. See note below.
+- `tests/` — zero-dependency zsh test suite. `tests/run.sh` runs every `tests/test_*.zsh` (each in its own `zsh -f`, sandboxed fake `$HOME`) plus glow-stream's `go test`. Run it after touching anything under `zshrc/`. New suite = new `tests/test_<name>.zsh` sourcing `tests/lib.zsh`; no registration step.
 
 ## Conventions
 
@@ -49,6 +50,7 @@ So only `code-editors/`, `git/`, `iterm2/`, `zshrc/`, `fonts/` (plus root files)
 - New install steps go in `setup.sh` and must guard on "already installed" to keep it idempotent.
 - New tracked config area → create the dir **and** add `!<dir>` to `.gitignore`.
 - The `git/*.sh` scripts are `source`d by `setup.sh` (not exec'd) and assume the `~/.config` symlink already exists.
+- Run `tests/run.sh` before committing shell changes; `tests/test_syntax.zsh` parse-checks every tracked shell file, so even files without a dedicated suite get covered.
 
 ## Note on fonts
 

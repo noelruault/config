@@ -115,7 +115,7 @@ function fileformat(){
         x86_64)
             file_format="macho64"
             ;;
-        aarch64)
+        arm64|aarch64)   # macOS reports arm64, not aarch64
             file_format="macho64"
             ;;
         esac

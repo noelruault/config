@@ -17,7 +17,7 @@ function myip(){
     for (( i=0 ; i <= ${#ips} ; i++ )); do
         echo "${names[$i]} ${ips[$i]}"
     done
-    for i "${ips[@]}"; do
+    for i in "${ips[@]}"; do
       echo $i
     done
 

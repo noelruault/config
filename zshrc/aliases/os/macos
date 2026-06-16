@@ -191,6 +191,19 @@ function enbounce() {
 }
 
 # ------------------------------
+# LOCAL LLM / GPU
+# ------------------------------
+
+# Raise the GPU (Metal) wired-memory cap so large Ollama models get more of the
+# unified RAM. Default cap is ~75% of total; on a 24GB Mac that leaves big tags
+# (e.g. qwen3-coder:30b ~19GB) starved once KV cache grows. Temporary; resets
+# on reboot. Arg = MB to allow the GPU (default 20480 = 20GB).
+function gpu-max() {
+    local mb="${1:-20480}"
+    sudo sysctl iogpu.wired_limit_mb="$mb"
+}
+
+# ------------------------------
 # COMMAND LINE ENHANCEMENTS
 # ------------------------------
 

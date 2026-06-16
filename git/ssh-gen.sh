@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+# Sourced by setup.sh (no shebang on purpose); the directive keeps shellcheck working.
 read -p "Enter email: " EMAIL
 SSH_FILENAME="id_ed25519-$(date +'%Y%m%d')"
 echo "ℹ️ Email: $EMAIL Key: $SSH_FILENAME"

@@ -20,29 +20,42 @@ histrm() {
     # A history line is "self" (a histrm call) if its command is histrm ...
     local selfre='(^|;)[[:space:]]*histrm([[:space:]]|$)'
 
+    # LC_ALL=C: the history file is "metafied" by zsh and contains raw non-UTF8
+    # bytes; in a UTF-8 locale macOS awk dies on them mid-file ("towc: multibyte
+    # conversion failure") and the truncated output would replace the history.
+    local ok=0
     if [[ $1 == -n && $2 == <-> ]]; then
-        awk -v n="$2" -v re="$selfre" '
-            { L[NR]=$0 }
-            END { last=NR; while (last>0 && L[last] ~ re) last--
-                  cut=last-n; c=0
+        # cut is in non-self-count space, not line-index space: a histrm call
+        # sitting mid-history would otherwise inflate the cutoff and -n would
+        # remove fewer entries than asked.
+        LC_ALL=C awk -v n="$2" -v re="$selfre" '
+            { L[NR]=$0; if ($0 !~ re) total++ }
+            END { cut=total-n; c=0
                   for (i=1;i<=NR;i++){ if (L[i] ~ re) continue; c++; if (c>cut) continue; print L[i] } }
-        ' "$f" > "$tmp"
+        ' "$f" > "$tmp" && ok=1
     elif (( $# )); then
-        awk -v p="$*" -v re="$selfre" '
+        LC_ALL=C awk -v p="$*" -v re="$selfre" '
             { cmd=$0; sub(/^: [0-9]*:[0-9]*;/,"",cmd)
               if (cmd ~ re) next
               if (index(cmd,p)) next
               print }
-        ' "$f" > "$tmp"
+        ' "$f" > "$tmp" && ok=1
     else
-        awk -v re="$selfre" '
+        LC_ALL=C awk -v re="$selfre" '
             { L[NR]=$0 }
             END { last=NR; while (last>0 && L[last] ~ re) last--
                   for (i=1;i<=NR;i++){ if (L[i] ~ re) continue; if (i==last) continue; print L[i] } }
-        ' "$f" > "$tmp"
+        ' "$f" > "$tmp" && ok=1
+    fi
+
+    if (( ! ok )); then
+        print -u2 "histrm: awk failed, history left untouched"
+        command rm -f "$tmp"
+        return 1
     fi
 
     after=$(grep -c '' "$tmp")
+    command cp -p "$f" "${f}.histrm-bak"   # one-deep undo: previous history kept here
     command mv "$tmp" "$f"
     fc -p "$f" 2>/dev/null                   # reload the cleaned history into this session
     local d=$((before-after))
