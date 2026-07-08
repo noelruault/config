@@ -5,8 +5,7 @@ function current_git_ssh_key(){
     echo $SSH_VERSION | grep "Server accepts key:" | grep -oEi '\S+.ssh\S+'
 }
 
-### GIT
-# https://github.com/ohmyzsh/ohmyzsh/wiki/Cheatsheet#git
+### GIT https://github.com/ohmyzsh/ohmyzsh/wiki/Cheatsheet#git
 alias gamod="git ls-files --modified | xargs git add"
 
 alias gbreset='git branch --merged | grep -v \* | xargs git branch -D '
@@ -55,8 +54,7 @@ function gotest() {
     go test ./... -p 1 -count 1 -v |
         sed ''/PASS/s//$(printf "\033[32mPASS\033[0m")/'' |
         sed ''/FAIL/s//$(printf "\033[31mFAIL\033[0m")/'' # \
-    ## | GREP_COLOR="01;33" egrep --color=always '\s*[a-zA-Z0-9\-_.]+[:][0-9]+[:]|^'
-    # return
+    ## | GREP_COLOR="01;33" egrep --color=always '\s*[a-zA-Z0-9\-_.]+[:][0-9]+[:]|^' return
 
     if [[ "$1" == "e2e" ]]; then
         go test ./test/endtoend -tags=endtoend -count=1 -timeout 120s |
@@ -74,8 +72,7 @@ function gocover() {
     go test $COVERFLAGS -coverprofile=$t $@ && go tool cover -func=$t && unlink $t
 }
 
-# for pkg in *; do go test "./$pkg"; done
-# go clean -testcache # https://golang.org/pkg/cmd/go/internal/clean/
+# for pkg in *; do go test "./$pkg"; done go clean -testcache # https://golang.org/pkg/cmd/go/internal/clean/
 
 function gonew() {
     GITDIR="github.com/$(whoami)"
@@ -149,10 +146,7 @@ alias localhosts='ifconfig | grep "inet " | grep -v 127.0.0.1' # https://stackov
 # CP command, do rsync if file is a folder or higher than 50MB  // rsync -ah --progress
 
 ##### FIXES
-# Fix slowness of pastes with zsh-syntax-highlighting.zsh
-# https://github.com/vercel/hyper/issues/1276
-# https://github.com/zsh-users/zsh-syntax-highlighting/issues/295
-# https://github.com/magicdude4eva/iterm-oh-my-zsh-powerlevel10k
+# Fix slowness of pastes with zsh-syntax-highlighting.zsh https://github.com/vercel/hyper/issues/1276 https://github.com/zsh-users/zsh-syntax-highlighting/issues/295 https://github.com/magicdude4eva/iterm-oh-my-zsh-powerlevel10k
 
 #     zstyle ':bracketed-paste-magic' active-widgets '.self-*'
 
@@ -168,11 +162,9 @@ function check-valid-email() {
     ({ echo 'MAIL FROM any@email.com'; sleep 1} | nc $EMAIL_SERVER 25 2>&1 | grep --extended-regex '^250.*OK' --silent  && echo "email $EMAIL_DOMAIN is reachable") || echo "email $EMAIL_DOMAIN is NOT reachable"
 }
 
-# go_to_dir_on_specific_folder will try to find a directory that matches
-# with the given parameters inside of an specific folder.
+# go_to_dir_on_specific_folder will try to find a directory that matches with the given parameters inside of an specific folder.
 #
-# NOTE: WORK_FOLDER variable could be changed to something else, more specific
-# and without evaluations or commands.
+# NOTE: WORK_FOLDER variable could be changed to something else, more specific and without evaluations or commands.
 #
 # Used uncommon commands :
 # - https://ss64.com/bash/wc.html
@@ -213,8 +205,7 @@ function go_to_dir_on_specific_folder() {
         # The parenthesis at the begining will make this an array.
         search=($(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}'))
 
-        # This loop will check if the input matches exactly with the name of the folder,
-        # if there is an exact match, will cd and end the function.
+        # This loop will check if the input matches exactly with the name of the folder, if there is an exact match, will cd and end the function.
         for i in "${search[@]}"; do
             if [ $i = $1 ]; then
                 cd $WORK_FOLDER$1
@@ -227,8 +218,7 @@ function go_to_dir_on_specific_folder() {
         for i in "${search[@]}"; do echo $i; done
         return
     else
-        # If only one folder was found, change to the found directory
-        # cd $WORK_FOLDER$(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}')
+        # If only one folder was found, change to the found directory cd $WORK_FOLDER$(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}')
 
         ## TODO(nruault): REMOVE ME -----------------------
         FOLDER=$(find $WORK_FOLDER -type d -name "*$1*$2*" -print -maxdepth 1 | awk -F/ '{print $NF}')
@@ -374,8 +364,7 @@ alias vagrantclean="vagrant box list | cut -f 1 -d ' ' | xargs -L 1 vagrant box 
 # Add rubygems to the path
 export PATH=/usr/local/lib/ruby/gems/2.7.0/bin:$PATH
 
-# ping to specific port
-# nc -vz -u seaparty.crabdance.com 2194
+# ping to specific port nc -vz -u seaparty.crabdance.com 2194
 # -z Zero-I/O mode [used for scanning]
 # -v Verbose
 # -u UDP mode
@@ -413,14 +402,12 @@ function jsnew() {
     code .
 }
 
-# Add deno completions to search path
-# if [[ ":$FPATH:" != *":/Users/$(whoami)/completions:"* ]]; then export FPATH="/Users/$(whoami)/completions:$FPATH"; fi
+# Add deno completions to search path if [[ ":$FPATH:" != *":/Users/$(whoami)/completions:"* ]]; then export FPATH="/Users/$(whoami)/completions:$FPATH"; fi
 
 # bun completions: sourced exactly once in zprofile. Do not re-source here.
 # . "/Users/$(whoami)/.deno/env"
 
-# nvm (node version manager): lazy. First call to nvm/node/npm/npx sources
-# nvm.sh, then re-dispatches. Subsequent calls hit the real command directly.
+# nvm (node version manager): lazy. First call to nvm/node/npm/npx sources nvm.sh, then re-dispatches. Subsequent calls hit the real command directly.
 export NVM_DIR="$HOME/.nvm"
 nvm() {
   unfunction nvm node npm npx 2>/dev/null
@@ -455,11 +442,9 @@ _claudio_init_home() {
   [[ -d "$target_home/.claude" ]] || mkdir -p "$target_home/.claude"
 
   # Share config dirs across personal/work homes by symlinking to the canonical
-  # ~/.claude/<dir> (the real user $HOME, not the alternate claudio home). Only
-  # dirs safe to share globally live here; a dir absent from canonical is skipped
+  # ~/.claude/<dir> (the real user $HOME, not the alternate claudio home). Only dirs safe to share globally live here; a dir absent from canonical is skipped
   # (guard below), so listing not-yet-created ones like prompts is harmless.
-  # Per-profile state (projects, history, sessions, settings.json, plugins,
-  # tasks) stays separate and is NOT listed here.
+  # Per-profile state (projects, history, sessions, settings.json, plugins, tasks) stays separate and is NOT listed here.
   local real_home="${target_home%/*}"
   local shared_dir
   for shared_dir in skills agents hooks prompts commands; do
@@ -470,11 +455,7 @@ _claudio_init_home() {
     fi
   done
 
-  # macOS Security framework reads $HOME/Library/Keychains. With HOME pointed
-  # at the alt home, anything touching the keychain (git credential helper,
-  # gh, ssh-add) triggers a "Keychain Not Found" prompt. Symlink the real
-  # user's Keychains dir so lookups resolve transparently. (Claude itself no
-  # longer reads the keychain here: it auths via $CLAUDE_CODE_OAUTH_TOKEN.)
+  # macOS Security framework reads $HOME/Library/Keychains. With HOME pointed at the alt home, anything touching the keychain (git credential helper, gh, ssh-add, AND claude's own per-account login slot) triggers a "Keychain Not Found" prompt. Symlink the real user's Keychains dir so lookups resolve transparently -- claude's CLAUDE_CONFIG_DIR-suffixed credential slot lives in that real login keychain.
   [[ -d "$target_home/Library" ]] || mkdir -p "$target_home/Library"
   local canonical_keychains="$real_home/Library/Keychains"
   local linked_keychains="$target_home/Library/Keychains"
@@ -482,30 +463,19 @@ _claudio_init_home() {
     ln -s "$canonical_keychains" "$linked_keychains"
   fi
 
-  # If anything writes $target_home/Library/Preferences/com.apple.security.plist
-  # with an empty DefaultKeychain (seen after a failed keychain lookup), the
-  # Security framework triggers a "Keychain Not Found — A keychain cannot be
-  # found to store '$USER'" prompt on every subsequent call. The real HOME has
-  # no such file; the alt HOME shouldn't either. Nuke it on init so Security
-  # falls back to its built-in defaults and resolves via the symlink above.
+  # If anything writes $target_home/Library/Preferences/com.apple.security.plist with an empty DefaultKeychain (seen after a failed keychain lookup), the
+  # Security framework triggers a "Keychain Not Found — A keychain cannot be found to store '$USER'" prompt on every subsequent call. The real HOME has no such file; the alt HOME shouldn't either. Nuke it on init so Security falls back to its built-in defaults and resolves via the symlink above.
   rm -f "$target_home/Library/Preferences/com.apple.security.plist" 2>/dev/null
 }
 
-# Per-account auth via long-lived OAuth tokens (`claude setup-token`), NOT the
-# shared macOS Keychain. The Keychain stores Claude's OAuth creds under one
-# fixed (service, account) pair that every HOME collides on, so swapping it in
-# and out raced and cross-contaminated the two accounts whenever two sessions
-# ran at once. Instead each home keeps its own long-lived token in a 0600 file
-# and we pass it via $CLAUDE_CODE_OAUTH_TOKEN at launch (auth precedence #5,
-# above /login OAuth). Env-scoped + non-rotating => fully concurrency-safe, and
-# it never touches the Keychain. Generate the tokens with `claudio --1 login` /
-# `claudio --2 login`. Requires a Pro/Max/Team/Enterprise plan and bills the
-# subscription, not API credits.
-_claudio_token_file() {
-  case "$1" in
-    personal) printf '%s' "$CLAUDE_HOME_PERSONAL/.claude/.claudio-oauth-token" ;;
-    work)     printf '%s' "$CLAUDE_HOME_WORK/.claude/.claudio-oauth-token" ;;
-  esac
+# Per-account auth: each account does a full-scope browser `claude auth login` under its OWN CLAUDE_CONFIG_DIR. Claude keys its Keychain slot by config dir
+# (service "Claude Code-credentials-<sha256(CLAUDE_CONFIG_DIR)[:8]>"), so two distinct config dirs get two distinct slots -- BOTH accounts stay logged in, full scope (remote-control + usage %), concurrently, with no token swap and no race. The old collision happened because claudio set HOME but never
+# CLAUDE_CONFIG_DIR, so both accounts landed on the one suffix-less default slot.
+# Bills the subscription, not the API. See notebook.d/claudio.md.
+_claudio_config_dir() {
+  local home_dir
+  home_dir=$(_claudio_home_for_account "$1") || return 1
+  printf '%s' "$home_dir/.claude"
 }
 
 _claudio_home_for_account() {
@@ -516,50 +486,87 @@ _claudio_home_for_account() {
   esac
 }
 
-# Generate this account's long-lived OAuth token via `claude setup-token` and
-# store it 0600 in the account's home. setup-token runs its OWN browser OAuth,
-# so the token belongs to whichever account you authorize in the browser, NOT
-# to the --1/--2 flag: log into the matching account when the browser opens.
-# The command prints the token to stdout and saves it nowhere, so we capture
-# stdout and extract the sk-ant-oat... value (its progress/prompts go to stderr,
-# which stays visible). Falls back to a manual paste if auto-capture finds none.
+# Full-scope browser login for this account, under its own CLAUDE_CONFIG_DIR so claude writes a per-account Keychain slot (see _claudio_config_dir). Authorize the MATCHING account in the browser -- --1 = personal, --2 = work -- since the browser may reuse a claude.ai cookie; use the account switcher / incognito if it lands on the wrong one. Unset the API/OAuth env vars so a stray one can't outrank the login.
 _claudio_login() {
-  local account="$1" home_dir tok_file raw tok
+  local account="$1" home_dir
   home_dir=$(_claudio_home_for_account "$account") || {
     echo "_claudio_login: unknown account '$account'" >&2; return 2; }
-  tok_file=$(_claudio_token_file "$account")
 
   _claudio_init_home "$home_dir"
 
-  echo "claudio: running 'claude setup-token' for the $account account." >&2
+  echo "claudio: 'claude auth login' for the $account account (full scope)." >&2
   echo "         Authorize your $account account in the browser that opens." >&2
-  # Capture stdout (the token); setup-token's own progress/instructions go to
-  # stderr, which flows to the terminal here, so the user still sees the prompts.
-  raw=$(HOME="$home_dir" command claude setup-token)
-  tok=$(printf '%s\n' "$raw" | grep -oE 'sk-ant-oat[0-9A-Za-z._-]+' | head -1)
-
-  if [[ -z "$tok" ]]; then
-    # Nothing matched: echo back whatever setup-token printed (in case it landed
-    # on stdout and got captured) so the user can copy it, then paste manually.
-    [[ -n "$raw" ]] && printf '%s\n' "$raw" >&2
-    echo "claudio: couldn't auto-capture a token. Paste it here, then press enter:" >&2
-    local pasted; read -r pasted
-    tok=$(printf '%s' "$pasted" | tr -d '[:space:]')
-  fi
-  [[ -z "$tok" ]] && { echo "claudio: no token captured; aborted." >&2; return 1; }
-
-  mkdir -p "${tok_file%/*}"
-  ( umask 077 && printf '%s' "$tok" > "$tok_file" )
-  chmod 600 "$tok_file" 2>/dev/null
-  echo "claudio: saved $account token -> $tok_file" >&2
+  (
+    unset ANTHROPIC_API_KEY ANTHROPIC_AUTH_TOKEN CLAUDE_CODE_OAUTH_TOKEN
+    HOME="$home_dir" \
+      CLAUDE_CONFIG_DIR="$home_dir/.claude" \
+      command claude auth login
+  )
 }
 
+# Print this account's live usage %, read from its OWN Keychain slot's access token against GET /api/oauth/usage (needs user:profile, which the full-scope login has). READ-ONLY: uses the access token as-is, NEVER the refresh token, so it can't rotate/clobber claude's grant (refresh-token rotation is exactly why the usage widget needs its own separate grant). Never prints the token. Silently skips (returns 1, no output) if jq is missing, the slot is empty, the token is stale (401 -> empty body), or offline. Requires jq + curl.
+_claudio_usage() {
+  local account="$1" home_dir svc tok resp
+  home_dir=$(_claudio_home_for_account "$account") || return 1
+  command -v jq >/dev/null 2>&1 || return 1
+  svc="Claude Code-credentials-$(printf '%s' "$home_dir/.claude" | shasum -a 256 | cut -c1-8)"
+  tok=$(security find-generic-password -s "$svc" -w 2>/dev/null | jq -r '.claudeAiOauth.accessToken // empty' 2>/dev/null)
+  [[ -z "$tok" ]] && return 1
+  resp=$(curl -s --max-time 8 https://api.anthropic.com/api/oauth/usage \
+    -H "authorization: Bearer $tok" \
+    -H "anthropic-beta: oauth-2025-04-20" 2>/dev/null)
+  [[ -z "$resp" ]] && return 1
+  printf '%s' "$resp" | jq -e . >/dev/null 2>&1 || return 1
+  # Error bodies (401 stale token, 429 rate limit) are valid JSON with no usage fields.
+  # Surface the reason instead of a misleading "n/a" or a silent blank line.
+  if printf '%s' "$resp" | jq -e '.five_hour.utilization == null' >/dev/null 2>&1; then
+    local err
+    err=$(printf '%s' "$resp" | jq -r '.error.message // "usage unavailable"')
+    echo "    usage:  ($err)" >&2
+    return 0
+  fi
+  # resets_at may be ISO-8601 or epoch; only surfaced when a bucket is maxed (>=100%).
+  printf '%s' "$resp" | jq -r '
+    def p(x): if x == null then "n/a" else "\(x|round)%" end;
+    def fmt(t): if t == null then "?"
+      elif (t|type)=="number" then (t|localtime|strftime("%b %d %H:%M"))
+      else (try (t|fromdateiso8601|localtime|strftime("%b %d %H:%M")) catch (t|tostring)) end;
+    def part(o): p(o.utilization)
+      + (if (o.utilization != null and (o.utilization|round) >= 100)
+           then " (resets " + fmt(o.resets_at) + ")" else "" end);
+    "    usage:  session " + part(.five_hour)
+      + "   week " + part(.seven_day)
+      + (if (.extra_usage.is_enabled == true) then "   extra " + p(.extra_usage.utilization) else "" end)
+  ' >&2
+}
+
+# Show which real account a profile is logged into (verify --1 = personal, --2 = work). Reads that account's own Keychain slot via CLAUDE_CONFIG_DIR. The header names the flag + account role, and claude's generic "Run claude auth login" hint is rewritten to the claudio command that targets THIS account (a bare 'claude auth login' would write the suffix-less default slot, not this account's slot). When logged in, claude's --text already prints the real Email/Organization -- that's the live confirmation that --1 is personal and --2 is work.
+_claudio_status() {
+  local account="$1" home_dir flag
+  home_dir=$(_claudio_home_for_account "$account") || {
+    echo "_claudio_status: unknown account '$account'" >&2; return 2; }
+  case "$account" in
+    personal) flag="--1" ;;
+    work)     flag="--2" ;;
+  esac
+
+  echo "[$flag] $account account:" >&2
+  (
+    unset ANTHROPIC_API_KEY ANTHROPIC_AUTH_TOKEN CLAUDE_CODE_OAUTH_TOKEN
+    HOME="$home_dir" \
+      CLAUDE_CONFIG_DIR="$home_dir/.claude" \
+      command claude auth status --text 2>&1
+  ) | sed -e "s|claude auth login|claudio $flag login|g" -e 's/^/    /' >&2
+  _claudio_usage "$account"   # appends a live "usage: session X% week Y%" line when logged in; no-op otherwise
+}
+
+# Launch claude as this account. CLAUDE_CONFIG_DIR pins the per-account config + Keychain slot; the API/OAuth env vars are unset so claude uses that slot's full-scope login rather than a stray key/token. Two accounts run concurrently with zero cross-contamination: distinct config dirs -> distinct Keychain slots. If claude reports "not logged in", run 'claudio <flag> login' once.
 _claudio_run() {
   local account="$1"
   shift
 
   local real_home="$HOME"
-  local home_dir tok_file token flag
+  local home_dir flag
 
   case "$account" in
     personal) home_dir="$CLAUDE_HOME_PERSONAL"; flag="--1" ;;
@@ -570,35 +577,32 @@ _claudio_run() {
       ;;
   esac
 
-  # If --resume <id> points at a session that lives only in the OTHER home,
-  # offer to copy it here so the resume succeeds instead of "not found".
+  # If --resume <id> points at a session that lives only in the OTHER home, offer to copy it here so the resume succeeds instead of "not found".
   _claudio_offer_session_copy "$account" "$@"
 
   _claudio_init_home "$home_dir"
 
-  tok_file=$(_claudio_token_file "$account")
-  if [[ ! -s "$tok_file" ]]; then
-    echo "claudio: no auth token for the $account account yet." >&2
-    echo "         Run 'claudio $flag login' first to generate one." >&2
-    return 1
-  fi
-  token=$(<"$tok_file")
-
-  # Subshell so the ANTHROPIC_* unset stays scoped to claude: those vars
-  # outrank CLAUDE_CODE_OAUTH_TOKEN in the auth precedence and, if set in the
-  # parent shell, would silently bill the API instead of the subscription.
+  echo "claudio: launching as $account ($flag)…" >&2
+  # DO NOT "simplify" the env below (see notebook.d/claudio.md "INVARIANTS"):
+  #   * CLAUDE_CONFIG_DIR is what isolates the two accounts -- it selects a
+  #     per-dir Keychain slot (Claude Code-credentials-<sha256(dir)[:8]>).
+  #     Removing it (or relying on HOME alone) collapses both onto ONE slot and
+  #     the accounts cross-contaminate. This is the exact bug we fixed.
+  #   * The three unset vars each outrank the Keychain login in claude's auth
+  #     precedence; a stray one silently uses the wrong creds / bills the API.
+  #   * AWS_* point back at the real ~/.aws since HOME is redirected.
+  # Subshell so all of this stays scoped to claude.
   (
-    unset ANTHROPIC_API_KEY ANTHROPIC_AUTH_TOKEN
+    unset ANTHROPIC_API_KEY ANTHROPIC_AUTH_TOKEN CLAUDE_CODE_OAUTH_TOKEN
     HOME="$home_dir" \
-    CLAUDE_CODE_OAUTH_TOKEN="$token" \
-    AWS_CONFIG_FILE="$real_home/.aws/config" \
-    AWS_SHARED_CREDENTIALS_FILE="$real_home/.aws/credentials" \
+      CLAUDE_CONFIG_DIR="$home_dir/.claude" \
+      AWS_CONFIG_FILE="$real_home/.aws/config" \
+      AWS_SHARED_CREDENTIALS_FILE="$real_home/.aws/credentials" \
       command claude "$@"
   )
 }
 
-# Extract a --resume / -r session id from an arg list. Echoes the id on stdout
-# if found, empty string otherwise. Recognises: `--resume <id>`, `--resume=<id>`,
+# Extract a --resume / -r session id from an arg list. Echoes the id on stdout if found, empty string otherwise. Recognises: `--resume <id>`, `--resume=<id>`,
 # `-r <id>`, `-r=<id>`.
 _claudio_extract_resume_id() {
   local prev=""
@@ -616,8 +620,7 @@ _claudio_extract_resume_id() {
   return 1
 }
 
-# Given a session id, echo "personal" or "work" if exactly one home contains
-# the matching <id>.jsonl. Echoes "ambiguous" and returns 2 if both contain it.
+# Given a session id, echo "personal" or "work" if exactly one home contains the matching <id>.jsonl. Echoes "ambiguous" and returns 2 if both contain it.
 # Returns 1 if neither does.
 _claudio_account_for_session() {
   local id="$1"
@@ -630,10 +633,8 @@ _claudio_account_for_session() {
   return 1
 }
 
-# Copy a session (transcript + any todo/state files keyed by the id) from one
-# home to another, recreating the same project-slug subdir under the dest.
-# Both homes resolve the same real project path, so the slug matches and the
-# resume finds the transcript. Args: <id> <from_account> <to_account>.
+# Copy a session (transcript + any todo/state files keyed by the id) from one home to another, recreating the same project-slug subdir under the dest.
+# Both homes resolve the same real project path, so the slug matches and the resume finds the transcript. Args: <id> <from_account> <to_account>.
 # Returns 1 if the transcript isn't found in the source home.
 _claudio_copy_session() {
   local id="$1" from="$2" to="$3"
@@ -650,8 +651,7 @@ _claudio_copy_session() {
   mkdir -p "${dst%/*}"
   cp -p "$src" "$dst"
 
-  # Bring along todo/state files keyed by the session id. Naming varies across
-  # claude versions (<id>.json, <id>-agent-*.json, ...), so glob-match the id.
+  # Bring along todo/state files keyed by the session id. Naming varies across claude versions (<id>.json, <id>-agent-*.json, ...), so glob-match the id.
   # Capture-then-test instead of `find | read`: unambiguous in bash and zsh.
   local todo_src="$from_home/.claude/todos"
   local todo_dst="$to_home/.claude/todos"
@@ -666,8 +666,7 @@ _claudio_copy_session() {
   return 0
 }
 
-# When "$@" carries --resume <id> and that session lives ONLY in the OTHER
-# account's home, prompt to copy it into "$account"'s home so the resume works.
+# When "$@" carries --resume <id> and that session lives ONLY in the OTHER account's home, prompt to copy it into "$account"'s home so the resume works.
 # No-op if the id is already here, in both homes (ambiguous), or in neither.
 _claudio_offer_session_copy() {
   local account="$1"
@@ -706,8 +705,7 @@ _claudio_offer_session_copy() {
   fi
 }
 
-# Interactive account picker. Echoes "personal" or "work" on stdout; all UI
-# goes to stderr so the choice can be captured. Returns 1 if nothing chosen.
+# Interactive account picker. Echoes "personal" or "work" on stdout; all UI goes to stderr so the choice can be captured. Returns 1 if nothing chosen.
 _claudio_choose_account() {
   local choice
   if command -v gum >/dev/null 2>&1; then
@@ -736,29 +734,46 @@ claudio() {
       cat <<'EOF'
 Usage:
   claudio                       Choose account interactively, then launch claude
-  claudio --1 [args]            Use personal account (pass args to claude)
-  claudio --2 [args]            Use work account (pass args to claude)
-  claudio --1 login             Generate + store the personal account's OAuth token
-  claudio --2 login             Generate + store the work account's OAuth token
-  claudio login                 Choose an account, then generate its token
+  claudio --1 [args]            Personal account   (args pass through to claude)
+  claudio --2 [args]            Work account
+  claudio --1 login             Full-scope browser login for personal (run once)
+  claudio --2 login             Full-scope browser login for work    (run once)
+  claudio login                 Choose an account, then log it in
+  claudio --1 status            Show which real account --1 is logged into
+  claudio status                Show both, to verify --1=personal / --2=work
   claudio --resume <id> [args]  Auto-detect which home holds <id> and dispatch
-  claudio --1 --resume <id>     If <id> lives only in the other home, offer to copy it here first
+  claudio --1 --resume <id>     If <id> lives only in the other home, copy it here first
 
-Auth: each account uses a long-lived token from `claude setup-token`, kept 0600
-in its home and passed via $CLAUDE_CODE_OAUTH_TOKEN. No shared Keychain, so --1
-and --2 can run at the same time without clobbering each other. Run the matching
-`login` once per account (re-run if a token ever expires / returns 401).
+Auth: each account does a full-scope `claude auth login` under its OWN
+CLAUDE_CONFIG_DIR. Claude keys its Keychain slot by config dir, so --1 and --2
+get separate slots and BOTH stay logged in at full scope (remote-control + usage
+%) concurrently -- no token swap, no race. Log in once per account (authorize
+the MATCHING account in the browser: --1 personal, --2 work). Bills the
+subscription, not the API.
 EOF
       return 0
       ;;
   esac
 
-  # login / setup-token: generate this account's token (choose one if not given).
+  # login: full-scope browser login for this account (choose one if not given).
   case "${1:-}" in
-    login|setup-token)
+    login)
       shift
       [[ -z "$account" ]] && { account=$(_claudio_choose_account) || return 1; }
       _claudio_login "$account"
+      return $?
+      ;;
+    status)
+      shift
+      echo "@ $(date '+%Y-%m-%d %H:%M:%S %Z')" >&2
+      if [[ -n "$account" ]]; then
+        _claudio_status "$account"
+        return $?
+      fi
+      # No flag: show both, so you can eyeball --1=personal / --2=work.
+      _claudio_status personal
+      echo >&2
+      _claudio_status work
       return $?
       ;;
   esac

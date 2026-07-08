@@ -2547,7 +2547,7 @@
 				<real>1</real>
 			</dict>
 			<key>Mouse Reporting</key>
-			<true/>
+			<false/>
 			<key>Name</key>
 			<string>Default (and tabs)</string>
 			<key>Non Ascii Font</key>
@@ -4356,7 +4356,7 @@
 				<real>1</real>
 			</dict>
 			<key>Mouse Reporting</key>
-			<true/>
+			<false/>
 			<key>Name</key>
 			<string>Floating window</string>
 			<key>Non Ascii Font</key>
@@ -4745,7 +4745,7 @@
 		</dict>
 	</dict>
 	<key>ShowFullScreenTabBar</key>
-	<false/>
+	<true/>
 	<key>SmartPlacement</key>
 	<true/>
 	<key>SoundForEsc</key>

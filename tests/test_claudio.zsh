@@ -1,13 +1,11 @@
 #!/usr/bin/env zsh
 # claudio helpers, exercised against a sandboxed $HOME and a fake `claude` on
-# PATH — the real binary and the macOS Keychain are never touched. Auth is now
-# token-based (CLAUDE_CODE_OAUTH_TOKEN), so there is no keychain swap to test;
-# we verify token capture/storage (_claudio_login), token injection at launch
-# (_claudio_run), and the session copy/offer helpers (file moves only).
+# PATH — the real binary and the macOS Keychain are never touched. Auth is full-scope login isolated per account by CLAUDE_CONFIG_DIR (claude keys its
+# Keychain slot by config dir), so there is no shared slot to race on. We verify the per-account config dir / launch env (_claudio_config_dir, _claudio_run,
+# _claudio_login, _claudio_status) and the session copy/offer helpers.
 source "${0:A:h}/lib.zsh"
 t_sandbox
-# No stderr suppression: if external ever fails to source, that should be loud,
-# not a wall of "expected [x], got []" failures.
+# No stderr suppression: if external ever fails to source, that should be loud, not a wall of "expected [x], got []" failures.
 source "$REPO/zshrc/aliases/utils/external"
 
 t "extract: --resume <id>"
@@ -57,8 +55,7 @@ _claudio_home_for_account bogus >/dev/null
 assert_eq "$?" "1" "exit code"
 assert_eq "$(_claudio_home_for_account work)" "$CLAUDE_HOME_WORK" "work maps to work home"
 
-# ---- _claudio_copy_session ----------------------------------------------
-# work home has projects/myslug/csess.jsonl + a todo file keyed by the id.
+# ---- _claudio_copy_session ---------------------------------------------- work home has projects/myslug/csess.jsonl + a todo file keyed by the id.
 mkdir -p "$CLAUDE_HOME_WORK/.claude/projects/myslug" "$CLAUDE_HOME_WORK/.claude/todos"
 print -r -- 'transcript-body' > "$CLAUDE_HOME_WORK/.claude/projects/myslug/csess.jsonl"
 print -r -- 'todo-body' > "$CLAUDE_HOME_WORK/.claude/todos/csess-agent-x.json"
@@ -110,89 +107,123 @@ out=$(_claudio_offer_session_copy personal --resume dsess <<< 'n' 2>&1)
 assert_eq "$(find $CLAUDE_HOME_PERSONAL/.claude/projects -name dsess.jsonl)" "" "not copied"
 assert_contains "$out" "leaving it in work"
 
-# ---- _claudio_token_file -------------------------------------------------
-t "token_file maps each account to its per-home 0600 token path"
-assert_eq "$(_claudio_token_file personal)" "$CLAUDE_HOME_PERSONAL/.claude/.claudio-oauth-token" "personal"
-assert_eq "$(_claudio_token_file work)" "$CLAUDE_HOME_WORK/.claude/.claudio-oauth-token" "work"
-
-# ---- fake `claude` on PATH so the real binary/Keychain are never touched -
+# ==========================================================================
+# Auth: full-scope login per account, isolated by CLAUDE_CONFIG_DIR.
+# A fake `claude` on PATH echoes the auth-relevant env + args, so we assert what claudio passes without ever touching the real binary or Keychain. The core guarantee: each account gets its OWN CLAUDE_CONFIG_DIR (=> its own Keychain slot), so --1 and --2 never share a slot -- nothing to race on.
+# ==========================================================================
 # PATH was scrubbed to /usr/bin:/bin above; prepend a stub bin dir.
 mkdir -p "$T_DIR/bin"
 _fake_claude() { cat > "$T_DIR/bin/claude"; chmod +x "$T_DIR/bin/claude"; }
 PATH="$T_DIR/bin:/usr/bin:/bin"
-
-# Fake OAuth tokens for the tests below. The real `sk-ant-oat…` prefix is
-# SPLIT in source (two adjacent quoted strings -> concatenated at runtime) so
-# secret scanners don't flag these obviously-fake, short fixtures as real
-# Anthropic tokens. At runtime they still carry the prefix, so they exercise the
-# extractor's `sk-ant-oat…` pattern for real.
-_OAT='sk-ant-''oat01-'
-TOK_P="${_OAT}fake-personal"
-TOK_W="${_OAT}fake-work"
-TOK_PASTE="${_OAT}fake-pasted"
-
-# setup-token prints noise + a token to stdout (mimics the real command). The
-# fake reads the token from the exported env so no token literal lives in here.
-export SETUP_TOK="$TOK_P"
 _fake_claude <<'SH'
 #!/bin/sh
-if [ "$1" = "setup-token" ]; then
-  echo "Opening browser for authorization..."
-  echo "$SETUP_TOK"
-else
-  echo "CLAUDE_RAN home=$HOME token=$CLAUDE_CODE_OAUTH_TOKEN apikey=${ANTHROPIC_API_KEY:-unset} args=$*"
-fi
+echo "CLAUDE_RAN home=$HOME configdir=$CLAUDE_CONFIG_DIR token=${CLAUDE_CODE_OAUTH_TOKEN:-unset} apikey=${ANTHROPIC_API_KEY:-unset} args=$*"
 SH
 
-# ---- _claudio_login: capture + store the token 0600 ----------------------
-t "login extracts the sk-ant-oat token from setup-token output and stores it 0600"
-_claudio_login personal </dev/null >/dev/null 2>&1; rc=$?
-assert_eq "$rc" "0" "exit code"
-assert_eq "$(cat $(_claudio_token_file personal))" "$TOK_P" "token captured"
-assert_eq "$(stat -f '%Lp' $(_claudio_token_file personal))" "600" "token file mode 0600"
+# Fake `security` + `curl` so _claudio_usage (called by _claudio_status) never
+# reads the real Keychain or hits the network. security returns a slot JSON with
+# a token; curl returns a canned /api/oauth/usage body. Overridden per-test below.
+cat > "$T_DIR/bin/security" <<'SEC'
+#!/bin/sh
+echo '{"claudeAiOauth":{"accessToken":"sk-ant-oat01-KEYTEST-NOTREAL","refreshToken":"r","expiresAt":9999999999999,"scopes":["user:profile"]}}'
+SEC
+chmod +x "$T_DIR/bin/security"
+cat > "$T_DIR/bin/curl" <<'CURL'
+#!/bin/sh
+echo '{"five_hour":{"utilization":50.0},"seven_day":{"utilization":19.0},"extra_usage":{"is_enabled":false,"utilization":null}}'
+CURL
+chmod +x "$T_DIR/bin/curl"
+
+# ---- _claudio_config_dir: per-account config dir => per-account keychain slot
+t "config_dir maps each account to its per-home .claude dir"
+assert_eq "$(_claudio_config_dir personal)" "$CLAUDE_HOME_PERSONAL/.claude" "personal"
+assert_eq "$(_claudio_config_dir work)" "$CLAUDE_HOME_WORK/.claude" "work"
+
+t "the two accounts get DISTINCT config dirs (no shared slot to race on)"
+cdp=$(_claudio_config_dir personal); cdw=$(_claudio_config_dir work)
+assert_eq "$([[ "$cdp" != "$cdw" ]] && echo distinct || echo same)" "distinct"
+
+t "distinct config dirs hash to distinct keychain services (claude's own keying)"
+# claude keys its slot "Claude Code-credentials-<sha256(configdir)[:8]>"; distinct dirs -> distinct services -> both accounts stay logged in concurrently.
+hp=$(printf '%s' "$cdp" | shasum -a 256 | cut -c1-8)
+hw=$(printf '%s' "$cdw" | shasum -a 256 | cut -c1-8)
+assert_eq "$([[ "$hp" != "$hw" ]] && echo distinct || echo same)" "distinct"
+
+# ---- _claudio_run: per-account CLAUDE_CONFIG_DIR + HOME, drops stray auth env
+t "run launches personal with its own CLAUDE_CONFIG_DIR and drops stray API/OAuth env"
+export ANTHROPIC_API_KEY=should-be-dropped
+export CLAUDE_CODE_OAUTH_TOKEN=should-be-dropped
+out=$(_claudio_run personal </dev/null 2>&1)
+unset ANTHROPIC_API_KEY CLAUDE_CODE_OAUTH_TOKEN
+assert_contains "$out" "configdir=$CLAUDE_HOME_PERSONAL/.claude" "personal config dir"
+assert_contains "$out" "home=$CLAUDE_HOME_PERSONAL" "personal home"
+assert_contains "$out" "token=unset" "stray OAuth token dropped"
+assert_contains "$out" "apikey=unset" "stray API key dropped"
+
+t "run launches work with the work config dir (no cross-contamination)"
+out=$(_claudio_run work </dev/null 2>&1)
+assert_contains "$out" "configdir=$CLAUDE_HOME_WORK/.claude" "work config dir"
+assert_contains "$out" "home=$CLAUDE_HOME_WORK" "work home"
+
+t "run: unknown account gives rc 2"
+_claudio_run bogus </dev/null >/dev/null 2>&1
+assert_eq "$?" "2" "exit code"
+
+# ---- _claudio_login: full-scope 'claude auth login' under the account's dir --
+t "login runs 'claude auth login' under the account's CLAUDE_CONFIG_DIR"
+out=$(_claudio_login personal </dev/null 2>&1)
+assert_contains "$out" "args=auth login" "invokes auth login"
+assert_contains "$out" "configdir=$CLAUDE_HOME_PERSONAL/.claude" "personal keychain slot"
+assert_contains "$out" "token=unset" "no stray token forced onto the login"
 
 t "login: unknown account gives rc 2"
 _claudio_login bogus </dev/null >/dev/null 2>&1
 assert_eq "$?" "2" "exit code"
 
-# ---- _claudio_login: manual-paste fallback when no token is in the output -
+# ---- _claudio_status: read the account's own slot, name the flag ----------
+t "status runs 'claude auth status' under the account's CLAUDE_CONFIG_DIR"
+out=$(_claudio_status work </dev/null 2>&1)
+assert_contains "$out" "args=auth status" "invokes auth status"
+assert_contains "$out" "configdir=$CLAUDE_HOME_WORK/.claude" "work keychain slot"
+
+t "status header names the flag and account role"
+out=$(_claudio_status work </dev/null 2>&1)
+assert_contains "$out" "[--2] work account" "flag + role in header"
+out=$(_claudio_status personal </dev/null 2>&1)
+assert_contains "$out" "[--1] personal account" "flag + role in header"
+
+# Swap in a fake that prints claude's real 'not logged in' hint, to check the rewrite from 'claude auth login' -> the claudio command for this account.
 _fake_claude <<'SH'
 #!/bin/sh
-[ "$1" = "setup-token" ] && echo "no token printed here"
+echo "Not logged in. Run claude auth login to authenticate."
 SH
-t "login falls back to a manual paste when auto-capture finds nothing"
-_claudio_login work <<< "$TOK_PASTE" >/dev/null 2>&1
-assert_eq "$(cat $(_claudio_token_file work))" "$TOK_PASTE" "pasted token stored"
+t "status rewrites claude's generic login hint to 'claudio <flag> login'"
+out=$(_claudio_status personal </dev/null 2>&1)
+assert_contains "$out" "claudio --1 login" "points at the account-specific command"
+assert_eq "$(printf '%s' "$out" | grep -c 'claude auth login')" "0" "no bare 'claude auth login' left"
 
-# Restore the env-echoing fake for the launch tests.
-_fake_claude <<'SH'
-#!/bin/sh
-echo "CLAUDE_RAN home=$HOME token=$CLAUDE_CODE_OAUTH_TOKEN apikey=${ANTHROPIC_API_KEY:-unset} args=$*"
-SH
+# ---- _claudio_usage: live usage % from the account's OWN slot token ---------
+# security + curl are faked (set up after the fake claude, above), so this reads
+# a canned slot token + canned /api/oauth/usage body -- no real Keychain, no net.
+t "usage prints session + week % parsed from the endpoint"
+out=$(_claudio_usage work 2>&1)
+assert_contains "$out" "session 50%" "five_hour utilization"
+assert_contains "$out" "week 19%" "seven_day utilization"
 
-# ---- _claudio_run: missing token aborts, never launches claude -----------
-rm -f "$(_claudio_token_file personal)"
-t "run aborts with rc 1 when the account has no token yet"
-out=$(_claudio_run personal </dev/null 2>&1); rc=$?
+t "usage: unknown account -> rc 1, no output"
+out=$(_claudio_usage bogus 2>&1); rc=$?
 assert_eq "$rc" "1" "exit code"
-assert_contains "$out" "no auth token"
-assert_eq "$(printf '%s' "$out" | grep -c CLAUDE_RAN)" "0" "claude was not launched"
+assert_eq "$out" "" "no output"
 
-# ---- _claudio_run: inject the account's token, drop ANTHROPIC_* ----------
-print -rn -- "$TOK_P" > "$(_claudio_token_file personal)"
-print -rn -- "$TOK_W" > "$(_claudio_token_file work)"
-
-t "run launches claude with the personal token in CLAUDE_CODE_OAUTH_TOKEN"
-export ANTHROPIC_API_KEY=should-be-dropped
-out=$(_claudio_run personal </dev/null 2>&1)
-unset ANTHROPIC_API_KEY
-assert_contains "$out" "token=$TOK_P"
-assert_contains "$out" "home=$CLAUDE_HOME_PERSONAL"
-assert_contains "$out" "apikey=unset"
-
-t "run picks the work token for the work account (no cross-contamination)"
-out=$(_claudio_run work </dev/null 2>&1)
-assert_contains "$out" "token=$TOK_W"
-assert_contains "$out" "home=$CLAUDE_HOME_WORK"
+# curl that fails -> usage must degrade silently (offline must not break status)
+cat > "$T_DIR/bin/curl" <<'CURL'
+#!/bin/sh
+exit 7
+CURL
+chmod +x "$T_DIR/bin/curl"
+t "usage degrades silently when the endpoint is unreachable"
+out=$(_claudio_usage work 2>&1); rc=$?
+assert_eq "$out" "" "no output"
+assert_eq "$rc" "1" "exit code"
 
 t_done
