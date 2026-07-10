@@ -148,78 +148,76 @@ clone_private_repo() {
         git clone "git@github.com:$repo.git" "$dir" 2>/dev/null
 }
 
-LOOPCTL_REPO="noelruault/loopctl"
-LOOPCTL_DIR="$GO_SRC_NOELRUAULT/loopctl"
-install_loopctl() {
-    if ! clone_private_repo "$LOOPCTL_REPO" "$LOOPCTL_DIR"; then
-        setup_warn "loopctl: no access to github.com/$LOOPCTL_REPO (private repo; needs 'gh auth login' or an SSH key with rights) — skipping, 'loopctl' command won't be available."
+# install_command — generic installer for a command built from a private repo.
+#
+#   install_command <name> <owner/repo> <build-cmd> <link-bin> [link-bin...]
+#
+# Clones github.com/<owner/repo> into $GO_SRC_NOELRUAULT/<repo>, runs
+# <build-cmd> inside it when any <link-bin> is missing (binaries live IN the
+# repo — some tools, like loopctl, resolve their home from the binary's own
+# directory, so we never copy them out), then symlinks each <link-bin> into
+# ~/.local/bin. Every failure path warns and returns 0: setup never fails
+# because one optional tool is unavailable. Adding a tool from now on is one
+# wrapper line (plus any tool-specific post-hook).
+install_command() {
+    local name="$1" repo="$2" build_cmd="$3"
+    shift 3
+    local dir="$GO_SRC_NOELRUAULT/${repo#*/}" bin missing=0
+    if ! clone_private_repo "$repo" "$dir"; then
+        setup_warn "$name: no access to github.com/$repo (private repo; needs 'gh auth login' or an SSH key with rights) — skipping, '$name' command won't be available."
         return 0
     fi
+    # All current tools are Go; extend this probe if a non-Go tool ever joins.
     if ! command -v go >/dev/null 2>&1; then
-        setup_warn "loopctl: Go toolchain not found — skipping build. Install Go and re-run setup.sh."
+        setup_warn "$name: Go toolchain not found — skipping build. Install Go and re-run setup.sh."
         return 0
     fi
-    # Build only when a binary is missing (deps are vendored: builds offline).
-    if [ ! -x "$LOOPCTL_DIR/loopctl" ] || [ ! -x "$LOOPCTL_DIR/loop-runner" ]; then
-        (cd "$LOOPCTL_DIR" && make build) || {
-            setup_warn "loopctl: build failed ('make build' in $LOOPCTL_DIR) — skipping, 'loopctl' command won't be available."
+    for bin in "$@"; do [ -x "$dir/$bin" ] || missing=1; done
+    if [ "$missing" = 1 ]; then
+        (cd "$dir" && eval "$build_cmd") || {
+            setup_warn "$name: build failed ('$build_cmd' in $dir) — skipping, '$name' command won't be available. If the clone is stale, try: git -C $dir pull && re-run setup.sh"
             return 0
         }
     fi
     mkdir -p "$LOCAL_BIN"
-    ln -sf "$LOOPCTL_DIR/loopctl" "$LOCAL_BIN/loopctl"
-    echo "loopctl: $LOCAL_BIN/loopctl -> $LOOPCTL_DIR/loopctl"
+    for bin in "$@"; do
+        if [ -x "$dir/$bin" ]; then
+            ln -sf "$dir/$bin" "$LOCAL_BIN/$(basename "$bin")"
+            echo "$name: $LOCAL_BIN/$(basename "$bin") -> $dir/$bin"
+        else
+            setup_warn "$name: expected binary $dir/$bin missing after build — '$(basename "$bin")' not installed."
+        fi
+    done
+}
 
+# loopctl: the loop supervisor. `make build` also produces loop-runner beside
+# loops/ (not linked — loopctl execs it from its own directory). The publisher
+# post-hook wires the optional macOS-widget publishing.
+install_loopctl() {
+    install_command loopctl noelruault/loopctl "make build" loopctl
+    local dir="$GO_SRC_NOELRUAULT/loopctl"
+    [ -x "$dir/loopctl" ] || return 0 # install_command already warned
     # Widget publishing (optional): loopctl expects a publisher/ symlink at its
     # repo root pointing into a loopmonitor checkout (legacy name macos-widgets).
     # Without it loops still run; only the macOS widget publishing is disabled.
-    if [ -d "$LOOPCTL_DIR/publisher" ] && [ ! -L "$LOOPCTL_DIR/publisher" ]; then
+    if [ -d "$dir/publisher" ] && [ ! -L "$dir/publisher" ]; then
         return 0 # real directory already in place; leave it alone
     fi
     local mon
     for mon in "$GO_SRC_NOELRUAULT/loopmonitor/publisher" "$GO_SRC_NOELRUAULT/macos-widgets/publisher"; do
         if [ -d "$mon" ]; then
-            ln -sfn "$mon" "$LOOPCTL_DIR/publisher"
+            ln -sfn "$mon" "$dir/publisher"
             echo "loopctl: publisher -> $mon"
             return 0
         fi
     done
-    setup_warn "loopctl: widget publishing disabled — clone github.com/noelruault/loopmonitor and run: ln -s <loopmonitor>/publisher $LOOPCTL_DIR/publisher"
+    setup_warn "loopctl: widget publishing disabled — clone github.com/noelruault/loopmonitor and run: ln -s <loopmonitor>/publisher $dir/publisher"
 }
 
-ROUTER_REPO="noelruault/router"
-ROUTER_DIR="$GO_SRC_NOELRUAULT/router"
+# router: foreground checklist/plan executor (routes each item to the cheapest
+# capable model; see the repo's README).
 install_router() {
-    if ! clone_private_repo "$ROUTER_REPO" "$ROUTER_DIR"; then
-        setup_warn "router: no access to github.com/$ROUTER_REPO (private repo; needs 'gh auth login' or an SSH key with rights) — skipping, 'router' command won't be available."
-        return 0
-    fi
-    if ! command -v go >/dev/null 2>&1; then
-        setup_warn "router: Go toolchain not found — skipping build. Install Go and re-run setup.sh."
-        return 0
-    fi
-    if [ ! -d "$ROUTER_DIR/cmd/router" ]; then
-        # Library-only so far: build whatever cmds do exist, but no 'router' CLI.
-        local d name
-        for d in "$ROUTER_DIR"/cmd/*/; do
-            [ -d "$d" ] || continue
-            name=$(basename "$d")
-            [ -x "$ROUTER_DIR/$name" ] ||
-                (cd "$ROUTER_DIR" && GOTOOLCHAIN=auto go build -o "$name" "./cmd/$name") ||
-                setup_warn "router: build of cmd/$name failed."
-        done
-        setup_warn "router: cmd/router not present yet (CLI not published) — 'router' command not installed. 'git -C $ROUTER_DIR pull' and re-run setup.sh once it lands."
-        return 0
-    fi
-    if [ ! -x "$ROUTER_DIR/router" ]; then
-        (cd "$ROUTER_DIR" && GOTOOLCHAIN=auto go build -o router ./cmd/router) || {
-            setup_warn "router: build failed ('go build ./cmd/router' in $ROUTER_DIR) — skipping, 'router' command won't be available."
-            return 0
-        }
-    fi
-    mkdir -p "$LOCAL_BIN"
-    ln -sf "$ROUTER_DIR/router" "$LOCAL_BIN/router"
-    echo "router: $LOCAL_BIN/router -> $ROUTER_DIR/router"
+    install_command router noelruault/router "GOTOOLCHAIN=auto go build -o router ./cmd/router" router
 }
 
 # Overwrite config with symlinks
