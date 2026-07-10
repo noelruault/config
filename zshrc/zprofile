@@ -14,6 +14,11 @@ if [[ -x "/usr/local/go/bin/go" ]]; then
 fi
 # export GOPATH=$(go env GOPATH) # Useful for scripts but not necessary
 
+# Private Go modules under my namespace (loopctl, router, ...): bypass the
+# public module proxy/checksum DB so `go get github.com/noelruault/<repo>`
+# resolves over authenticated git instead of failing on proxy.golang.org.
+export GOPRIVATE=github.com/noelruault
+
 # How to bulk set paths in zprofile:
 # path=(
 #   /usr/local/{bin,sbin}

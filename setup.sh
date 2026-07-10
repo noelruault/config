@@ -120,6 +120,108 @@ install_aispeak() {
     fi
 }
 
+# loopctl + router: private Go CLIs (github.com/noelruault/{loopctl,router}).
+# Cloned into the Go src tree and built in place — loopctl's binary directory
+# is its home (it finds loops/ beside itself), so binaries are never copied,
+# only symlinked into ~/.local/bin (put on PATH by zshrc/zshrc).
+# Everything is best-effort: no repo access, no gh/git auth, or no Go
+# toolchain prints a warning and setup carries on; it never fails the run.
+LOCAL_BIN="$HOME/.local/bin"
+GO_SRC_NOELRUAULT="$HOME/go/src/github.com/noelruault"
+
+setup_warn() {
+    echo "WARNING: $*" >&2
+}
+
+# Clone a private repo (owner/name) into a directory if not already there.
+# Probes access softly first — gh (if authenticated), then git over SSH with a
+# short timeout — and returns non-zero without side effects when this machine
+# has no rights to the repo.
+clone_private_repo() {
+    local repo="$1" dir="$2"
+    [ -d "$dir/.git" ] && return 0
+    mkdir -p "$(dirname "$dir")"
+    if command -v gh >/dev/null 2>&1 && gh repo view "$repo" >/dev/null 2>&1; then
+        gh repo clone "$repo" "$dir" 2>/dev/null && return 0
+    fi
+    GIT_SSH_COMMAND="ssh -o BatchMode=yes -o ConnectTimeout=5" \
+        git clone "git@github.com:$repo.git" "$dir" 2>/dev/null
+}
+
+LOOPCTL_REPO="noelruault/loopctl"
+LOOPCTL_DIR="$GO_SRC_NOELRUAULT/loopctl"
+install_loopctl() {
+    if ! clone_private_repo "$LOOPCTL_REPO" "$LOOPCTL_DIR"; then
+        setup_warn "loopctl: no access to github.com/$LOOPCTL_REPO (private repo; needs 'gh auth login' or an SSH key with rights) — skipping, 'loopctl' command won't be available."
+        return 0
+    fi
+    if ! command -v go >/dev/null 2>&1; then
+        setup_warn "loopctl: Go toolchain not found — skipping build. Install Go and re-run setup.sh."
+        return 0
+    fi
+    # Build only when a binary is missing (deps are vendored: builds offline).
+    if [ ! -x "$LOOPCTL_DIR/loopctl" ] || [ ! -x "$LOOPCTL_DIR/loop-runner" ]; then
+        (cd "$LOOPCTL_DIR" && make build) || {
+            setup_warn "loopctl: build failed ('make build' in $LOOPCTL_DIR) — skipping, 'loopctl' command won't be available."
+            return 0
+        }
+    fi
+    mkdir -p "$LOCAL_BIN"
+    ln -sf "$LOOPCTL_DIR/loopctl" "$LOCAL_BIN/loopctl"
+    echo "loopctl: $LOCAL_BIN/loopctl -> $LOOPCTL_DIR/loopctl"
+
+    # Widget publishing (optional): loopctl expects a publisher/ symlink at its
+    # repo root pointing into a loopmonitor checkout (legacy name macos-widgets).
+    # Without it loops still run; only the macOS widget publishing is disabled.
+    if [ -d "$LOOPCTL_DIR/publisher" ] && [ ! -L "$LOOPCTL_DIR/publisher" ]; then
+        return 0 # real directory already in place; leave it alone
+    fi
+    local mon
+    for mon in "$GO_SRC_NOELRUAULT/loopmonitor/publisher" "$GO_SRC_NOELRUAULT/macos-widgets/publisher"; do
+        if [ -d "$mon" ]; then
+            ln -sfn "$mon" "$LOOPCTL_DIR/publisher"
+            echo "loopctl: publisher -> $mon"
+            return 0
+        fi
+    done
+    setup_warn "loopctl: widget publishing disabled — clone github.com/noelruault/loopmonitor and run: ln -s <loopmonitor>/publisher $LOOPCTL_DIR/publisher"
+}
+
+ROUTER_REPO="noelruault/router"
+ROUTER_DIR="$GO_SRC_NOELRUAULT/router"
+install_router() {
+    if ! clone_private_repo "$ROUTER_REPO" "$ROUTER_DIR"; then
+        setup_warn "router: no access to github.com/$ROUTER_REPO (private repo; needs 'gh auth login' or an SSH key with rights) — skipping, 'router' command won't be available."
+        return 0
+    fi
+    if ! command -v go >/dev/null 2>&1; then
+        setup_warn "router: Go toolchain not found — skipping build. Install Go and re-run setup.sh."
+        return 0
+    fi
+    if [ ! -d "$ROUTER_DIR/cmd/router" ]; then
+        # Library-only so far: build whatever cmds do exist, but no 'router' CLI.
+        local d name
+        for d in "$ROUTER_DIR"/cmd/*/; do
+            [ -d "$d" ] || continue
+            name=$(basename "$d")
+            [ -x "$ROUTER_DIR/$name" ] ||
+                (cd "$ROUTER_DIR" && GOTOOLCHAIN=auto go build -o "$name" "./cmd/$name") ||
+                setup_warn "router: build of cmd/$name failed."
+        done
+        setup_warn "router: cmd/router not present yet (CLI not published) — 'router' command not installed. 'git -C $ROUTER_DIR pull' and re-run setup.sh once it lands."
+        return 0
+    fi
+    if [ ! -x "$ROUTER_DIR/router" ]; then
+        (cd "$ROUTER_DIR" && GOTOOLCHAIN=auto go build -o router ./cmd/router) || {
+            setup_warn "router: build failed ('go build ./cmd/router' in $ROUTER_DIR) — skipping, 'router' command won't be available."
+            return 0
+        }
+    fi
+    mkdir -p "$LOCAL_BIN"
+    ln -sf "$ROUTER_DIR/router" "$LOCAL_BIN/router"
+    echo "router: $LOCAL_BIN/router -> $ROUTER_DIR/router"
+}
+
 # Overwrite config with symlinks
 overwrite_config() {
     local src="$1"
@@ -237,6 +339,11 @@ install_fonts
 # aispeak: also a private SSH clone, so likewise after SSH setup. No-op without
 # repo access; loaded by zshrc/aliases/utils/aispeak only when the clone exists.
 install_aispeak
+
+# loopctl + router: private clones too, so after gh/SSH auth is in place.
+# Warn-and-continue without repo access, Go, or a build; never fail setup.
+install_loopctl
+install_router
 
 # TODO:
 # https://iterm2colorschemes.com
