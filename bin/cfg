@@ -1,0 +1,4 @@
+#!/bin/zsh -f
+# cfg: setup.sh from any directory. `cfg doctor`, `cfg update`, `cfg init --only bin_links`.
+# Not named dot: Graphviz installs a dot, and ~/.local/bin is ahead of Homebrew on PATH, so this would hide it.
+exec "${0:A:h:h}/setup.sh" "$@"

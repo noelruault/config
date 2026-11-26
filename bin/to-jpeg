@@ -1,0 +1,52 @@
+#!/bin/zsh -f
+# to-jpeg: convert one or more images (HEIC, PNG, TIFF, ...) to JPEG beside the original, using macOS's built-in sips.
+#
+#   to-jpeg [-z max_px] image...
+#
+# Never overwrites: an existing photo.jpg makes the output photo-1.jpg, then photo-2.jpg.
+# Exits 1 if any file failed; the others still convert.
+# The Finder Quick Action "Convert to JPEG" (quick-actions/) calls this script.
+
+prog=${0:t}
+usage() { print -u2 "usage: $prog [-z max_px] image..."; exit 2; }
+
+resize=()
+while getopts z:h opt; do
+    case $opt in
+        z) [[ $OPTARG == <1-> ]] || { print -u2 "$prog: -z wants a positive pixel count, got '$OPTARG'"; exit 2; }
+           resize=(-Z $OPTARG) ;;
+        *) usage ;;
+    esac
+done
+shift $((OPTIND - 1))
+(( $# )) || usage
+
+# sips is part of macOS, not Homebrew, so there is nothing to install on any other OS.
+if ! command -v sips >/dev/null 2>&1; then
+    print -u2 "$prog: sips not found. It ships with macOS (/usr/bin/sips); this needs a Mac."
+    exit 1
+fi
+
+failed=0
+for src in "$@"; do
+    if [[ ! -f $src ]]; then
+        print -u2 "skip $src: not a file"
+        failed=1
+        continue
+    fi
+    if [[ ${src:e:l} == (jpg|jpeg) ]]; then
+        print -u2 "skip $src: already JPEG"
+        continue
+    fi
+    dst=${src:r}.jpg
+    n=0
+    while [[ -e $dst ]]; do dst=${src:r}-$((++n)).jpg; done
+    if err=$(sips -s format jpeg $resize "$src" --out "$dst" 2>&1 >/dev/null); then
+        print -- "$dst"
+    else
+        rm -f -- "$dst"
+        print -u2 "fail $src: ${err//$'\n'/ }"
+        failed=1
+    fi
+done
+exit $failed

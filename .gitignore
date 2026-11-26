@@ -20,11 +20,19 @@ iterm2/AppSupport
 # Un-ignores some folders
 !apps
 !rcs
+!bin
+!quick-actions
 !git
 !iterm2
 !zshrc
 !nvim
 !tests
+!setup
+!.github
 
 # Fonts live in a private repo, cloned here on demand by setup.sh
 .fonts/
+
+# leak-scan reads two per-machine lists that name the very values it exists to keep out of a public repo, and this repo is public. Copy the .example files beside them and fill them in locally.
+git/hooks/leak-patterns.txt
+git/hooks/internal-remotes.txt

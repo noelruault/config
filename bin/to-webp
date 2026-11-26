@@ -1,0 +1,67 @@
+#!/bin/zsh -f
+# to-webp: convert one or more images (PNG, JPEG, HEIC, ...) to WebP beside the original, using cwebp.
+#
+#   to-webp [-q quality] image...
+#
+# Never overwrites: an existing photo.webp makes the output photo-1.webp, then photo-2.webp.
+# Exits 1 if any file failed; the others still convert.
+# The Finder Quick Action "Convert to WebP" (quick-actions/) calls this script.
+
+prog=${0:t}
+usage() { print -u2 "usage: $prog [-q quality] image..."; exit 2; }
+
+quality=85
+while getopts q:h opt; do
+    case $opt in
+        q) [[ $OPTARG == <0-100> ]] || { print -u2 "$prog: -q wants 0-100, got '$OPTARG'"; exit 2; }
+           quality=$OPTARG ;;
+        *) usage ;;
+    esac
+done
+shift $((OPTIND - 1))
+(( $# )) || usage
+
+# Quick Actions run with PATH=/usr/bin:/bin:/usr/sbin:/sbin, which misses Homebrew.
+path=(/opt/homebrew/bin /usr/local/bin $path)
+if ! command -v cwebp >/dev/null 2>&1; then
+    print -u2 "$prog: cwebp not found. Install it: brew install webp"
+    exit 1
+fi
+
+tmp=$(mktemp -d "${TMPDIR:-/tmp}/to-webp.XXXXXX") || exit 1
+trap 'rm -rf -- "$tmp"' EXIT
+
+failed=0
+for src in "$@"; do
+    if [[ ! -f $src ]]; then
+        print -u2 "skip $src: not a file"
+        failed=1
+        continue
+    fi
+    if [[ ${src:e:l} == webp ]]; then
+        print -u2 "skip $src: already WebP"
+        continue
+    fi
+    dst=${src:r}.webp
+    n=0
+    while [[ -e $dst ]]; do dst=${src:r}-$((++n)).webp; done
+    in=$src
+    # cwebp cannot read HEIC, GIF or ICNS; sips (macOS) decodes them to a lossless PNG first.
+    if [[ ${src:e:l} != (png|jpg|jpeg|tif|tiff) ]]; then
+        in=$tmp/${src:t:r}.png
+        if ! err=$(sips -s format png "$src" --out "$in" 2>&1 >/dev/null); then
+            print -u2 "fail $src: ${err//$'\n'/ }"
+            failed=1
+            continue
+        fi
+    fi
+    # -metadata icc keeps the colour profile, so Display P3 screenshots do not wash out.
+    if err=$(cwebp -quiet -q $quality -metadata icc "$in" -o "$dst" 2>&1); then
+        print -- "$dst"
+    else
+        rm -f -- "$dst"
+        print -u2 "fail $src: ${err//$'\n'/ }"
+        failed=1
+    fi
+done
+exit $failed

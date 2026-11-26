@@ -25,7 +25,7 @@ done
 # Scripts: route by shebang. zsh scripts get zsh -n; bash/sh (or shebang-less,
 # they are sourced by setup.sh which is bash) get bash -n + shellcheck.
 typeset -a bfiles
-for f in "$REPO"/setup.sh "$REPO"/git/*.sh(.N) "$REPO"/zshrc/scripts/*.sh(.N); do
+for f in "$REPO"/setup.sh "$REPO"/setup/**/*.sh(.N) "$REPO"/git/*.sh(.N) "$REPO"/zshrc/scripts/*.sh(.N); do
     if [[ "$(head -n1 "$f")" == *zsh* ]]; then
         t "zsh -n ${f#$REPO/}"
         err=$(zsh -fn "$f" 2>&1)

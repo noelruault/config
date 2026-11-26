@@ -1,0 +1,47 @@
+#!/bin/zsh -f
+# to-webm: convert one or more videos (MOV, MP4, ...) to WebM (VP9 + Opus) beside the original, using ffmpeg.
+#
+#   to-webm video...
+#
+# Never overwrites: an existing clip.webm makes the output clip-1.webm, then clip-2.webm.
+# Exits 1 if any file failed; the others still convert.
+# The Finder Quick Action "Convert to WebM" (quick-actions/) calls this script.
+
+prog=${0:t}
+(( $# )) && [[ $1 != -* ]] || { print -u2 "usage: $prog video..."; exit 2; }
+
+# Quick Actions run with PATH=/usr/bin:/bin:/usr/sbin:/sbin, which misses Homebrew.
+path=(/opt/homebrew/bin /usr/local/bin $path)
+if ! command -v ffmpeg >/dev/null 2>&1; then
+    print -u2 "$prog: ffmpeg not found. Install it: brew install ffmpeg"
+    exit 1
+fi
+
+failed=0
+for src in "$@"; do
+    if [[ ! -f $src ]]; then
+        print -u2 "skip $src: not a file"
+        failed=1
+        continue
+    fi
+    if [[ ${src:e:l} == webm ]]; then
+        print -u2 "skip $src: already WebM"
+        continue
+    fi
+    dst=${src:r}.webm
+    n=0
+    while [[ -e $dst ]]; do dst=${src:r}-$((++n)).webm; done
+    # No Mac has a VP9 hardware encoder, so this is CPU-bound.
+    # taskpolicy -b runs it at background QoS (efficiency cores, throttled I/O): slower, but the Mac stays usable.
+    # -b:v 0 makes -crf constant quality instead of a bitrate cap.
+    if err=$(taskpolicy -b ffmpeg -nostdin -hide_banner -loglevel error -hwaccel videotoolbox -i "$src" \
+        -map 0:v:0 -map '0:a?' -c:v libvpx-vp9 -crf 32 -b:v 0 -row-mt 1 -deadline good -cpu-used 4 \
+        -c:a libopus -b:a 128k "$dst" 2>&1); then
+        print -- "$dst"
+    else
+        rm -f -- "$dst"
+        print -u2 "fail $src: ${err//$'\n'/ }"
+        failed=1
+    fi
+done
+exit $failed

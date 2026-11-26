@@ -1,347 +1,164 @@
 #!/bin/bash
-# Script to execute a first time set-up of zsh config files. This script mainly uses symbolic links to overwrite the default configuration.
-# A symbolic link, also termed a soft link, is a special kind of file that points to another file, much like a shortcut in Windows or a Macintosh alias.
+# Machine setup for this repo: install, update and check every component in setup/components.
+# This file is stage 0: it runs under whatever bash started it, including the 3.2 that macOS ships, and restarts itself under bash 5 before any other code loads.
+# shellcheck disable=SC2034  # LOCAL_BIN and SETUP_ASSUME_YES are read by the files sourced from setup/
 
-CURRENT_DIR=$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")
+# `sh setup.sh` or `zsh setup.sh` ignores the first line of this file. This hands over to bash before the first line a plain sh cannot parse.
+# shellcheck disable=SC2292  # must stay POSIX: the shell reading this line may not be bash
+[ -n "${BASH_VERSION:-}" ] || exec bash "$0" "$@"
 
-# Backup existing configuration
-backup_config() {
-    local config_dir="$1"
-    if [ -d "$config_dir" ] && ! [ -L "$config_dir" ]; then
-        local dest
-        dest="$HOME/.backup-config-$(date +'%Y%m%d')"
-        mv "$config_dir" "$dest"
-        echo "Current configuration backed up at $dest"
-    fi
+# Stage 0 files must stay valid bash 3.2. Everything else in setup/ may use bash 5.
+STAGE_ZERO_LIBS=(ui platform download)
+MODERN_LIBS=(private-repo interactive registry runner)
+
+usage() {
+    cat << EOF
+USAGE:
+    setup.sh COMMAND [OPTIONS]
+
+COMMANDS:
+    init          install every component (safe to run again)
+    update        pull this repo, then update every component
+    doctor        check every component; exits 1 when a required one fails
+    components    list what setup manages, in run order
+
+OPTIONS:
+    --dry-run       print the plan, change nothing
+    --only a,b      limit the run to these components
+    --skip a,b      leave these components out
+    --yes           answer every yes/no prompt with yes
+    -h, --help      show this help
+EOF
 }
 
-# Install Homebrew
-install_homebrew() {
-    if ! command -v brew &> /dev/null; then
-        echo "Installing Homebrew..."
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        echo >> /Users/"$(whoami)"/.zprofile
-        # shellcheck disable=SC2016  # literal $(...) is intended in the written line
-        echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/"$(whoami)"/.zprofile
-        eval "$(/opt/homebrew/bin/brew shellenv)"
+# hint_shortcut tells whoever just typed the full path to setup.sh that bin_links gave them a shorter name for it.
+hint_shortcut() {
+    [ "$SETUP_DRY_RUN" = false ] && [ -x "$LOCAL_BIN/cfg" ] || return 0
+    if command -v cfg > /dev/null 2>&1; then
+        say_info "from now on: cfg doctor, cfg update (cfg alone lists the commands)"
     else
-        echo "Homebrew is already installed."
+        say_info "in a new terminal: cfg doctor, cfg update (cfg alone lists the commands)"
     fi
 }
 
-# Install a brew package if not installed
-install_brew_package() {
-    local package="$1"
-    brew list "$package" &> /dev/null || brew install "$package"
-}
-
-# Set up latest bash via Homebrew
-setup_bash() {
-    install_brew_package bash
-    local brew_bash_path
-    brew_bash_path=$(which -a bash | head -n 1)
-    if ! grep -Fxq "$brew_bash_path" /etc/shells; then
-        echo "$brew_bash_path" | sudo tee -a /etc/shells
-        sudo chsh -s "$brew_bash_path"
-    else
-        echo "Latest Homebrew bash version already configured."
-    fi
-}
-
-# Install Oh-My-Zsh
-install_oh_my_zsh() {
-    if [ ! -d ~/.oh-my-zsh ]; then
-        echo "Installing Oh-My-Zsh..."
-        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-    else
-        echo "Oh-My-Zsh is already installed."
-    fi
-}
-
-# Install Zsh plugins
-install_zsh_plugins() {
-    local plugin_url="$1"
-    local plugin_dir="$2"
-    if [ ! -d "$plugin_dir" ]; then
-        git clone "$plugin_url" "$plugin_dir"
-    fi
-}
-
-# Install fonts (macOS only).
-# Fonts are commercially licensed, so they live in a private repo instead of
-# being committed here. Cloned on demand into .fonts/ (gitignored).
-# Requires git auth (SSH key) to the private repo; skips cleanly without it.
-FONTS_REPO="git@github.com:noelruault/fonts.git"
-install_fonts() {
-    if [[ $OSTYPE == 'darwin'* ]]; then
-        local fonts_dir="$CURRENT_DIR/.fonts"
-        echo "Installing fonts..."
-        if [ ! -d "$fonts_dir/.git" ]; then
-            git clone --depth=1 "$FONTS_REPO" "$fonts_dir" 2>/dev/null || {
-                echo "Fonts: no git access to $FONTS_REPO, skipping."
-                return
-            }
-        else
-            git -C "$fonts_dir" pull --ff-only 2>/dev/null || true
-        fi
-        # Only macOS-installable formats; skip web assets (woff/woff2/eot/css).
-        find "$fonts_dir" -type f \
-            \( -iname '*.ttf' -o -iname '*.otf' -o -iname '*.ttc' -o -iname '*.dfont' \) \
-            -exec cp {} ~/Library/Fonts/ \; \
-            || echo "Failed to copy fonts from $fonts_dir"
-    fi
-}
-
-# Install aispeak, the offline voice assistant (private repo until public).
-# Cloned on demand into the Go src tree; skips cleanly without git access, so
-# anyone running this setup without rights to the repo just gets nothing.
-# The shell loader (zshrc/aliases/utils/aispeak) sources it only if present.
-AISPEAK_REPO="git@github.com:noelruault/aispeak.git"
-AISPEAK_DIR="$HOME/go/src/github.com/noelruault/aispeak"
-install_aispeak() {
-    if [ -d "$AISPEAK_DIR/.git" ]; then
-        git -C "$AISPEAK_DIR" pull --ff-only 2>/dev/null || true
-    else
-        mkdir -p "$(dirname "$AISPEAK_DIR")"
-        git clone "$AISPEAK_REPO" "$AISPEAK_DIR" 2>/dev/null || {
-            # No access (private repo / no key) — silently skip.
-            return
-        }
-    fi
-    # Pre-build the speech binary if we can; otherwise it builds on first run.
-    if command -v swiftc >/dev/null 2>&1 && [ -x "$AISPEAK_DIR/speech-stt/build.sh" ]; then
-        "$AISPEAK_DIR/speech-stt/build.sh" >/dev/null 2>&1 || true
-    fi
-    # Populate doc corpora once (English manual download + local Spanish import),
-    # so `aispeak --topic vim-en|vim-es` works out of the box. Best-effort.
-    local docs_root="${XDG_DATA_HOME:-$HOME/.local/share}/aispeak/docs"
-    if [ ! -d "$docs_root/vim-en" ] && [ -x "$AISPEAK_DIR/scripts/fetch-docs.sh" ]; then
-        "$AISPEAK_DIR/scripts/fetch-docs.sh" all >/dev/null 2>&1 || true
-    fi
-}
-
-# loopctl + router: private Go CLIs (github.com/noelruault/{loopctl,router}).
-# Cloned into the Go src tree and built in place — loopctl's binary directory
-# is its home (it finds loops/ beside itself), so binaries are never copied,
-# only symlinked into ~/.local/bin (put on PATH by zshrc/zshrc).
-# Everything is best-effort: no repo access, no gh/git auth, or no Go
-# toolchain prints a warning and setup carries on; it never fails the run.
-LOCAL_BIN="$HOME/.local/bin"
-GO_SRC_NOELRUAULT="$HOME/go/src/github.com/noelruault"
-
-setup_warn() {
-    echo "WARNING: $*" >&2
-}
-
-# Clone a private repo (owner/name) into a directory if not already there.
-# Probes access softly first — gh (if authenticated), then git over SSH with a
-# short timeout — and returns non-zero without side effects when this machine
-# has no rights to the repo.
-clone_private_repo() {
-    local repo="$1" dir="$2"
-    [ -d "$dir/.git" ] && return 0
-    mkdir -p "$(dirname "$dir")"
-    if command -v gh >/dev/null 2>&1 && gh repo view "$repo" >/dev/null 2>&1; then
-        gh repo clone "$repo" "$dir" 2>/dev/null && return 0
-    fi
-    GIT_SSH_COMMAND="ssh -o BatchMode=yes -o ConnectTimeout=5" \
-        git clone "git@github.com:$repo.git" "$dir" 2>/dev/null
-}
-
-# install_command — generic installer for a command built from a private repo.
-#
-#   install_command <name> <owner/repo> <build-cmd> <link-bin> [link-bin...]
-#
-# Clones github.com/<owner/repo> into $GO_SRC_NOELRUAULT/<repo>, runs
-# <build-cmd> inside it when any <link-bin> is missing (binaries live IN the
-# repo — some tools, like loopctl, resolve their home from the binary's own
-# directory, so we never copy them out), then symlinks each <link-bin> into
-# ~/.local/bin. Every failure path warns and returns 0: setup never fails
-# because one optional tool is unavailable. Adding a tool from now on is one
-# wrapper line (plus any tool-specific post-hook).
-install_command() {
-    local name="$1" repo="$2" build_cmd="$3"
-    shift 3
-    local dir="$GO_SRC_NOELRUAULT/${repo#*/}" bin missing=0
-    if ! clone_private_repo "$repo" "$dir"; then
-        setup_warn "$name: no access to github.com/$repo (private repo; needs 'gh auth login' or an SSH key with rights) — skipping, '$name' command won't be available."
-        return 0
-    fi
-    # All current tools are Go; extend this probe if a non-Go tool ever joins.
-    if ! command -v go >/dev/null 2>&1; then
-        setup_warn "$name: Go toolchain not found — skipping build. Install Go and re-run setup.sh."
-        return 0
-    fi
-    for bin in "$@"; do [ -x "$dir/$bin" ] || missing=1; done
-    if [ "$missing" = 1 ]; then
-        (cd "$dir" && eval "$build_cmd") || {
-            setup_warn "$name: build failed ('$build_cmd' in $dir) — skipping, '$name' command won't be available. If the clone is stale, try: git -C $dir pull && re-run setup.sh"
-            return 0
-        }
-    fi
-    mkdir -p "$LOCAL_BIN"
-    for bin in "$@"; do
-        if [ -x "$dir/$bin" ]; then
-            ln -sf "$dir/$bin" "$LOCAL_BIN/$(basename "$bin")"
-            echo "$name: $LOCAL_BIN/$(basename "$bin") -> $dir/$bin"
-        else
-            setup_warn "$name: expected binary $dir/$bin missing after build — '$(basename "$bin")' not installed."
-        fi
+source_libs() {
+    local name
+    for name in "$@"; do
+        # shellcheck disable=SC1090  # path is built at runtime
+        source "$SETUP_ROOT/setup/lib/$name.sh" || exit 1
     done
 }
 
-# loopctl: the loop supervisor. `make build` also produces loop-runner beside
-# loops/ (not linked — loopctl execs it from its own directory). The publisher
-# post-hook wires the optional macOS-widget publishing.
-install_loopctl() {
-    install_command loopctl noelruault/loopctl "make build" loopctl
-    local dir="$GO_SRC_NOELRUAULT/loopctl"
-    [ -x "$dir/loopctl" ] || return 0 # install_command already warned
-    # Widget publishing (optional): loopctl expects a publisher/ symlink at its
-    # repo root pointing into a loopmonitor checkout (legacy name macos-widgets).
-    # Without it loops still run; only the macOS widget publishing is disabled.
-    if [ -d "$dir/publisher" ] && [ ! -L "$dir/publisher" ]; then
-        return 0 # real directory already in place; leave it alone
-    fi
-    local mon
-    for mon in "$GO_SRC_NOELRUAULT/loopmonitor/publisher" "$GO_SRC_NOELRUAULT/macos-widgets/publisher"; do
-        if [ -d "$mon" ]; then
-            ln -sfn "$mon" "$dir/publisher"
-            echo "loopctl: publisher -> $mon"
-            return 0
-        fi
-    done
-    setup_warn "loopctl: widget publishing disabled — clone github.com/noelruault/loopmonitor and run: ln -s <loopmonitor>/publisher $dir/publisher"
-}
-
-# router: foreground checklist/plan executor (routes each item to the cheapest
-# capable model; see the repo's README).
-install_router() {
-    install_command router noelruault/router "GOTOOLCHAIN=auto go build -o router ./cmd/router" router
-}
-
-# Overwrite config with symlinks
-overwrite_config() {
-    local src="$1"
-    local dest="$2"
-    if [ -e "$src" ]; then
-        rm -f "$dest" && ln -sF "$src" "$dest"
-        echo "Symlink created from $src to $dest"
-    else
-        echo "Source $src not found. Skipping."
-    fi
-}
-
-# Prompt user for confirmation
-prompt_user() {
-    local prompt_message="$1"
-    local default_answer="y"
-    read -rp "$prompt_message ([y]/n) " answer </dev/tty
-    answer=${answer:-$default_answer}
-    if [[ "$answer" =~ ^[Yy]$ ]]; then
-        return 0
-    else
+# restart_under_modern_bash replaces this process with the same command line running under bash 5, installing that bash first when init or update is allowed to.
+# The platform's bootstrap file supplies modern_bash_path and install_modern_bash; a platform without one has to bring its own bash 5.
+restart_under_modern_bash() {
+    local command="$1" modern_bash=""
+    shift
+    if ! declare -F modern_bash_path > /dev/null; then
+        say_fail "setup needs bash 5 or newer and this is bash $BASH_VERSION"
         return 1
     fi
+    modern_bash=$(modern_bash_path)
+    if [ -z "$modern_bash" ]; then
+        case "$command" in
+            init | update)
+                if [ "$SETUP_DRY_RUN" = true ]; then
+                    say_info "would install bash 5 first; run again after that for the full plan"
+                    return 0
+                fi
+                install_modern_bash || return 1
+                modern_bash=$(modern_bash_path)
+                ;;
+        esac
+    fi
+    if [ -z "$modern_bash" ]; then
+        say_fail "bash 5 is not installed (run: setup.sh init)"
+        return 1
+    fi
+    exec "$modern_bash" "$SETUP_ROOT/setup.sh" "$@"
 }
 
-# Main script execution starts here
-backup_config "$HOME/.config"
-overwrite_config "$HOME/config" "$HOME/.config"
+main() {
+    SETUP_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P) || exit 1
+    LOCAL_BIN="$HOME/.local/bin"
+    SETUP_DRY_RUN=false
+    SETUP_ASSUME_YES=false
 
-install_homebrew
-setup_bash
-# Core CLI tools, in one list so a fresh machine gets everything in a single pass.
-# bash is handled by setup_bash above (it also configures the login shell).
-# neovim config lives in nvim/ (active via ~/.config -> ~/config); lazy.nvim
-# bootstraps its plugins on first `nvim` launch.
-BREW_PACKAGES=(
-    git        # version control + private-repo clones
-    gh         # GitHub CLI: auth, private clones, PR/workflow ops
-    jq         # JSON processor: required by the .claude guards (claude-*-ro-guard)
-    python     # python3: bin/resolve-secrets in the .claude dotfiles repo
-    awscli     # aws CLI: the AWS read-only guard + day-to-day AWS
-    coreutils  # GNU coreutils (readlink -f used by this script, etc.)
-    fzf
-    shfmt
-    shellcheck
-    neovim
-)
-for pkg in "${BREW_PACKAGES[@]}"; do
-    install_brew_package "$pkg"
-done
+    local command="" only="" skip="" original_arguments=("$@")
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            init | update | doctor | components) command="$1" ;;
+            --dry-run) SETUP_DRY_RUN=true ;;
+            --yes) SETUP_ASSUME_YES=true ;;
+            --only | --skip)
+                # An empty list is refused too: `--only "$UNSET"` would otherwise select every component.
+                if [ $# -lt 2 ] || [ -z "$2" ]; then
+                    echo "setup.sh: $1 needs a comma-separated list" >&2
+                    exit 2
+                fi
+                if [ "$1" = --only ]; then only="$2"; else skip="$2"; fi
+                shift
+                ;;
+            -h | --help)
+                usage
+                exit 0
+                ;;
+            *)
+                echo "setup.sh: unknown argument: $1" >&2
+                usage >&2
+                exit 2
+                ;;
+        esac
+        shift
+    done
 
-# Optional / heavier tooling (uncomment as needed):
-# install_brew_package docker
-# install_brew_package colima
-# install_brew_package docker-compose
-# install_brew_package docker-credential-helper
-# install_brew_package kubectl
-
-install_oh_my_zsh
-
-# Install Zsh plugins and themes
-ZSH_CUSTOM=${ZSH_CUSTOM:-~/.oh-my-zsh/custom}
-install_zsh_plugins "https://github.com/zsh-users/zsh-syntax-highlighting" "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
-install_zsh_plugins "https://github.com/zsh-users/zsh-autosuggestions" "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
-
-SPACESHIP="$ZSH_CUSTOM/themes/spaceship-prompt"
-if [ ! -d "$SPACESHIP" ]; then
-    git clone https://github.com/spaceship-prompt/spaceship-prompt.git "$SPACESHIP" --depth=1
-    ln -s "$SPACESHIP/spaceship.zsh-theme" "$ZSH_CUSTOM/themes/spaceship.zsh-theme"
-fi
-
-# Overwrite ZSH configuration
-if prompt_user "Do you want to overwrite current zsh configuration?"; then
-    overwrite_config "$HOME/config/zshrc/zshrc" "$HOME/.zshrc"
-    overwrite_config "$HOME/config/zshrc/zprofile" "$HOME/.zprofile"
-fi
-
-# Overwrite Git configuration
-if prompt_user "Do you want to overwrite current git configuration?"; then
-    git_config_script="$CURRENT_DIR/git/git-config.sh"
-    if [ -f "$git_config_script" ]; then
-        # shellcheck disable=SC1090  # runtime path, not resolvable statically
-        source "$git_config_script" || echo "Error executing $git_config_script"
-    else
-        echo "$git_config_script not found, skipping."
+    # No command is never an install: a bare `cfg` typed to see what it does must not start changing the machine.
+    if [ -z "$command" ]; then
+        if [ ${#original_arguments[@]} -eq 0 ]; then
+            usage
+            exit 0
+        fi
+        echo "setup.sh: no command given" >&2
+        usage >&2
+        exit 2
     fi
-fi
 
-# Generate SSH keys if needed
-if prompt_user "Do you want to generate SSH keys?"; then
-    ssh_gen_script="$CURRENT_DIR/git/ssh-gen.sh"
-    if [ -f "$ssh_gen_script" ]; then
-        # shellcheck disable=SC1090  # runtime path, not resolvable statically
-        source "$ssh_gen_script" || echo "Error executing $ssh_gen_script"
-    else
-        echo "$ssh_gen_script not found, skipping."
+    source_libs "${STAGE_ZERO_LIBS[@]}"
+    if [ -f "$SETUP_ROOT/setup/lib/bootstrap-$SETUP_OS.sh" ]; then
+        source_libs "bootstrap-$SETUP_OS"
     fi
-fi
-
-# Configure SSH commit signing
-if prompt_user "Do you want to configure SSH commit signing?"; then
-    git_signing_script="$CURRENT_DIR/git/git-signing.sh"
-    if [ -f "$git_signing_script" ]; then
-        # shellcheck disable=SC1090  # runtime path, not resolvable statically
-        source "$git_signing_script" || echo "Error executing $git_signing_script"
-    else
-        echo "$git_signing_script not found, skipping."
+    if [ "${BASH_VERSINFO[0]}" -lt 5 ]; then
+        restart_under_modern_bash "$command" "${original_arguments[@]}"
+        exit $?
     fi
-fi
 
-# Fonts last: the private fonts repo is cloned over SSH, so this must run after
-# SSH key generation / signing above, otherwise a fresh machine has no auth yet.
-install_fonts
+    # After a pull this process still holds the old setup.sh and stage 0 libs, so it starts over to run the code it just fetched. SETUP_PULLED stops the second pass from pulling again.
+    if [ "$command" = update ] && [ "$SETUP_DRY_RUN" = false ] && [ -z "${SETUP_PULLED:-}" ]; then
+        if git -C "$SETUP_ROOT" pull --ff-only; then
+            SETUP_PULLED=1 exec "$BASH" "$SETUP_ROOT/setup.sh" "${original_arguments[@]}"
+        fi
+        say_warn "could not pull $SETUP_ROOT, updating from the current checkout"
+    fi
 
-# aispeak: also a private SSH clone, so likewise after SSH setup. No-op without
-# repo access; loaded by zshrc/aliases/utils/aispeak only when the clone exists.
-install_aispeak
+    source_libs "${MODERN_LIBS[@]}"
+    local file
+    for file in "$SETUP_ROOT"/setup/components/*.sh; do
+        # shellcheck disable=SC1090  # path is built at runtime
+        source "$file" || exit 1
+    done
 
-# loopctl + router: private clones too, so after gh/SSH auth is in place.
-# Warn-and-continue without repo access, Go, or a build; never fail setup.
-install_loopctl
-install_router
+    select_components "$only" "$skip" || exit 2
 
-# TODO:
-# https://iterm2colorschemes.com
+    case "$command" in
+        init)
+            run_phase install || exit 1
+            hint_shortcut
+            ;;
+        update) run_phase update ;;
+        doctor) run_phase check ;;
+        components) list_components ;;
+    esac
+}
+
+# main is called on the last line so bash has parsed the whole file before `update` pulls a newer copy over it.
+main "$@"

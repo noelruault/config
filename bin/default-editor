@@ -1,0 +1,49 @@
+#!/usr/bin/env swift
+// Usage: default-editor [AppName | /path/App.app | --show]; usage and the LaunchAgent are in bin/README.md.
+// Sync must write only types that differ from plain text: its own write re-fires the LaunchAgent, and the idempotent second run is what stops the loop.
+import AppKit
+import UniformTypeIdentifiers
+
+let source = UTType.plainText
+let followers = ["public.shell-script", "public.bash-script", "public.zsh-script", "public.csh-script", "public.ksh-script", "public.tcsh-script"].compactMap(UTType.init)
+
+func app(_ t: UTType) -> URL? { NSWorkspace.shared.urlForApplication(toOpen: t) }
+
+func set(_ appURL: URL, _ types: [UTType]) -> Bool {
+    let group = DispatchGroup()
+    var ok = true
+    for t in types {
+        group.enter()
+        NSWorkspace.shared.setDefaultApplication(at: appURL, toOpen: t) { err in
+            if let err { FileHandle.standardError.write("\(t.identifier): \(err.localizedDescription)\n".data(using: .utf8)!); ok = false }
+            group.leave()
+        }
+    }
+    group.wait()
+    return ok
+}
+
+let args = Array(CommandLine.arguments.dropFirst())
+
+if args.first == "--show" {
+    for t in [source] + followers { print("\(t.identifier) -> \(app(t)?.lastPathComponent ?? "none")") }
+    exit(0)
+}
+
+if let name = args.first {
+    let candidates = [name, "/Applications/\(name).app", "/System/Applications/\(name).app", "/Applications/\(name)"]
+    guard let path = candidates.first(where: { $0.hasSuffix(".app") && FileManager.default.fileExists(atPath: $0) }) else {
+        FileHandle.standardError.write("default-editor: no app at \(candidates.joined(separator: " or "))\n".data(using: .utf8)!)
+        exit(2)
+    }
+    if !set(URL(fileURLWithPath: path), [source]) { exit(1) }
+}
+
+guard let target = app(source) else {
+    FileHandle.standardError.write("default-editor: no app opens \(source.identifier)\n".data(using: .utf8)!)
+    exit(1)
+}
+let stale = followers.filter { app($0)?.standardizedFileURL != target.standardizedFileURL }
+if stale.isEmpty { exit(0) }
+if !set(target, stale) { exit(1) }
+print("\(stale.map(\.identifier).joined(separator: ", ")) -> \(target.lastPathComponent)")

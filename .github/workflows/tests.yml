@@ -1,0 +1,92 @@
+# Two jobs: the test suite (which includes the GUIDELINES.md rules, tests/test_slop.zsh), and a real `setup.sh init` on a machine that has never seen this repo.
+# GitHub-hosted on purpose: this repo is public, and a self-hosted runner would run a fork's pull request code on a personal machine.
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  # Nothing in the repo has to change for setup to break: a formula gets renamed, an installer moves, macos-latest becomes a new macOS.
+  schedule:
+    - cron: "17 6 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  tests:
+    runs-on: macos-latest
+    timeout-minutes: 10
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Without shellcheck and shfmt the lint cases skip instead of failing. bash is the bash 5 that setup restarts itself under.
+      - name: Install bash 5, shellcheck and shfmt
+        run: brew install bash shellcheck shfmt
+      - run: tests/run.sh
+      - name: The setup plan resolves
+        run: ./setup.sh init --dry-run
+
+  fresh-machine:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    env:
+      # A component step that prints nothing about what it did fails the run here; for a person the runner writes a closing line instead.
+      SETUP_STRICT_REPORT: 1
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # A new Mac has only the bash 3.2 from macOS. If the runner image ever ships Homebrew's bash, stage 0 would stop being exercised without this.
+      - name: Start without bash 5
+        run: |
+          if brew list bash > /dev/null 2>&1; then brew uninstall --ignore-dependencies bash; fi
+          for bash5 in /opt/homebrew/bin/bash /usr/local/bin/bash; do
+            if [ -e "$bash5" ]; then echo "::error::$bash5 still exists"; exit 1; fi
+          done
+          /bin/bash -c 'echo "starting under bash $BASH_VERSION"; [ "${BASH_VERSINFO[0]}" -lt 5 ]'
+
+      - name: Without bash 5, doctor says so instead of crashing
+        run: |
+          status=0
+          out=$(/bin/bash ./setup.sh doctor 2>&1) || status=$?
+          echo "$out"
+          [ "$status" -eq 1 ]
+          grep -q "bash 5 is not installed" <<< "$out"
+
+      # No terminal here, so the steps that ask questions or need a password are skipped as warnings, and the private repos are not reachable. Neither may fail the run.
+      - name: setup.sh init
+        run: /bin/bash ./setup.sh init --yes
+
+      - name: Required components are healthy
+        run: ./setup.sh doctor
+
+      - name: Components that need neither a terminal nor private access are fully set up
+        run: |
+          out=$(./setup.sh doctor --only config_link,homebrew,packages,oh_my_zsh,shell_rc,bin_links)
+          echo "$out"
+          if grep -qE '✗|⚠' <<< "$out"; then exit 1; fi
+          [ "$(cd ~/.config && pwd -P)" = "$(pwd -P)" ]
+
+      - name: setup.sh init is safe to run again
+        run: |
+          ./setup.sh init --yes
+          backups=$(find ~ -maxdepth 1 -name '.backup-config-*' | wc -l)
+          echo "backups of ~/.config: $backups"
+          [ "$backups" -le 1 ]
+
+      - name: setup.sh update
+        run: ./setup.sh update --yes --skip homebrew
+
+      # Second run of the suite, now with every Brewfile tool present, so the cases that skip without ffmpeg or cwebp run too.
+      - name: Test suite on the installed machine
+        run: tests/run.sh
