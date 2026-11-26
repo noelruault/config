@@ -17,6 +17,8 @@ setup() { SETUP_STRICT_REPORT=1 "$modern_bash" "$REPO/setup.sh" "$@" 2>&1; }
 with_fixture_components() {
     "$modern_bash" -c '
         SETUP_ROOT=$1 SETUP_DRY_RUN=false SETUP_ASSUME_YES=false
+        # These made-up components are silent on purpose, so a strict setting inherited from the caller (CI exports one) would fail cases that are about something else. A case that wants it sets it.
+        unset SETUP_STRICT_REPORT
         for file in ui platform registry runner; do source "$1/setup/lib/$file.sh"; done
         COMPONENT_ORDER=(first second third)
         define_component first all optional "fails, optional"
