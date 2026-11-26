@@ -97,9 +97,16 @@ function i.pwgen() {
         password+="${all_chars:$idx:1}"
     done
 
-    # Shuffle the password
-    echo "$password" | fold -w1 | shuf | tr -d "\n"
-    echo
+    # Shuffled here rather than through shuf: that is GNU coreutils, and on a Mac without it this printed an empty password.
+    local -a chars=( ${(s::)password} )
+    local j swap
+    for ((i=${#chars}; i>1; i--)); do
+        j=$((RANDOM % i + 1))
+        swap=$chars[i]
+        chars[i]=$chars[j]
+        chars[j]=$swap
+    done
+    echo "${(j::)chars}"
 }
 
 function fileformat(){

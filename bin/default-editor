@@ -19,7 +19,11 @@ func set(_ appURL: URL, _ types: [UTType]) -> Bool {
             group.leave()
         }
     }
-    group.wait()
+    // Bounded: with no logged-in desktop to answer (a CI runner, an ssh session) macOS never calls back, and an unbounded wait held a whole setup run until its job was killed.
+    if group.wait(timeout: .now() + 20) == .timedOut {
+        FileHandle.standardError.write("default-editor: macOS did not answer within 20 seconds, nothing changed\n".data(using: .utf8)!)
+        return false
+    }
     return ok
 }
 

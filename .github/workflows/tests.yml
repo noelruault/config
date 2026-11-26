@@ -64,7 +64,9 @@ jobs:
           grep -q "bash 5 is not installed" <<< "$out"
 
       # No terminal here, so the steps that ask questions or need a password are skipped as warnings, and the private repos are not reachable. Neither may fail the run.
+      # The cap is well above a normal run (a few minutes): a step waiting on a person who is not there should fail here, not eat the whole job.
       - name: setup.sh init
+        timeout-minutes: 15
         run: /bin/bash ./setup.sh init --yes
 
       - name: Required components are healthy
